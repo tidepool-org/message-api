@@ -7,15 +7,14 @@ var should = require('chai').should(),
 
 describe('message API', function() {
 
-    
+    before(function(){
+        api = supertest('http://localhost:'+config.port);
+    });
+
     describe('get /api/message/:msgId', function() {
 
-        before(function(){
-            api = supertest('http://localhost:'+config.port);
-        });
-
         it('should not work without msgId parameter', function(done) {
-            api.get('/api/message')
+            api.get('/api/message/read')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -24,7 +23,7 @@ describe('message API', function() {
         });
 
         it('returns message for given id as JSON', function(done) {
-            api.get('/api/message/121')
+            api.get('/api/message/read/121')
             .expect(200)
             .expect('Content-Type', /json/)
             .end(function(err, res) {
@@ -36,17 +35,50 @@ describe('message API', function() {
 
     });
 
-    describe('put /api/message/send/:groupId', function() {
+    describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
 
-        before(function(){
-            api = supertest('http://localhost:'+config.port);
+    
+        it('should not work without patientid parameter', function(done) {
+            api.get('/api/message/all')
+            .expect(404)
+            .end(function(err, res) {
+                if (err) return done(err);
+                done();
+            });
         });
 
+        it('returns messages for given id as JSON', function(done) {
+            api.get('/api/message/all/12342/8766663922/8766665000')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .end(function(err, res) {
+                if (err) return done(err);
+                res.body.should.have.property('messages').and.be.instanceof(Array);
+                done();
+            });
+        });
+
+        it('returns messages for given id as JSON', function(done) {
+            api.get('/api/message/all/12342/8766663922')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .end(function(err, res) {
+                if (err) return done(err);
+                res.body.should.have.property('messages').and.be.instanceof(Array);
+                done();
+            });
+        });
+
+    });
+
+    describe('put /api/message/send/:groupId', function() {
+
+        
         it('should not work without groupId parameter', function(done) {
 
             api.put('/api/message/send')
             .send({message:'here it is'})
-            .expect(405)
+            .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
                 done();
