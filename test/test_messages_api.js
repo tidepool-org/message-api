@@ -58,6 +58,11 @@ describe('message API', function() {
             });
         });
 
+    });
+
+    describe('get /api/message/all/:patientid/:starttime', function() {
+
+
         it('returns messages for given id as JSON', function(done) {
             api.get('/api/message/all/12342/8766663922')
             .expect(200)
