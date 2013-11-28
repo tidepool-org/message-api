@@ -33,6 +33,31 @@ describe('message API', function() {
             });
         });
 
+        it('returns message in the described format', function(done) {
+            api.get('/api/message/read/121')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .end(function(err, res) {
+                if (err) return done(err);
+
+                var message = res.body.message;
+                message.should.be.instanceof(Array);
+
+
+                done();
+            });
+        });
+
+        /*
+            {
+                EventId : ''
+                PatientId : ''
+                GroupId : ''
+                TimeStamp : ''
+                MessageText: ''
+            }
+        */
+
     });
 
     describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
@@ -60,8 +85,7 @@ describe('message API', function() {
 
     });
 
-    describe('get /api/message/all/:patientid/:starttime', function() {
-
+    describe('get /api/message/all/:patientid/:starttime also works without endtime', function() {
 
         it('returns messages for given id as JSON', function(done) {
             api.get('/api/message/all/12342/8766663922')
