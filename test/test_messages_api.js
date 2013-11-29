@@ -3,7 +3,16 @@
 var should = require('chai').should(),
     supertest = require('supertest'),
     config = require('../env'),
-    api;
+    api, 
+    testMessage;    
+
+    
+testMessage = {
+        UserId: "12121212",
+        GroupId: "999",
+        TimeStamp: "2013-11-28T23:07:40+00:00",
+        MessageText: "In three words I can sum up everything I've learned about life: it goes on."
+    };    
 
 describe('message API', function() {
 
@@ -34,6 +43,9 @@ describe('message API', function() {
         });
 
         it('returns message in the described format', function(done) {
+
+            var messageFields = ['Id', 'UserId','GroupId', 'TimeStamp', 'MessageText'];
+
             api.get('/api/message/read/121')
             .expect(200)
             .expect('Content-Type', /json/)
@@ -41,22 +53,12 @@ describe('message API', function() {
                 if (err) return done(err);
 
                 var message = res.body.message;
-                message.should.be.instanceof(Array);
-
+                var theMessage = message[0];
+                theMessage.should.have.keys(messageFields);
 
                 done();
             });
         });
-
-        /*
-            {
-                EventId : ''
-                PatientId : ''
-                GroupId : ''
-                TimeStamp : ''
-                MessageText: ''
-            }
-        */
 
     });
 
@@ -118,7 +120,7 @@ describe('message API', function() {
         it('returns 201', function(done) {
 
             api.put('/api/message/send/12345')
-            .send({message:'here it is'})
+            .send({message:testMessage})
             .expect(201)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -127,5 +129,16 @@ describe('message API', function() {
 
         });
 
+        it('given message', function(done) {
+
+            api.put('/api/message/send/12345')
+            .expect(201)
+            .send({message:testMessage}).end(function(err, res) {
+                if (err) return done(err);
+                console.log('id in test',res.body.id)
+                res.body.should.have.property('id').and.not.be.empty;
+                done();
+            });
+        });
     });
 });

@@ -15,7 +15,8 @@
   "dependencies": {
     "restify": "~2.6.0",
     "request": "~2.25.0",
-    "cookies": "~0.3.6"
+    "cookies": "~0.3.6",
+    "mongojs": "~0.9.8"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
