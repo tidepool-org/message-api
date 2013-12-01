@@ -3,24 +3,72 @@
 var should = require('chai').should(),
     supertest = require('supertest'),
     config = require('../env'),
+    mongojs = require('mongojs'),
+    testDbInstance,
     api, 
-    testMessage;    
+    testMessages, 
+    messageIds;   
 
-    
-testMessage = {
+/*
+Dummy messages that we load for tests
+*/    
+testMessages = [{
         UserId: "12121212",
         GroupId: "999",
         TimeStamp: "2013-11-28T23:07:40+00:00",
         MessageText: "In three words I can sum up everything I've learned about life: it goes on."
-    };    
+    },
+    {
+        UserId: "232323",
+        GroupId: "777",
+        TimeStamp: "2013-11-29T23:05:40+00:00",
+        MessageText: "Second message."
+    },
+    {
+        UserId: "232323",
+        GroupId: "777",
+        TimeStamp: "2013-11-30T23:05:40+00:00",
+        MessageText: "Third message."
+    },
+    {
+        UserId: "232323",
+        GroupId: "777",
+        TimeStamp: "2013-11-25T23:05:40+00:00",
+        MessageText: "First message."
+    }];
 
 describe('message API', function() {
 
     before(function(){
+        /*
+        Setup api and also load data for tests
+        */
         api = supertest('http://localhost:'+config.port);
+
+        testDbInstance = mongojs('mongodb://localhost/message-api', ['messages']);
+    
+        testDbInstance.messages.remove();
+
+        testMessages.forEach(function(message) {
+            testDbInstance.messages.save(message);
+        });
+
     });
 
+
     describe('get /api/message/:msgId', function() {
+
+        var testMessageId;
+
+        beforeEach(function(done){
+            /*
+            Get id of existing message for tests 
+            */
+            testDbInstance.messages.findOne({},function(err, doc) {
+                testMessageId = doc._id;
+                done();                
+            });
+        });
 
         it('should not work without msgId parameter', function(done) {
             api.get('/api/message/read')
@@ -32,7 +80,8 @@ describe('message API', function() {
         });
 
         it('returns message for given id as JSON', function(done) {
-            api.get('/api/message/read/121')
+
+            api.get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', /json/)
             .end(function(err, res) {
@@ -42,11 +91,11 @@ describe('message API', function() {
             });
         });
 
-        it('returns message in the described format', function(done) {
+        it('returns message with Id, UserId, GroupId, TimeStamp , MessageText', function(done) {
 
             var messageFields = ['Id', 'UserId','GroupId', 'TimeStamp', 'MessageText'];
 
-            api.get('/api/message/read/121')
+            api.get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', /json/)
             .end(function(err, res) {
@@ -54,15 +103,36 @@ describe('message API', function() {
 
                 var message = res.body.message;
                 var theMessage = message[0];
+                
                 theMessage.should.have.keys(messageFields);
 
                 done();
             });
         });
 
+        it('returns 204 if no message found for id', function(done) {
+
+            api.get('/api/message/read/529bbc61094d17a104066001')
+            .expect(204)
+            .end(function(err, res) {
+                if (err) return done(err);
+                done();
+            });
+        });
+
+        it('returns 417 if a bad id is given', function(done) {
+
+            api.get('/api/message/read/badIdGiven')
+            .expect(417)
+            .end(function(err, res) {
+                if (err) return done(err);
+                done();
+            });
+        });
+
     });
 
-    describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
+    /*describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
 
     
         it('should not work without patientid parameter', function(done) {
@@ -140,5 +210,5 @@ describe('message API', function() {
                 done();
             });
         });
-    });
+    });*/
 });

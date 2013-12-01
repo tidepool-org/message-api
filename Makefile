@@ -1,26 +1,25 @@
 TESTS=test/*.js
 OPTS=-R tap
 
-
 all: build install
 
 install:
 	npm install
 
+mongo-setup:
+	mongod
+	mongo
+
+start-api:
+	source config/local.sh
+	node lib/index.js
+
 test:
-	grunt jshint
+	mocha --timeout 5000 --reporter $(TESTS)
 
 build:
-	grunt
+	jshint test/*.js
+	jshint lib/*.js
 
-docs/: lib/
-	grunt
-
-travis:
-	# set up for travis
-	npm install -g grunt mocha jshint grunt-cli
-	uname -a
-
-configure:
-	
+.PHONY: test
 
