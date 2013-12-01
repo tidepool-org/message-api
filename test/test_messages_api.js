@@ -225,5 +225,22 @@ describe('message API', function() {
                 done();
             });
         });
+
+        it('return 417 when messages to add does not meet the requirements', function(done) {
+
+            var invalidMessage = {
+                UserId: "12345",
+                TimeStamp: "2013-12-04T23:05:40+00:00",
+                MessageText: ""
+            };
+
+            api.put('/api/message/send/12345')
+            .expect(417)
+            .send({message:invalidMessage})
+            .end(function(err, res) {
+                if (err) return done(err);
+                done();
+            });
+        });
     });
 });
