@@ -103,7 +103,7 @@ describe('message API', function() {
 
                 var message = res.body.message;
                 var theMessage = message[0];
-                
+
                 theMessage.should.have.keys(messageFields);
 
                 done();
@@ -170,9 +170,10 @@ describe('message API', function() {
             });
         });
 
-    });
+    });*/
 
     describe('put /api/message/send/:groupId', function() {
+
 
         
         it('should not work without groupId parameter', function(done) {
@@ -189,6 +190,13 @@ describe('message API', function() {
 
         it('returns 201', function(done) {
 
+            var testMessage = {
+                UserId: "12345",
+                GroupId: "777",
+                TimeStamp: "2013-11-29T23:05:40+00:00",
+                MessageText: "Test put message 1."
+            };
+
             api.put('/api/message/send/12345')
             .send({message:testMessage})
             .expect(201)
@@ -199,16 +207,23 @@ describe('message API', function() {
 
         });
 
-        it('given message', function(done) {
+        it('return Id when message added', function(done) {
+
+            var testMessage = {
+                UserId: "12345",
+                GroupId: "777",
+                TimeStamp: "2013-12-04T23:05:40+00:00",
+                MessageText: "Test put message 2."
+            };
 
             api.put('/api/message/send/12345')
             .expect(201)
-            .send({message:testMessage}).end(function(err, res) {
+            .send({message:testMessage})
+            .end(function(err, res) {
                 if (err) return done(err);
-                console.log('id in test',res.body.id)
-                res.body.should.have.property('id').and.not.be.empty;
+                res.body.should.have.property('Id').and.not.be.empty;
                 done();
             });
         });
-    });*/
+    });
 });
