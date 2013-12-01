@@ -1,1 +1,0 @@
-export MONGO_CONNECTION_STRING="mongodb://localhost/blip"
