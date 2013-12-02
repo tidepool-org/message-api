@@ -150,7 +150,7 @@ describe('message API', function() {
             });
         });
 
-        it('returns messages for given id 777 as JSON', function(done) {
+        it('returns messages for given id 777 between the given dates', function(done) {
 
             api.get('/api/message/all/777/2013-11-25/2013-11-30')
             .expect(200)
@@ -164,10 +164,10 @@ describe('message API', function() {
 
     });
 
-    /*describe('get /api/message/all/:patientid/:starttime also works without endtime', function() {
+    describe('get /api/message/all/:patientid/:starttime also works without endtime', function() {
 
-        it('returns messages for given id as JSON', function(done) {
-            api.get('/api/message/all/12342/8766663922')
+        it('returns messages for group and from given date', function(done) {
+            api.get('/api/message/all/777/2013-11-25')
             .expect(200)
             .expect('Content-Type', /json/)
             .end(function(err, res) {
@@ -177,7 +177,7 @@ describe('message API', function() {
             });
         });
 
-    });*/
+    });
 
     describe('put /api/message/send/:groupId', function() {
 
