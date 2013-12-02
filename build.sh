@@ -1,3 +1,5 @@
 #! /bin/bash -eu
 
-npm install .
+npm install . &
+wait
+. test.sh &

@@ -1,8 +1,11 @@
 #! /bin/bash -eu
 
-
-(. start.sh &)
-(exec mongod mongo &)
-(mocha test &)
+exec mongod &
+wait
+mongo &
+wait
+. start.sh &
+wait
+mocha test &
 
 
