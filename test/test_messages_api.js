@@ -55,15 +55,13 @@ describe('message API', function() {
 
     });
 
-
     describe('get /api/message/:msgId', function() {
 
         var testMessageId;
 
         beforeEach(function(done){
-            /*
-            Get id of existing message for tests 
-            */
+            
+            //Get id of existing message for tests 
             testDbInstance.messages.findOne({},function(err, doc) {
                 testMessageId = doc._id;
                 done();                
@@ -132,9 +130,8 @@ describe('message API', function() {
 
     });
 
-    /*describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
+    describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
 
-    
         it('should not work without patientid parameter', function(done) {
             api.get('/api/message/all')
             .expect(404)
@@ -144,8 +141,18 @@ describe('message API', function() {
             });
         });
 
-        it('returns messages for given id as JSON', function(done) {
-            api.get('/api/message/all/12342/8766663922/8766665000')
+        it('returns 204 when there are no messages for given id', function(done) {
+            api.get('/api/message/all/12342/2013-11-25/2013-11-30')
+            .expect(204)
+            .end(function(err, res) {
+                if (err) return done(err);
+                done();
+            });
+        });
+
+        it('returns messages for given id 777 as JSON', function(done) {
+
+            api.get('/api/message/all/777/2013-11-25/2013-11-30')
             .expect(200)
             .expect('Content-Type', /json/)
             .end(function(err, res) {
@@ -157,7 +164,7 @@ describe('message API', function() {
 
     });
 
-    describe('get /api/message/all/:patientid/:starttime also works without endtime', function() {
+    /*describe('get /api/message/all/:patientid/:starttime also works without endtime', function() {
 
         it('returns messages for given id as JSON', function(done) {
             api.get('/api/message/all/12342/8766663922')
