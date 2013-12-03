@@ -196,10 +196,10 @@ describe('message API', function() {
         it('returns 201', function(done) {
 
             var testMessage = {
-                UserId: "12345",
-                GroupId: "777",
-                Timestamp: "2013-11-29T23:05:40+00:00",
-                MessageText: "Test put message 1."
+                UserId : "12345",
+                GroupId : "777",
+                Timestamp : "2013-11-29T23:05:40+00:00",
+                MessageText : "Test put message 1."
             };
 
             api.post('/api/message/send/12345')
