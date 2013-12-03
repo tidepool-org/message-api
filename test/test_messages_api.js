@@ -118,10 +118,10 @@ describe('message API', function() {
             });
         });
 
-        it('returns 417 if a bad id is given', function(done) {
+        it('returns 400 if a bad id is given', function(done) {
 
             api.get('/api/message/read/badIdGiven')
-            .expect(417)
+            .expect(400)
             .end(function(err, res) {
                 if (err) return done(err);
                 done();
@@ -232,7 +232,7 @@ describe('message API', function() {
             });
         });
 
-        it('return 417 when messages to add does not meet the requirements', function(done) {
+        it('return 400 when messages to add does not meet the requirements', function(done) {
 
             var invalidMessage = {
                 userid: "12345",
@@ -241,7 +241,7 @@ describe('message API', function() {
             };
 
             api.post('/api/message/send/12345')
-            .expect(417)
+            .expect(400)
             .send({message:invalidMessage})
             .end(function(err, res) {
                 if (err) return done(err);
