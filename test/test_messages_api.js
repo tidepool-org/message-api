@@ -13,28 +13,28 @@ var should = require('chai').should(),
 Dummy messages that we load for tests
 */    
 testMessages = [{
-        UserId: "12121212",
-        GroupId: "999",
-        Timestamp: "2013-11-28T23:07:40+00:00",
-        MessageText: "In three words I can sum up everything I've learned about life: it goes on."
+        userid: "12121212",
+        groupid: "999",
+        timestamp: "2013-11-28T23:07:40+00:00",
+        messagetext: "In three words I can sum up everything I've learned about life: it goes on."
     },
     {
-        UserId: "232323",
-        GroupId: "777",
-        Timestamp: "2013-11-29T23:05:40+00:00",
-        MessageText: "Second message."
+        userid: "232323",
+        groupid: "777",
+        timestamp: "2013-11-29T23:05:40+00:00",
+        messagetext: "Second message."
     },
     {
-        UserId: "232323",
-        GroupId: "777",
-        Timestamp: "2013-11-30T23:05:40+00:00",
-        MessageText: "Third message."
+        userid: "232323",
+        groupid: "777",
+        timestamp: "2013-11-30T23:05:40+00:00",
+        messagetext: "Third message."
     },
     {
-        UserId: "232323",
-        GroupId: "777",
-        Timestamp: "2013-11-25T23:05:40+00:00",
-        MessageText: "First message."
+        userid: "232323",
+        groupid: "777",
+        timestamp: "2013-11-25T23:05:40+00:00",
+        messagetext: "First message."
     }];
 
 describe('message API', function() {
@@ -89,9 +89,9 @@ describe('message API', function() {
             });
         });
 
-        it('returns message with Id, UserId, GroupId, Timestamp , MessageText', function(done) {
+        it('returns message with id, userid, groupid, timestamp , messagetext', function(done) {
 
-            var messageFields = ['Id', 'UserId','GroupId', 'Timestamp', 'MessageText'];
+            var messageFields = ['id', 'userid','groupid', 'timestamp', 'messagetext'];
 
             api.get('/api/message/read/'+testMessageId)
             .expect(200)
@@ -180,9 +180,9 @@ describe('message API', function() {
 
     });
 
-    describe('post /api/message/send/:groupId', function() {
+    describe('post /api/message/send/:groupid', function() {
         
-        it('should not work without groupId parameter', function(done) {
+        it('should not work without groupid parameter', function(done) {
 
             api.post('/api/message/send')
             .send({message:'here it is'})
@@ -197,10 +197,10 @@ describe('message API', function() {
         it('returns 201', function(done) {
 
             var testMessage = {
-                UserId : "12345",
-                GroupId : "777",
-                Timestamp : "2013-11-29T23:05:40+00:00",
-                MessageText : "Test put message 1."
+                userid : "12345",
+                groupid : "777",
+                timestamp : "2013-11-29T23:05:40+00:00",
+                messagetext : "Test put message 1."
             };
 
             api.post('/api/message/send/12345')
@@ -216,10 +216,10 @@ describe('message API', function() {
         it('return Id when message added', function(done) {
 
             var testMessage = {
-                UserId: "12345",
-                GroupId: "777",
-                Timestamp: "2013-12-04T23:05:40+00:00",
-                MessageText: "Test put message 2."
+                userid: "12345",
+                groupid: "777",
+                timestamp: "2013-12-04T23:05:40+00:00",
+                messagetext: "Test put message 2."
             };
 
             api.post('/api/message/send/12345')
@@ -235,9 +235,9 @@ describe('message API', function() {
         it('return 417 when messages to add does not meet the requirements', function(done) {
 
             var invalidMessage = {
-                UserId: "12345",
-                Timestamp: "2013-12-04T23:05:40+00:00",
-                MessageText: ""
+                userid: "12345",
+                timestamp: "2013-12-04T23:05:40+00:00",
+                messagetext: ""
             };
 
             api.post('/api/message/send/12345')
