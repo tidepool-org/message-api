@@ -59,12 +59,11 @@ describe('message API', function() {
 
         var testMessageId;
 
-        beforeEach(function(done){
+        before(function(){
             
             //Get id of existing message for tests 
             testDbInstance.messages.findOne({},function(err, doc) {
                 testMessageId = doc._id;
-                done();                
             });
         });
 
