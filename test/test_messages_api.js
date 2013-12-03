@@ -110,7 +110,9 @@ describe('message API', function() {
 
         it('returns 204 if no message found for id', function(done) {
 
-            api.get('/api/message/read/529bbc61094d17a104066001')
+            var dummyId = mongojs.ObjectId().toString();
+
+            api.get('/api/message/read/'+dummyId)
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
