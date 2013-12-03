@@ -15,25 +15,25 @@ Dummy messages that we load for tests
 testMessages = [{
         UserId: "12121212",
         GroupId: "999",
-        TimeStamp: "2013-11-28T23:07:40+00:00",
+        Timestamp: "2013-11-28T23:07:40+00:00",
         MessageText: "In three words I can sum up everything I've learned about life: it goes on."
     },
     {
         UserId: "232323",
         GroupId: "777",
-        TimeStamp: "2013-11-29T23:05:40+00:00",
+        Timestamp: "2013-11-29T23:05:40+00:00",
         MessageText: "Second message."
     },
     {
         UserId: "232323",
         GroupId: "777",
-        TimeStamp: "2013-11-30T23:05:40+00:00",
+        Timestamp: "2013-11-30T23:05:40+00:00",
         MessageText: "Third message."
     },
     {
         UserId: "232323",
         GroupId: "777",
-        TimeStamp: "2013-11-25T23:05:40+00:00",
+        Timestamp: "2013-11-25T23:05:40+00:00",
         MessageText: "First message."
     }];
 
@@ -89,9 +89,9 @@ describe('message API', function() {
             });
         });
 
-        it('returns message with Id, UserId, GroupId, TimeStamp , MessageText', function(done) {
+        it('returns message with Id, UserId, GroupId, Timestamp , MessageText', function(done) {
 
-            var messageFields = ['Id', 'UserId','GroupId', 'TimeStamp', 'MessageText'];
+            var messageFields = ['Id', 'UserId','GroupId', 'Timestamp', 'MessageText'];
 
             api.get('/api/message/read/'+testMessageId)
             .expect(200)
@@ -179,13 +179,11 @@ describe('message API', function() {
 
     });
 
-    describe('put /api/message/send/:groupId', function() {
-
-
+    describe('post /api/message/send/:groupId', function() {
         
         it('should not work without groupId parameter', function(done) {
 
-            api.put('/api/message/send')
+            api.post('/api/message/send')
             .send({message:'here it is'})
             .expect(404)
             .end(function(err, res) {
@@ -200,11 +198,11 @@ describe('message API', function() {
             var testMessage = {
                 UserId: "12345",
                 GroupId: "777",
-                TimeStamp: "2013-11-29T23:05:40+00:00",
+                Timestamp: "2013-11-29T23:05:40+00:00",
                 MessageText: "Test put message 1."
             };
 
-            api.put('/api/message/send/12345')
+            api.post('/api/message/send/12345')
             .send({message:testMessage})
             .expect(201)
             .end(function(err, res) {
@@ -219,11 +217,11 @@ describe('message API', function() {
             var testMessage = {
                 UserId: "12345",
                 GroupId: "777",
-                TimeStamp: "2013-12-04T23:05:40+00:00",
+                Timestamp: "2013-12-04T23:05:40+00:00",
                 MessageText: "Test put message 2."
             };
 
-            api.put('/api/message/send/12345')
+            api.post('/api/message/send/12345')
             .expect(201)
             .send({message:testMessage})
             .end(function(err, res) {
@@ -237,11 +235,11 @@ describe('message API', function() {
 
             var invalidMessage = {
                 UserId: "12345",
-                TimeStamp: "2013-12-04T23:05:40+00:00",
+                Timestamp: "2013-12-04T23:05:40+00:00",
                 MessageText: ""
             };
 
-            api.put('/api/message/send/12345')
+            api.post('/api/message/send/12345')
             .expect(417)
             .send({message:invalidMessage})
             .end(function(err, res) {
