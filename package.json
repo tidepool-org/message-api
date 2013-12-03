@@ -16,7 +16,9 @@
     "restify": "2.6.0",
     "request": "2.25.0",
     "cookies": "0.3.6",
-    "mongojs": "0.9.8"
+    "mongojs": "0.9.8",
+    "lodash": "2.4.1",
+    "bunyan": "0.22.1"
   },
   "devDependencies": {
     "supertest": "0.8.1",
