@@ -59,11 +59,12 @@ describe('message API', function() {
 
         var testMessageId;
 
-        before(function(){
+        before(function(done){
             
             //Get id of existing message for tests 
             testDbInstance.messages.findOne({},function(err, doc) {
                 testMessageId = doc._id;
+                done();
             });
         });
 
@@ -128,6 +129,7 @@ describe('message API', function() {
         });
 
     });
+
 
     describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
 
@@ -247,4 +249,5 @@ describe('message API', function() {
             });
         });
     });
+   
 });
