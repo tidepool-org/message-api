@@ -142,7 +142,7 @@ describe('message API', function() {
         });
     });
 
-    describe('get /api/message/all/:groupid/:starttime/:endtime', function() {
+    describe('get /api/message/all/:groupid?starttime=xxx&endtime=yyy', function() {
 
         it('should not work without groupid parameter', function(done) {
             api.get('/api/message/all')
@@ -176,7 +176,7 @@ describe('message API', function() {
 
     });
 
-    describe('get /api/message/all/:groupid?starttime= also works without endtime', function() {
+    describe('get /api/message/all/:groupid?starttime=xxx also works without endtime', function() {
 
         it('returns messages for group and from given date', function(done) {
             api.get('/api/message/all/777?starttime=2013-11-25')
