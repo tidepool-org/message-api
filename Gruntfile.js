@@ -53,9 +53,8 @@ module.exports = function(grunt) {
                 'mongo'
             ].join('&&'),
         options: {
-          async: true,
-          failOnError: false,
-          execOptions: { detached: true }
+          async: false,
+          failOnError: false
         }
       },
       startAPI: {
@@ -65,8 +64,7 @@ module.exports = function(grunt) {
                 'node lib/index.js'
             ].join('&&'),
         options: {
-          async: true,
-          execOptions: { detached: true }
+          async: false
         }
       }
     },
@@ -88,9 +86,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
 
   // Default task(s).
-  grunt.registerTask('default', ['shell:startMongo','shell:startAPI','mochaTest']);
+  grunt.registerTask('default', ['mochaTest']);
   // Standard tasks
-  grunt.registerTask('test', ['shell:startMongo','shell:startAPI','mochaTest']);
-  grunt.registerTask('start', ['shell:startAPI']);
+  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('start-mongo', ['shell:startMongo']);
+  grunt.registerTask('start-api', ['shell:startAPI']);
 
 };
