@@ -144,7 +144,7 @@ describe('message API', function() {
             });
         });
 
-        it('returns 204 when there are no messages for given id', function(done) {
+        it('returns 204 when there are no messages for given groupid', function(done) {
             api.get('/api/message/all/12342/2013-11-25/2013-11-30')
             .expect(204)
             .end(function(err, res) {
@@ -153,7 +153,7 @@ describe('message API', function() {
             });
         });
 
-        it('returns messages for given id 777 between the given dates', function(done) {
+        it('returns messages for given groupid 777 between the given dates', function(done) {
 
             api.get('/api/message/all/777/2013-11-25/2013-11-30')
             .expect(200)
