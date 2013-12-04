@@ -1,17 +1,17 @@
 'use strict';
-
+/* jshint -W079 *//* jshint -W098 */
 var should = require('chai').should(),
+/* jshint +W079 *//* jshint +W098 */
     supertest = require('supertest'),
     config = require('../env'),
     mongojs = require('mongojs'),
     testDbInstance,
-    api, 
-    testMessages, 
-    messageIds;   
+    api,
+    testMessages;
 
 /*
 Dummy messages that we load for tests
-*/    
+*/
 testMessages = [{
         userid: '12121212',
         groupid: '999',
@@ -238,7 +238,7 @@ describe('message API', function() {
             .send({message:testMessage})
             .end(function(err, res) {
                 if (err) return done(err);
-                res.body.should.have.property('Id').and.not.be.empty;
+                res.body.should.have.property('Id');
                 done();
             });
         });
