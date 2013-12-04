@@ -33,7 +33,8 @@ Start the server for the API with:
 ```grunt start-api```
 
 
-**Running Tests**
+## Running Integration Tests
+
 To run the integration tests in seperate terminal windows do the following
 
 ```grunt start-mongo```
