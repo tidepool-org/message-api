@@ -26,28 +26,38 @@ source config/local.sh
 
 If running locally, you will need to start a local instance of MongoDB:
 
-```grunt start-mongo```
+```bash
+grunt start-mongo
+```
 
 Start the server for the API with:
 
-```grunt start-api```
+```bash
+grunt start-api
+```
 
 
 ## Running Integration Tests
 
-To run the integration tests in seperate terminal windows do the following
+To run the integration tests in three seperate terminal windows do the following
 
-```grunt start-mongo```
+```bash
+grunt start-mongo
+```
 
-```grunt start-api```
+```bash
+grunt start-api
+```
 
-```grunt test```
+```bash
+grunt test
+```
 
 ## Config
 
 By default, the message-api runs on port **3002**. You can change this by setting the `PORT` environment variable.
 
-Configuration is handled by `env.js` and loads environment variables. Check the file for defaults and documentation.
+Configuration is handled by `env.js` and loads environment variables. Check the file for defaults and documentatio.
 
 You can set environment variables manually, or use a bash script. For example:
 
