@@ -58,12 +58,14 @@ describe('message API', function() {
     describe('get /api/message/:msgId', function() {
 
         var testMessageId;
+        var testMessageContent;
 
         before(function(done){
             
             //Get id of existing message for tests 
             testDbInstance.messages.findOne({},function(err, doc) {
                 testMessageId = doc._id;
+                testMessageContent = doc;
                 done();
             });
         });
@@ -77,7 +79,7 @@ describe('message API', function() {
             });
         });
 
-        it('returns message for given id as JSON', function(done) {
+        it('returns message for given id as JSON with content we expect', function(done) {
 
             api.get('/api/message/read/'+testMessageId)
             .expect(200)
@@ -85,6 +87,15 @@ describe('message API', function() {
             .end(function(err, res) {
                 if (err) return done(err);
                 res.body.should.have.property('message').and.be.instanceof(Array);
+
+                var theMessage = res.body.message[0];
+
+                theMessage.id.should.equal(String(testMessageId));
+                theMessage.timestamp.should.equal(String(testMessageContent.timestamp));
+                theMessage.groupid.should.equal(String(testMessageContent.groupid));
+                theMessage.userid.should.equal(String(testMessageContent.userid));
+                theMessage.messagetext.should.equal(String(testMessageContent.messagetext));
+
                 done();
             });
         });
