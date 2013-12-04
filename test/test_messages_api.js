@@ -129,13 +129,11 @@ describe('message API', function() {
                 done();
             });
         });
-
     });
 
+    describe('get /api/message/all/:groupid/:starttime/:endtime', function() {
 
-    describe('get /api/message/all/:patientid/:starttime/:endtime', function() {
-
-        it('should not work without patientid parameter', function(done) {
+        it('should not work without groupid parameter', function(done) {
             api.get('/api/message/all')
             .expect(404)
             .end(function(err, res) {
@@ -145,7 +143,7 @@ describe('message API', function() {
         });
 
         it('returns 204 when there are no messages for given groupid', function(done) {
-            api.get('/api/message/all/12342/2013-11-25/2013-11-30')
+            api.get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -155,7 +153,7 @@ describe('message API', function() {
 
         it('returns messages for given groupid 777 between the given dates', function(done) {
 
-            api.get('/api/message/all/777/2013-11-25/2013-11-30')
+            api.get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
             .expect(200)
             .expect('Content-Type', /json/)
             .end(function(err, res) {
@@ -167,10 +165,10 @@ describe('message API', function() {
 
     });
 
-    describe('get /api/message/all/:patientid/:starttime also works without endtime', function() {
+    describe('get /api/message/all/:groupid?starttime= also works without endtime', function() {
 
         it('returns messages for group and from given date', function(done) {
-            api.get('/api/message/all/777/2013-11-25')
+            api.get('/api/message/all/777?starttime=2013-11-25')
             .expect(200)
             .expect('Content-Type', /json/)
             .end(function(err, res) {
