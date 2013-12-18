@@ -45,7 +45,7 @@ describe('message API', function() {
         */
         api = supertest('http://localhost:'+config.port);
 
-        testDbInstance = mongojs('mongodb://localhost/message-api', ['messages']);
+        testDbInstance = mongojs('mongodb://localhost/tidepool-platform', ['messages']);
     
         testDbInstance.messages.remove();
 
@@ -86,9 +86,8 @@ describe('message API', function() {
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
                 if (err) return done(err);
-                res.body.should.have.property('message').and.be.instanceof(Array);
-
-                var theMessage = res.body.message[0];
+                
+                var theMessage = res.body.message;
 
                 theMessage.id.should.equal(String(testMessageId));
                 theMessage.timestamp.should.equal(String(testMessageContent.timestamp));
@@ -111,7 +110,7 @@ describe('message API', function() {
                 if (err) return done(err);
 
                 var message = res.body.message;
-                var theMessage = message[0];
+                var theMessage = message;
 
                 theMessage.should.have.keys(messageFields);
 
@@ -131,10 +130,10 @@ describe('message API', function() {
             });
         });
 
-        it('returns 400 if a bad id is given', function(done) {
+        it('returns 204 if a bad id is given', function(done) {
 
             api.get('/api/message/read/badIdGiven')
-            .expect(400)
+            .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
                 done();
