@@ -5,8 +5,10 @@ var should = require('chai').should(),
     supertest = require('supertest'),
     config = require('../env'),
     mongojs = require('mongojs'),
+    messagesService,
     testDbInstance,
-    api,
+    crud,
+    apiEndPoint,
     testMessages;
 
 /*
@@ -43,7 +45,15 @@ describe('message API', function() {
         /*
         Setup api and also load data for tests
         */
-        api = supertest('http://localhost:'+config.port);
+
+
+        config = require('../env');
+        crud = require('../lib/handler/mongoHandler')(config.mongoDbConnectionString);
+
+        apiEndPoint = 'http://localhost:'+config.port;
+
+        messagesService = require('../lib/messagesService')(crud,config.port);
+        messagesService.start();
 
         testDbInstance = mongojs('mongodb://localhost/tidepool-platform', ['messages']);
     
@@ -53,6 +63,10 @@ describe('message API', function() {
             testDbInstance.messages.save(message);
         });
 
+    });
+
+    after(function(){
+        messagesService.stop();
     });
 
     describe('get /api/message/:msgId', function() {
@@ -71,7 +85,7 @@ describe('message API', function() {
         });
 
         it('should not work without msgId parameter', function(done) {
-            api.get('/api/message/read')
+            supertest(apiEndPoint).get('/api/message/read')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -81,7 +95,7 @@ describe('message API', function() {
 
         it('returns message for given id as JSON with content we expect', function(done) {
 
-            api.get('/api/message/read/'+testMessageId)
+            supertest(apiEndPoint).get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -103,7 +117,7 @@ describe('message API', function() {
 
             var messageFields = ['id', 'userid','groupid', 'timestamp', 'messagetext'];
 
-            api.get('/api/message/read/'+testMessageId)
+            supertest(apiEndPoint).get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -122,7 +136,7 @@ describe('message API', function() {
 
             var dummyId = mongojs.ObjectId().toString();
 
-            api.get('/api/message/read/'+dummyId)
+            supertest(apiEndPoint).get('/api/message/read/'+dummyId)
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -132,7 +146,7 @@ describe('message API', function() {
 
         it('returns 204 if a bad id is given', function(done) {
 
-            api.get('/api/message/read/badIdGiven')
+            supertest(apiEndPoint).get('/api/message/read/badIdGiven')
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -144,7 +158,7 @@ describe('message API', function() {
     describe('get /api/message/all/:groupid?starttime=xxx&endtime=yyy', function() {
 
         it('should not work without groupid parameter', function(done) {
-            api.get('/api/message/all')
+            supertest(apiEndPoint).get('/api/message/all')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -153,7 +167,7 @@ describe('message API', function() {
         });
 
         it('returns 204 when there are no messages for given groupid', function(done) {
-            api.get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
+            supertest(apiEndPoint).get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -163,7 +177,7 @@ describe('message API', function() {
 
         it('returns messages for given groupid 777 between the given dates', function(done) {
 
-            api.get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
+            supertest(apiEndPoint).get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -178,7 +192,7 @@ describe('message API', function() {
     describe('get /api/message/all/:groupid?starttime=xxx also works without endtime', function() {
 
         it('returns messages for group and from given date', function(done) {
-            api.get('/api/message/all/777?starttime=2013-11-25')
+            supertest(apiEndPoint).get('/api/message/all/777?starttime=2013-11-25')
             .expect(200)
             .expect('Content-Type','application/json')
             .end(function(err, res) {
@@ -194,7 +208,7 @@ describe('message API', function() {
         
         it('should not work without groupid parameter', function(done) {
 
-            api.post('/api/message/send')
+            supertest(apiEndPoint).post('/api/message/send')
             .send({message:'here it is'})
             .expect(404)
             .end(function(err, res) {
@@ -213,7 +227,7 @@ describe('message API', function() {
                 messagetext : 'Test put message 1.'
             };
 
-            api.post('/api/message/send/12345')
+            supertest(apiEndPoint).post('/api/message/send/12345')
             .send({message:testMessage})
             .expect(201)
             .end(function(err, res) {
@@ -232,7 +246,7 @@ describe('message API', function() {
                 messagetext: 'Test put message 2.'
             };
 
-            api.post('/api/message/send/12345')
+            supertest(apiEndPoint).post('/api/message/send/12345')
             .expect(201)
             .send({message:testMessage})
             .end(function(err, res) {
@@ -250,7 +264,7 @@ describe('message API', function() {
                 messagetext: ''
             };
 
-            api.post('/api/message/send/12345')
+            supertest(apiEndPoint).post('/api/message/send/12345')
             .expect(400)
             .send({message:invalidMessage})
             .end(function(err, res) {
