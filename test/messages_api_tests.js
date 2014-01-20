@@ -71,16 +71,43 @@ describe('message API', function() {
             messagesService.stop();
         });
 
-        it('GET /api/message/read/123456743 returns 200', function(done) {
+        it('GET /api/message/doesnotexist should return 404', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/doesnotexist')
+            .expect(404,done);
+        });
+
+        it('GET /api/message/read/:msgid returns 200', function(done) {
             supertest(apiEndPoint)
             .get('/api/message/read/123456743')
             .expect(200,done);
         });
 
-        it('GET /api/message/all/88883288 with a starttime returns 200', function(done) {
+        it('GET /api/message/all/:groupid with a starttime returns 200', function(done) {
             supertest(apiEndPoint)
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(200,done);
+        });
+
+        it('GET /api/message/all/:groupid with a starttime and end time returns 200', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .expect(200,done);
+        });
+
+        it('POST /api/message/send/:groupid returns 201', function(done) {
+
+            var message = {
+                userid: '12121212',
+                groupid: '999',
+                timestamp: '2013-11-28T23:07:40+00:00',
+                messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+            };
+
+            supertest(apiEndPoint)
+            .post('/api/message/send/88883288')
+            .send({message:message})
+            .expect(201,done);
         });
 
         it('GET /api/message/status', function(done) {
