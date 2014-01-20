@@ -132,7 +132,70 @@ describe('message API', function() {
         that no implementation details are leaked. 
     */
     describe('test results when errors occur', function() {
+        before(function(){
+            /*
+            Setup api and also load data for tests
+            */
 
+            config = require('../env');
+
+            // just a  way of setting the path that the fake 
+            testConfig  = {
+                throwErrors : true,
+                returnNone : false
+            };
+
+            fakeCrud = require('./handler/fakeMongoHandler')(testConfig);
+
+            apiEndPoint = 'http://localhost:'+config.port;
+
+            messagesService = require('../lib/messagesService')(fakeCrud,config.port);
+            messagesService.start();
+
+        });
+
+        after(function(){
+            messagesService.stop();
+        });
+
+        it('GET /api/message/read/:msgid returns 200', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/read/123456743')
+            .expect(500,done);
+        });
+
+        it('GET /api/message/all/:groupid with a starttime returns 200', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/all/88883288?starttime=2013-11-25')
+            .expect(500,done);
+        });
+
+        it('GET /api/message/all/:groupid with a starttime and end time returns 200', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .expect(500,done);
+        });
+
+        it('POST /api/message/send/:groupid returns 201', function(done) {
+
+            var message = {
+                userid: '12121212',
+                groupid: '999',
+                timestamp: '2013-11-28T23:07:40+00:00',
+                messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+            };
+
+            supertest(apiEndPoint)
+            .post('/api/message/send/88883288')
+            .send({message:message})
+            .expect(500,done);
+        });
+
+        it('GET /api/message/status', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/status')
+            .expect(500,done);
+        });
         
     });
 
