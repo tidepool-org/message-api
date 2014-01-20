@@ -39,49 +39,72 @@ var should = require('chai').should(),
 
 describe('message API', function() {
 
-    before(function(){
-        /*
-        Setup api and also load data for tests
-        */
+    /*
+        GOAL: To test that under normal operation that we get the return codes
+        and any data (where applicable) that we would expect.
+    */
+    describe('test results when all is OK', function() {
 
-        config = require('../env');
-        // just a  way of seeting the path that the fake 
-        testConfig  = {
-            throwErrors : false,
-            returnNone : false
-        };
+        before(function(){
+            /*
+            Setup api and also load data for tests
+            */
 
-        fakeCrud = require('./handler/fakeMongoHandler')(testConfig);
+            config = require('../env');
 
-        apiEndPoint = 'http://localhost:'+config.port;
+            // just a  way of setting the path that the fake 
+            testConfig  = {
+                throwErrors : false,
+                returnNone : false
+            };
 
-        messagesService = require('../lib/messagesService')(fakeCrud,config.port);
-        messagesService.start();
+            fakeCrud = require('./handler/fakeMongoHandler')(testConfig);
 
-    });
+            apiEndPoint = 'http://localhost:'+config.port;
 
-    after(function(){
-        messagesService.stop();
-    });
+            messagesService = require('../lib/messagesService')(fakeCrud,config.port);
+            messagesService.start();
 
-    describe('test when working as expected', function() {
+        });
 
+        after(function(){
+            messagesService.stop();
+        });
 
-        it('get /api/message/read/123456743 returns 200', function(done) {
+        it('GET /api/message/read/123456743 returns 200', function(done) {
             supertest(apiEndPoint)
             .get('/api/message/read/123456743')
+            .expect(200,done);
+        });
+
+        it('GET /api/message/all/88883288 with a starttime returns 200', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/all/88883288?starttime=2013-11-25')
+            .expect(200,done);
+        });
+
+        it('GET /api/message/status', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/status')
             .expect(200,done);
         });
 
         
     });
 
-    describe('test when data not returned', function() {
+    /*
+        GOAL: To test we get the correct return code when no data match's what we requested.
+    */
+    describe('test results when data is not found', function() {
 
        
     });
 
-    describe('test when errors occur', function() {
+    /*
+        GOAL: To test that when excepetions occur when are give the correct return code and 
+        that no implementation details are leaked. 
+    */
+    describe('test results when errors occur', function() {
 
         
     });

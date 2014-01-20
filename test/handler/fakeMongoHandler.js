@@ -87,8 +87,8 @@ function handleGetMessage(messageId,callback) {
     return resolveCallbackValues(callback,message);
 }
 
-function handleGetAllMessages(groupId,callback) {
-    log.debug('Finding all messages for group[%s]', groupId);
+function handleGetAllMessages(groupId, startTime, endTime, callback) {
+    log.debug('Finding all messages for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
 
     var messages = 
     [{
