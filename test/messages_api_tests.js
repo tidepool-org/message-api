@@ -123,7 +123,49 @@ describe('message API', function() {
         GOAL: To test we get the correct return code when no data match's what we requested.
     */
     describe('test results when data is not found', function() {
+        before(function(){
+            /*
+            Setup api and also load data for tests
+            */
 
+            config = require('../env');
+
+            // just a  way of setting the path that the fake 
+            testConfig  = {
+                throwErrors : false,
+                returnNone : true
+            };
+
+            fakeCrud = require('./handler/fakeMongoHandler')(testConfig);
+
+            apiEndPoint = 'http://localhost:'+config.port;
+
+            messagesService = require('../lib/messagesService')(fakeCrud,config.port);
+            messagesService.start();
+
+        });
+
+        after(function(){
+            messagesService.stop();
+        });
+
+        it('GET /api/message/read/:msgid returns 204', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/read/123456743')
+            .expect(204,done);
+        });
+
+        it('GET /api/message/all/:groupid with a starttime returns 204', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/all/88883288?starttime=2013-11-25')
+            .expect(204,done);
+        });
+
+        it('GET /api/message/all/:groupid with a starttime and end time returns 204', function(done) {
+            supertest(apiEndPoint)
+            .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .expect(204,done);
+        });
        
     });
 
@@ -158,25 +200,25 @@ describe('message API', function() {
             messagesService.stop();
         });
 
-        it('GET /api/message/read/:msgid returns 200', function(done) {
+        it('GET /api/message/read/:msgid returns 500', function(done) {
             supertest(apiEndPoint)
             .get('/api/message/read/123456743')
             .expect(500,done);
         });
 
-        it('GET /api/message/all/:groupid with a starttime returns 200', function(done) {
+        it('GET /api/message/all/:groupid with a starttime returns 500', function(done) {
             supertest(apiEndPoint)
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(500,done);
         });
 
-        it('GET /api/message/all/:groupid with a starttime and end time returns 200', function(done) {
+        it('GET /api/message/all/:groupid with a starttime and end time returns 500', function(done) {
             supertest(apiEndPoint)
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(500,done);
         });
 
-        it('POST /api/message/send/:groupid returns 201', function(done) {
+        it('POST /api/message/send/:groupid returns 500', function(done) {
 
             var message = {
                 userid: '12121212',
