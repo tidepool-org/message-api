@@ -34,7 +34,7 @@ var should = require('chai').should(),
     testConfig,
     fakeCrud,
     apiEndPoint,
-    testMessages;
+    testMessage = require('./helpers/testMessagesData').individual;
 
 
 describe('message API', function() {
@@ -58,7 +58,7 @@ describe('message API', function() {
                 returnNone : false
             };
 
-            fakeCrud = require('./handler/fakeMongoHandler')(testConfig);
+            fakeCrud = require('./helpers/fakeMongoHandler')(testConfig);
 
             apiEndPoint = 'http://localhost:'+config.port;
 
@@ -97,16 +97,9 @@ describe('message API', function() {
 
         it('POST /api/message/send/:groupid returns 201', function(done) {
 
-            var message = {
-                userid: '12121212',
-                groupid: '999',
-                timestamp: '2013-11-28T23:07:40+00:00',
-                messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
-            };
-
             supertest(apiEndPoint)
             .post('/api/message/send/88883288')
-            .send({message:message})
+            .send({message:testMessage})
             .expect(201,done);
         });
 
@@ -142,7 +135,7 @@ describe('message API', function() {
                 returnNone : true
             };
 
-            fakeCrud = require('./handler/fakeMongoHandler')(testConfig);
+            fakeCrud = require('./helpers/fakeMongoHandler')(testConfig);
 
             apiEndPoint = 'http://localhost:'+config.port;
 
@@ -193,7 +186,7 @@ describe('message API', function() {
                 returnNone : false
             };
 
-            fakeCrud = require('./handler/fakeMongoHandler')(testConfig);
+            fakeCrud = require('./helpers/fakeMongoHandler')(testConfig);
 
             apiEndPoint = 'http://localhost:'+config.port;
 
