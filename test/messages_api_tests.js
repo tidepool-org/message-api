@@ -116,7 +116,13 @@ describe('message API', function() {
             .expect(200,done);
         });
 
-        
+        it('GET /status returns 401 when status is passed as 401', function(done) {
+
+            supertest(apiEndPoint)
+            .get('/api/message/status?status=401')
+            .expect(401,done);
+        });
+
     });
 
     /*

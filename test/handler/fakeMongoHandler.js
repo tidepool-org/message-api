@@ -46,6 +46,7 @@ var fakeMongoHandler = function(testingConfig) {
     settings = testingConfig;
 
     return {
+        status: handleStatus,
         createMessage : handleCreateMessage,
         getMessage : handleGetMessage,
         getAllMessages : handleGetAllMessages
@@ -67,6 +68,19 @@ function resolveCallbackValues(callback,data){
 
     return callback(null,data);
 }
+
+function handleStatus(callback){
+    var dependencyStatus = { running: false, deps: { up: [], down: [] } };
+    
+    if (settings.throwErrors){
+        dependencyStatus.deps.down = ['mongo'];
+    }
+
+    dependencyStatus.running = (dependencyStatus.deps.down.length === 0);
+    dependencyStatus.statuscode = dependencyStatus.running ? 200 : 500;
+
+    return resolveCallbackValues(callback,dependencyStatus);
+};
 
 function handleCreateMessage (message,callback) {
     log.debug('Create in mongo message[%j]', message);
