@@ -31,7 +31,7 @@ var should = require('chai').should(),
     supertest = require('supertest'),
     config = require('../env'),
     mongojs = require('mongojs'),
-    testMessages = require('./helpers/testMessagesData').relatedSet
+    messagesToSave = require('./helpers/testMessagesData').relatedSet,
     messagesService,
     testDbInstance,
     crud,
@@ -44,8 +44,12 @@ describe('message API', function() {
         Setup api and also load data for tests
         */
 
-
         config = require('../env');
+
+        if(config.mongoDbConnectionString == null){
+            config.mongoDbConnectionString = 'mongodb://localhost/tidepool-platform';
+        }
+
         crud = require('../lib/handler/mongoHandler')(config.mongoDbConnectionString);
 
         apiEndPoint = 'http://localhost:'+config.port;
@@ -53,11 +57,12 @@ describe('message API', function() {
         messagesService = require('../lib/messagesService')(crud,config.port);
         messagesService.start();
 
-        testDbInstance = mongojs('mongodb://localhost/tidepool-platform', ['messages']);
+        testDbInstance = mongojs(config.mongoDbConnectionString, ['messages']);
     
         testDbInstance.messages.remove();
 
-        testMessages.forEach(function(message) {
+        messagesToSave.forEach(function(message) {
+            //console.log('save message: ',message);
             testDbInstance.messages.save(message);
         });
 
@@ -70,14 +75,14 @@ describe('message API', function() {
     describe('get /api/message/:msgId', function() {
 
         var testMessageId;
-        var testMessageContent;
+        var messageFromMongo;
 
         before(function(done){
             
             //Get id of existing message for tests 
             testDbInstance.messages.findOne({},function(err, doc) {
                 testMessageId = doc._id;
-                testMessageContent = doc;
+                messageFromMongo = doc;
                 done();
             });
         });
@@ -102,10 +107,10 @@ describe('message API', function() {
                 var theMessage = res.body.message;
 
                 theMessage.id.should.equal(String(testMessageId));
-                theMessage.timestamp.should.equal(String(testMessageContent.timestamp));
-                theMessage.groupid.should.equal(String(testMessageContent.groupid));
-                theMessage.userid.should.equal(String(testMessageContent.userid));
-                theMessage.messagetext.should.equal(String(testMessageContent.messagetext));
+                theMessage.timestamp.should.equal(String(messageFromMongo.timestamp));
+                theMessage.groupid.should.equal(String(messageFromMongo.groupid));
+                theMessage.userid.should.equal(String(messageFromMongo.userid));
+                theMessage.messagetext.should.equal(String(messageFromMongo.messagetext));
 
                 done();
             });
@@ -218,12 +223,7 @@ describe('message API', function() {
 
         it('returns 201', function(done) {
 
-            var testMessage = {
-                userid : '12345',
-                groupid : '777',
-                timestamp : '2013-11-29T23:05:40+00:00',
-                messagetext : 'Test put message 1.'
-            };
+            var testMessage = require('./helpers/testMessagesData').individual;
 
             supertest(apiEndPoint).post('/api/message/send/12345')
             .send({message:testMessage})
@@ -237,12 +237,7 @@ describe('message API', function() {
 
         it('return Id when message added', function(done) {
 
-            var testMessage = {
-                userid: '12345',
-                groupid: '777',
-                timestamp: '2013-12-04T23:05:40+00:00',
-                messagetext: 'Test put message 2.'
-            };
+            var testMessage = require('./helpers/testMessagesData').individual;
 
             supertest(apiEndPoint).post('/api/message/send/12345')
             .expect(201)
