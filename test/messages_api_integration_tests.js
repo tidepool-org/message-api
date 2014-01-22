@@ -39,6 +39,9 @@ describe('message API', function() {
 
         testDbInstance.messages.remove();
 
+        //set to be with the service endpoint
+        supertest = supertest(testingHelper.serviceEndpoint());
+
         messagesToSave.forEach(function(message) {
             testDbInstance.messages.save(message);
         });
@@ -65,7 +68,7 @@ describe('message API', function() {
         });
 
         it('should not work without msgId parameter', function(done) {
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/read')
+            supertest.get('/api/message/read')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -75,7 +78,7 @@ describe('message API', function() {
 
         it('returns message for given id as JSON with content we expect', function(done) {
 
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/'+testMessageId)
+            supertest.get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -84,6 +87,7 @@ describe('message API', function() {
                 var theMessage = res.body.message;
 
                 theMessage.id.should.equal(String(testMessageId));
+                theMessage.parentmessage.should.equal(String(messageFromMongo.parentmessage));
                 theMessage.timestamp.should.equal(String(messageFromMongo.timestamp));
                 theMessage.groupid.should.equal(String(messageFromMongo.groupid));
                 theMessage.userid.should.equal(String(messageFromMongo.userid));
@@ -93,11 +97,11 @@ describe('message API', function() {
             });
         });
 
-        it('returns message with id, userid, groupid, timestamp , messagetext', function(done) {
+        it('returns message with id, parentmessage, userid, groupid, timestamp , messagetext', function(done) {
 
-            var messageFields = ['id', 'userid','groupid', 'timestamp', 'messagetext'];
+            var messageFields = ['id', 'parentmessage', 'userid','groupid', 'timestamp', 'messagetext'];
 
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/'+testMessageId)
+            supertest.get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -116,7 +120,7 @@ describe('message API', function() {
 
             var dummyId = mongojs.ObjectId().toString();
 
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/'+dummyId)
+            supertest.get('/api/message/read/'+dummyId)
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -126,7 +130,7 @@ describe('message API', function() {
 
         it('returns 404 if a bad id is given', function(done) {
 
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/badIdGiven')
+            supertest.get('/api/message/read/badIdGiven')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -138,7 +142,7 @@ describe('message API', function() {
     describe('GET /api/message/all/:groupid?starttime=xxx&endtime=yyy', function() {
 
         it('should not work without groupid parameter', function(done) {
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/all')
+            supertest.get('/api/message/all')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -147,7 +151,7 @@ describe('message API', function() {
         });
 
         it('returns 404 when there are no messages for given groupid', function(done) {
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
+            supertest.get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -157,7 +161,7 @@ describe('message API', function() {
 
         it('returns messages for given groupid 777 between the given dates', function(done) {
 
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
+            supertest.get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -172,7 +176,7 @@ describe('message API', function() {
     describe('GET /api/message/all/:groupid?starttime=xxx also works without endtime', function() {
 
         it('returns messages for group and from given date', function(done) {
-            supertest(testingHelper.serviceEndpoint()).get('/api/message/all/777?starttime=2013-11-25')
+            supertest.get('/api/message/all/777?starttime=2013-11-25')
             .expect(200)
             .expect('Content-Type','application/json')
             .end(function(err, res) {
@@ -188,7 +192,7 @@ describe('message API', function() {
         
         it('should not work without groupid parameter', function(done) {
 
-            supertest(testingHelper.serviceEndpoint()).post('/api/message/send')
+            supertest.post('/api/message/send')
             .send({message:'here it is'})
             .expect(404)
             .end(function(err, res) {
@@ -202,7 +206,7 @@ describe('message API', function() {
 
             var testMessage = require('./helpers/testMessagesData').individual;
 
-            supertest(testingHelper.serviceEndpoint()).post('/api/message/send/12345')
+            supertest.post('/api/message/send/12345')
             .send({message:testMessage})
             .expect(201)
             .end(function(err, res) {
@@ -216,7 +220,7 @@ describe('message API', function() {
 
             var testMessage = require('./helpers/testMessagesData').individual;
 
-            supertest(testingHelper.serviceEndpoint()).post('/api/message/send/12345')
+            supertest.post('/api/message/send/12345')
             .expect(201)
             .send({message:testMessage})
             .end(function(err, res) {
@@ -229,12 +233,13 @@ describe('message API', function() {
         it('return 400 when messages to add does not meet the requirements', function(done) {
 
             var invalidMessage = {
+                parentmessage : '',
                 userid: '12345',
                 timestamp: '2013-12-04T23:05:40+00:00',
                 messagetext: ''
             };
 
-            supertest(testingHelper.serviceEndpoint()).post('/api/message/send/12345')
+            supertest.post('/api/message/send/12345')
             .expect(400)
             .send({message:invalidMessage})
             .end(function(err, res) {
