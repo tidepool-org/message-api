@@ -98,4 +98,6 @@ function getServiceEndpoint(){
     return 'http://localhost:'+servicePort;
 }
 
+testingHelper.sessionToken = 'afd09fe8-eebf-49fd-99b5-665571d078e2';
+
 module.exports = testingHelper;

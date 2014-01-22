@@ -22,7 +22,7 @@ var should = require('chai').should(),
     testingHelper = require('./helpers/testingHelper')({integrationTest:false}),
     testMessage = require('./helpers/testMessagesData').individual,
     supertest = require('supertest')(testingHelper.serviceEndpoint()),
-    sessionToken = 'afd09fe8-eebf-49fd-99b5-665571d078e2';
+    sessionToken = testingHelper.sessionToken;
 
 
 describe('message API', function() {
