@@ -30,7 +30,7 @@ describe('message API', function() {
         GOAL: To test that under normal operation that we get the return codes
         and any data (where applicable) that we would expect.
     */
-    describe('test results when all is OK', function() {
+    describe('when the request has been fulfilled', function() {
 
         before(function(){
             
@@ -48,7 +48,7 @@ describe('message API', function() {
             testingHelper.stopService();
         });
 
-        it('GET doesnotexist should return 404', function(done) {
+        it('GET /doesnotexist should return 404', function(done) {
             supertest(testingHelper.serviceEndpoint())
             .get('/api/message/doesnotexist')
             .expect(404,done);
@@ -148,7 +148,7 @@ describe('message API', function() {
         GOAL: To test that when excepetions occur when are give the correct return code and 
         that no implementation details are leaked. 
     */
-    describe('test results when errors occur', function() {
+    describe('when an error occurs', function() {
         before(function(){
             
             // just a  way of setting the path that the fake 
