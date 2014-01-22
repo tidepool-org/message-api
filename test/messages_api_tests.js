@@ -17,11 +17,11 @@
 /* jshint -W079 *//* jshint -W098 */
 var should = require('chai').should(),
 /* jshint +W079 *//* jshint +W098 */
-    supertest = require('supertest'),
     testHandlerConfig,
     fakeCrud,
     testingHelper = require('./helpers/testingHelper')({integrationTest:false}),
-    testMessage = require('./helpers/testMessagesData').individual;
+    testMessage = require('./helpers/testMessagesData').individual,
+    supertest = require('supertest')(testingHelper.serviceEndpoint());
 
 
 describe('message API', function() {
@@ -49,53 +49,53 @@ describe('message API', function() {
         });
 
         it('GET /doesnotexist should return 404', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/doesnotexist')
             .expect(404,done);
         });
 
         it('GET read/:msgid returns 200', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/read/123456743')
             .expect(200,done);
         });
 
         it('GET all/:groupid with a starttime returns 200', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(200,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 200', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(200,done);
         });
 
         it('POST send/:groupid returns 201', function(done) {
 
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .post('/api/message/send/88883288')
             .send({message:testMessage})
             .expect(201,done);
         });
 
         it('GET /status', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/status')
             .expect(200,done);
         });
 
         it('GET /status?status=401 returns 401 ', function(done) {
 
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/status?status=401')
             .expect(401,done);
         });
 
         it('GET /status?randomParam=401 returns 200 as randomParam is ignored', function(done) {
 
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/status?randomParam=401')
             .expect(200,done);
         });
@@ -125,19 +125,19 @@ describe('message API', function() {
         });
 
         it('GET read/:msgid returns 404', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/read/123456743')
             .expect(404,done);
         });
 
         it('GET all/:groupid with a starttime returns 404', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(404,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 404', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(404,done);
         });
@@ -167,19 +167,19 @@ describe('message API', function() {
         });
 
         it('GET read/:msgid returns 500', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/read/123456743')
             .expect(500,done);
         });
 
         it('GET all/:groupid with a starttime returns 500', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(500,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 500', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(500,done);
         });
@@ -193,14 +193,14 @@ describe('message API', function() {
                 messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
             };
 
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .post('/api/message/send/88883288')
             .send({message:message})
             .expect(500,done);
         });
 
         it('GET status', function(done) {
-            supertest(testingHelper.serviceEndpoint())
+            supertest
             .get('/api/message/status')
             .expect(500,done);
         });
