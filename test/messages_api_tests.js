@@ -21,7 +21,8 @@ var should = require('chai').should(),
     fakeCrud,
     testingHelper = require('./helpers/testingHelper')({integrationTest:false}),
     testMessage = require('./helpers/testMessagesData').individual,
-    supertest = require('supertest')(testingHelper.serviceEndpoint());
+    supertest = require('supertest')(testingHelper.serviceEndpoint()),
+    sessionToken = 'afd09fe8-eebf-49fd-99b5-665571d078e2';
 
 
 describe('message API', function() {
@@ -48,27 +49,45 @@ describe('message API', function() {
             testingHelper.stopService();
         });
 
+        
+
         it('GET /doesnotexist should return 404', function(done) {
             supertest
             .get('/api/message/doesnotexist')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(404,done);
+        });
+
+        it('GET read/:msgid returns 401 when session token not used', function(done) {
+            supertest
+            .get('/api/message/read/123456743')
+            .expect(401,done);
         });
 
         it('GET read/:msgid returns 200', function(done) {
             supertest
             .get('/api/message/read/123456743')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200,done);
+        });
+
+        it('GET all/:groupid with no sessionToken returns 401', function(done) {
+            supertest
+            .get('/api/message/all/88883288?starttime=2013-11-25')
+            .expect(401,done);
         });
 
         it('GET all/:groupid with a starttime returns 200', function(done) {
             supertest
             .get('/api/message/all/88883288?starttime=2013-11-25')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 200', function(done) {
             supertest
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200,done);
         });
 
@@ -76,27 +95,37 @@ describe('message API', function() {
 
             supertest
             .post('/api/message/send/88883288')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .send({message:testMessage})
             .expect(201,done);
+        });
+
+        it('GET /status with no token returns 401 ', function(done) {
+            supertest
+            .get('/api/message/status')
+            .expect(401,done);
         });
 
         it('GET /status', function(done) {
             supertest
             .get('/api/message/status')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200,done);
         });
 
-        it('GET /status?status=401 returns 401 ', function(done) {
+        it('GET /status?status=201 returns 201 ', function(done) {
 
             supertest
-            .get('/api/message/status?status=401')
-            .expect(401,done);
+            .get('/api/message/status?status=201')
+            .set('X-Tidepool-Session-Token', sessionToken)
+            .expect(201,done);
         });
 
         it('GET /status?randomParam=401 returns 200 as randomParam is ignored', function(done) {
 
             supertest
             .get('/api/message/status?randomParam=401')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200,done);
         });
 
@@ -127,18 +156,21 @@ describe('message API', function() {
         it('GET read/:msgid returns 404', function(done) {
             supertest
             .get('/api/message/read/123456743')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(404,done);
         });
 
         it('GET all/:groupid with a starttime returns 404', function(done) {
             supertest
             .get('/api/message/all/88883288?starttime=2013-11-25')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(404,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 404', function(done) {
             supertest
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(404,done);
         });
        
@@ -169,18 +201,21 @@ describe('message API', function() {
         it('GET read/:msgid returns 500', function(done) {
             supertest
             .get('/api/message/read/123456743')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(500,done);
         });
 
         it('GET all/:groupid with a starttime returns 500', function(done) {
             supertest
             .get('/api/message/all/88883288?starttime=2013-11-25')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(500,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 500', function(done) {
             supertest
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(500,done);
         });
 
@@ -195,6 +230,7 @@ describe('message API', function() {
 
             supertest
             .post('/api/message/send/88883288')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .send({message:message})
             .expect(500,done);
         });
@@ -202,6 +238,7 @@ describe('message API', function() {
         it('GET status', function(done) {
             supertest
             .get('/api/message/status')
+            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(500,done);
         });
         
