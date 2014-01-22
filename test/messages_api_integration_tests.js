@@ -26,7 +26,7 @@ var should = require('chai').should(),
 
 describe('message API', function() {
 
-    before(function(){
+    before(function(done){
         
         var testConfig = testingHelper.testConfig();
 
@@ -34,30 +34,21 @@ describe('message API', function() {
 
         //using the test helper setup the service and load test data
         testingHelper.initAndStartService(crud);
-
         testDbInstance = testingHelper.mongoTestInstance();
-
         testDbInstance.messages.remove();
 
-        //save the first which will be the parent message
-        var isFirst = true,
-        parentMessageFromMongo;
+        var fakeRootId = testingHelper.createMongoId();
 
-
-        messagesToSave.forEach(function(message) {
-
-            if(isFirst == false) {
-                message.parentmessage = parentMessageFromMongo._id;
+        for (var index = 0; index < messagesToSave.length; ++index) {
+            
+            if(index === 0){
+                testDbInstance.messages.save(messagesToSave[index]);
+            }else{
+                messagesToSave[index].parentmessage = fakeRootId;
+                testDbInstance.messages.save(messagesToSave[index]);
             }
-
-            testDbInstance.messages.save(message,function(err, doc){
-                if(doc && isFirst){
-                    parentMessageFromMongo = doc;
-                    console.log('saved ',parentMessageFromMongo._id);
-                    isFirst = false;
-                }
-            });
-        });
+        }
+        done();
 
     });
 
@@ -180,6 +171,9 @@ describe('message API', function() {
             .end(function(err, res) {
                 if (err) return done(err);
                 res.body.should.have.property('messages').and.be.instanceof(Array);
+
+
+                console.log('## all messages ##',res.body.messages);
                 done();
             });
         });
@@ -195,6 +189,7 @@ describe('message API', function() {
             .end(function(err, res) {
                 if (err) return done(err);
                 res.body.should.have.property('messages').and.be.instanceof(Array);
+                console.log('## all messages ##',res.body.messages);
                 done();
             });
         });

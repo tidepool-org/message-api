@@ -24,7 +24,7 @@ testMessagesData.relatedSet = [
 {
     parentmessage : '',
     userid: '12121212',
-    groupid: '999',
+    groupid: '777',
     timestamp: '2013-11-28T23:07:40+00:00',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
 },
