@@ -18,50 +18,38 @@
 var should = require('chai').should(),
 /* jshint +W079 *//* jshint +W098 */
     supertest = require('supertest'),
-    config = require('../env'),
     mongojs = require('mongojs'),
     messagesToSave = require('./helpers/testMessagesData').relatedSet,
-    messagesService,
+    testingHelper = require('./helpers/testingHelper')({integrationTest:true}),
     testDbInstance,
-    crud,
-    apiEndPoint;
+    crud;
 
 describe('message API', function() {
 
     before(function(){
-        /*
-        Setup api and also load data for tests
-        */
+        
+        var testConfig = testingHelper.testConfig();
 
-        config = require('../env');
+        crud = require('../lib/handler/mongoHandler')(testConfig.mongoDbConnectionString);
 
-        if(config.mongoDbConnectionString == null){
-            config.mongoDbConnectionString = 'mongodb://localhost/tidepool-platform';
-        }
+        //using the test helper setup the service and load test data
+        testingHelper.initAndStartService(crud);
 
-        crud = require('../lib/handler/mongoHandler')(config.mongoDbConnectionString);
+        testDbInstance = testingHelper.mongoTestInstance();
 
-        apiEndPoint = 'http://localhost:'+config.port;
-
-        messagesService = require('../lib/messagesService')(crud,config.port);
-        messagesService.start();
-
-        testDbInstance = mongojs(config.mongoDbConnectionString, ['messages']);
-    
         testDbInstance.messages.remove();
 
         messagesToSave.forEach(function(message) {
-            //console.log('save message: ',message);
             testDbInstance.messages.save(message);
         });
 
     });
 
     after(function(){
-        messagesService.stop();
+        testingHelper.stopService();
     });
 
-    describe('get /api/message/:msgId', function() {
+    describe('GET /api/message/:msgId', function() {
 
         var testMessageId;
         var messageFromMongo;
@@ -77,7 +65,7 @@ describe('message API', function() {
         });
 
         it('should not work without msgId parameter', function(done) {
-            supertest(apiEndPoint).get('/api/message/read')
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/read')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -87,7 +75,7 @@ describe('message API', function() {
 
         it('returns message for given id as JSON with content we expect', function(done) {
 
-            supertest(apiEndPoint).get('/api/message/read/'+testMessageId)
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -109,7 +97,7 @@ describe('message API', function() {
 
             var messageFields = ['id', 'userid','groupid', 'timestamp', 'messagetext'];
 
-            supertest(apiEndPoint).get('/api/message/read/'+testMessageId)
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/'+testMessageId)
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -128,7 +116,7 @@ describe('message API', function() {
 
             var dummyId = mongojs.ObjectId().toString();
 
-            supertest(apiEndPoint).get('/api/message/read/'+dummyId)
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/'+dummyId)
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -138,7 +126,7 @@ describe('message API', function() {
 
         it('returns 204 if a bad id is given', function(done) {
 
-            supertest(apiEndPoint).get('/api/message/read/badIdGiven')
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/read/badIdGiven')
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -147,10 +135,10 @@ describe('message API', function() {
         });
     });
 
-    describe('get /api/message/all/:groupid?starttime=xxx&endtime=yyy', function() {
+    describe('GET /api/message/all/:groupid?starttime=xxx&endtime=yyy', function() {
 
         it('should not work without groupid parameter', function(done) {
-            supertest(apiEndPoint).get('/api/message/all')
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/all')
             .expect(404)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -159,7 +147,7 @@ describe('message API', function() {
         });
 
         it('returns 204 when there are no messages for given groupid', function(done) {
-            supertest(apiEndPoint).get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
             .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -169,7 +157,7 @@ describe('message API', function() {
 
         it('returns messages for given groupid 777 between the given dates', function(done) {
 
-            supertest(apiEndPoint).get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
             .expect(200)
             .expect('Content-Type', 'application/json')
             .end(function(err, res) {
@@ -181,10 +169,10 @@ describe('message API', function() {
 
     });
 
-    describe('get /api/message/all/:groupid?starttime=xxx also works without endtime', function() {
+    describe('GET /api/message/all/:groupid?starttime=xxx also works without endtime', function() {
 
         it('returns messages for group and from given date', function(done) {
-            supertest(apiEndPoint).get('/api/message/all/777?starttime=2013-11-25')
+            supertest(testingHelper.serviceEndpoint()).get('/api/message/all/777?starttime=2013-11-25')
             .expect(200)
             .expect('Content-Type','application/json')
             .end(function(err, res) {
@@ -196,11 +184,11 @@ describe('message API', function() {
 
     });
 
-    describe('post /api/message/send/:groupid', function() {
+    describe('POST /api/message/send/:groupid', function() {
         
         it('should not work without groupid parameter', function(done) {
 
-            supertest(apiEndPoint).post('/api/message/send')
+            supertest(testingHelper.serviceEndpoint()).post('/api/message/send')
             .send({message:'here it is'})
             .expect(404)
             .end(function(err, res) {
@@ -214,7 +202,7 @@ describe('message API', function() {
 
             var testMessage = require('./helpers/testMessagesData').individual;
 
-            supertest(apiEndPoint).post('/api/message/send/12345')
+            supertest(testingHelper.serviceEndpoint()).post('/api/message/send/12345')
             .send({message:testMessage})
             .expect(201)
             .end(function(err, res) {
@@ -228,7 +216,7 @@ describe('message API', function() {
 
             var testMessage = require('./helpers/testMessagesData').individual;
 
-            supertest(apiEndPoint).post('/api/message/send/12345')
+            supertest(testingHelper.serviceEndpoint()).post('/api/message/send/12345')
             .expect(201)
             .send({message:testMessage})
             .end(function(err, res) {
@@ -246,7 +234,7 @@ describe('message API', function() {
                 messagetext: ''
             };
 
-            supertest(apiEndPoint).post('/api/message/send/12345')
+            supertest(testingHelper.serviceEndpoint()).post('/api/message/send/12345')
             .expect(400)
             .send({message:invalidMessage})
             .end(function(err, res) {

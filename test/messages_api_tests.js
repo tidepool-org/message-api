@@ -18,11 +18,9 @@
 var should = require('chai').should(),
 /* jshint +W079 *//* jshint +W098 */
     supertest = require('supertest'),
-    config = require('../env'),
-    messagesService,
-    testConfig,
+    testHandlerConfig,
     fakeCrud,
-    apiEndPoint,
+    testingHelper = require('./helpers/testingHelper')({integrationTest:false}),
     testMessage = require('./helpers/testMessagesData').individual;
 
 
@@ -35,72 +33,62 @@ describe('message API', function() {
     describe('test results when all is OK', function() {
 
         before(function(){
-            /*
-            Setup api and also load data for tests
-            */
-
-            config = require('../env');
-
-            // just a  way of setting the path that the fake 
-            testConfig  = {
+            
+            //setting how the fake mongo handler will behave
+            testHandlerConfig  = {
                 throwErrors : false,
                 returnNone : false
             };
 
-            fakeCrud = require('./helpers/fakeMongoHandler')(testConfig);
-
-            apiEndPoint = 'http://localhost:'+config.port;
-
-            messagesService = require('../lib/messagesService')(fakeCrud,config.port);
-            messagesService.start();
-
+            fakeCrud = require('./helpers/fakeMongoHandler')(testHandlerConfig);
+            testingHelper.initAndStartService(fakeCrud);
         });
 
         after(function(){
-            messagesService.stop();
+            testingHelper.stopService();
         });
 
         it('GET /api/message/doesnotexist should return 404', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/doesnotexist')
             .expect(404,done);
         });
 
         it('GET /api/message/read/:msgid returns 200', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/read/123456743')
             .expect(200,done);
         });
 
         it('GET /api/message/all/:groupid with a starttime returns 200', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(200,done);
         });
 
         it('GET /api/message/all/:groupid with a starttime and end time returns 200', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(200,done);
         });
 
         it('POST /api/message/send/:groupid returns 201', function(done) {
 
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .post('/api/message/send/88883288')
             .send({message:testMessage})
             .expect(201,done);
         });
 
         it('GET /api/message/status', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/status')
             .expect(200,done);
         });
 
         it('GET /status returns 401 when status is passed as 401', function(done) {
 
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/status?status=401')
             .expect(401,done);
         });
@@ -112,45 +100,37 @@ describe('message API', function() {
     */
     describe('test results when data is not found', function() {
         before(function(){
-            /*
-            Setup api and also load data for tests
-            */
-
-            config = require('../env');
+           
 
             // just a  way of setting the path that the fake 
-            testConfig  = {
+            testHandlerConfig  = {
                 throwErrors : false,
                 returnNone : true
             };
 
-            fakeCrud = require('./helpers/fakeMongoHandler')(testConfig);
-
-            apiEndPoint = 'http://localhost:'+config.port;
-
-            messagesService = require('../lib/messagesService')(fakeCrud,config.port);
-            messagesService.start();
+            fakeCrud = require('./helpers/fakeMongoHandler')(testHandlerConfig);
+            testingHelper.initAndStartService(fakeCrud);
 
         });
 
         after(function(){
-            messagesService.stop();
+           testingHelper.stopService();
         });
 
         it('GET /api/message/read/:msgid returns 204', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/read/123456743')
             .expect(204,done);
         });
 
         it('GET /api/message/all/:groupid with a starttime returns 204', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(204,done);
         });
 
         it('GET /api/message/all/:groupid with a starttime and end time returns 204', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(204,done);
         });
@@ -163,45 +143,36 @@ describe('message API', function() {
     */
     describe('test results when errors occur', function() {
         before(function(){
-            /*
-            Setup api and also load data for tests
-            */
-
-            config = require('../env');
-
+            
             // just a  way of setting the path that the fake 
-            testConfig  = {
+            testHandlerConfig  = {
                 throwErrors : true,
                 returnNone : false
             };
 
-            fakeCrud = require('./helpers/fakeMongoHandler')(testConfig);
-
-            apiEndPoint = 'http://localhost:'+config.port;
-
-            messagesService = require('../lib/messagesService')(fakeCrud,config.port);
-            messagesService.start();
+            fakeCrud = require('./helpers/fakeMongoHandler')(testHandlerConfig);
+            testingHelper.initAndStartService(fakeCrud);
 
         });
 
         after(function(){
-            messagesService.stop();
+            testingHelper.stopService();
         });
 
         it('GET /api/message/read/:msgid returns 500', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/read/123456743')
             .expect(500,done);
         });
 
         it('GET /api/message/all/:groupid with a starttime returns 500', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/all/88883288?starttime=2013-11-25')
             .expect(500,done);
         });
 
         it('GET /api/message/all/:groupid with a starttime and end time returns 500', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(500,done);
         });
@@ -215,14 +186,14 @@ describe('message API', function() {
                 messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
             };
 
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .post('/api/message/send/88883288')
             .send({message:message})
             .expect(500,done);
         });
 
         it('GET /api/message/status', function(done) {
-            supertest(apiEndPoint)
+            supertest(testingHelper.serviceEndpoint())
             .get('/api/message/status')
             .expect(500,done);
         });
