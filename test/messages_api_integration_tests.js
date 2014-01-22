@@ -163,7 +163,7 @@ describe('message API', function() {
             });
         });
 
-        it('returns messages for given groupid 777 between the given dates', function(done) {
+        it('returns 3 messages for given groupid 777 between the given dates', function(done) {
 
             supertest.get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
             .expect(200)
@@ -171,16 +171,14 @@ describe('message API', function() {
             .end(function(err, res) {
                 if (err) return done(err);
                 res.body.should.have.property('messages').and.be.instanceof(Array);
-
-
-                console.log('## all messages ##',res.body.messages);
+                res.body.messages.length.should.equal(3);
                 done();
             });
         });
 
     });
 
-    describe('GET /api/message/all/:groupid?starttime=xxx also works without endtime', function() {
+    describe('GET /api/message/all/:groupid?starttime=xxx also works without endtime and return 4 messages', function() {
 
         it('returns messages for group and from given date', function(done) {
             supertest.get('/api/message/all/777?starttime=2013-11-25')
@@ -189,7 +187,7 @@ describe('message API', function() {
             .end(function(err, res) {
                 if (err) return done(err);
                 res.body.should.have.property('messages').and.be.instanceof(Array);
-                console.log('## all messages ##',res.body.messages);
+                res.body.messages.length.should.equal(4);
                 done();
             });
         });
