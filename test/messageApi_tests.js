@@ -104,7 +104,7 @@ describe('message API', function() {
                     message.should.have.property('messagetext');
                     message.should.have.property('timestamp');
                 });
-                
+
                 done();
             });
         });
@@ -230,17 +230,15 @@ describe('message API', function() {
             .expect(500,done);
         });
 
-        it('GET all/:groupid with a starttime returns 500', function(done) {
+        it('GET all/:groupid?starttime=xxx returns 500', function(done) {
             supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25')
-            
             .expect(500,done);
         });
 
-        it('GET all/:groupid with a starttime and end time returns 500', function(done) {
+        it('GET all/:groupid?starttime=xxx&endtime=yyy returns 500', function(done) {
             supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
-            
             .expect(500,done);
         });
 
@@ -255,15 +253,13 @@ describe('message API', function() {
 
             supertest(messaging)
             .post('/api/message/send/88883288')
-            
             .send({message:message})
             .expect(500,done);
         });
 
-        it('GET status', function(done) {
+        it('GET status returns 500', function(done) {
             supertest(messaging)
             .get('/api/message/status')
-            
             .expect(500,done);
         });
         
