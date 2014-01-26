@@ -171,6 +171,15 @@ describe('message API', function() {
                 if (err) return done(err);
                 res.body.should.have.property('messages').and.be.instanceof(Array);
                 res.body.messages.length.should.equal(3);
+
+                res.body.messages.forEach(function(message){
+                    message.should.have.property('id');
+                    message.should.have.property('userid');
+                    message.should.have.property('groupid');
+                    message.should.have.property('messagetext');
+                    message.should.have.property('timestamp');
+                });
+
                 done();
             });
         });
@@ -188,6 +197,15 @@ describe('message API', function() {
                 if (err) return done(err);
                 res.body.should.have.property('messages').and.be.instanceof(Array);
                 res.body.messages.length.should.equal(4);
+
+                res.body.messages.forEach(function(message){
+                    message.should.have.property('id');
+                    message.should.have.property('userid');
+                    message.should.have.property('groupid');
+                    message.should.have.property('messagetext');
+                    message.should.have.property('timestamp');
+                });
+                
                 done();
             });
         });
