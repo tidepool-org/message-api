@@ -18,7 +18,7 @@
 var log,
 settings;
 
-log = require('../../lib/log.js')('fakeMongoHandler.js');
+log = require('../../lib/log.js')('mockMongoHandler.js');
 
 /*
     Handler CRUD opertaions via Mongo instance, 
@@ -30,7 +30,7 @@ log = require('../../lib/log.js')('fakeMongoHandler.js');
     3) other wise we just return dummy data
 
 */
-var fakeMongoHandler = function(testingConfig) {
+var mockMongoHandler = function(testingConfig) {
 
     settings = testingConfig;
 
@@ -81,6 +81,7 @@ function handleGetMessage(messageId,callback) {
     log.debug('Get message[%s]', messageId);
 
     var message = {
+        id : '1299999299',
         userid: '12121212',
         groupid: '44J88FD76',
         timestamp: '2013-11-28T23:07:40+00:00',
@@ -95,24 +96,28 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
 
     var messages = 
     [{
+        id : '1299999299',
         userid: '12121212',
         groupid: groupId,
         timestamp: '2013-11-28T23:07:40+00:00',
         messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
     },
     {
+        id : '12999333444',
         userid: '232323',
         groupid: groupId,
         timestamp: '2013-11-29T23:05:40+00:00',
         messagetext: 'Second message.'
     },
     {
+        id : '12990000000',
         userid: '232323',
         groupid: groupId,
         timestamp: '2013-11-30T23:05:40+00:00',
         messagetext: 'Third message.'
     },
     {
+        id : '1299554433',
         userid: '232323',
         groupid: groupId,
         timestamp: '2013-11-25T23:05:40+00:00',
@@ -122,4 +127,4 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     return resolveCallbackValues(callback,messages);
 }
 
-module.exports = fakeMongoHandler;
+module.exports = mockMongoHandler;

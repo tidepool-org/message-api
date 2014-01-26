@@ -1,4 +1,4 @@
-// == BSD2 LICENSE ==
+    // == BSD2 LICENSE ==
 // Copyright (c) 2014, Tidepool Project
 // 
 // This program is free software; you can redistribute it and/or modify it under
@@ -17,15 +17,34 @@
 /* jshint -W079 *//* jshint -W098 */
 var should = require('chai').should(),
 /* jshint +W079 *//* jshint +W098 */
-    testHandlerConfig,
-    fakeCrud,
-    testingHelper = require('./helpers/testingHelper')({integrationTest:false}),
     testMessage = require('./helpers/testMessagesData').individual,
-    supertest = require('supertest')(testingHelper.serviceEndpoint()),
-    sessionToken = testingHelper.sessionToken;
+    supertest = require('supertest'),
+    restify = require('restify');
 
 
 describe('message API', function() {
+
+    /*
+        minimise the components to just groups API and mocked crud handler
+    */
+    var setupAPI = function(crudHandler){
+    
+        var server = restify.createServer({name:'Message API Tests'});
+        server.use(restify.queryParser());
+        server.use(restify.bodyParser());
+
+        var messageApi = require('../lib/routes/messageApi')(crudHandler);
+
+        server.get('/api/message/status',messageApi.status);
+
+        server.get('/api/message/read/:msgid', messageApi.findById);
+        server.get('/api/message/all/:groupid?starttime&endtime', messageApi.findAllById);
+    
+        //adding messages
+        server.post('/api/message/send/:groupid', messageApi.add);
+
+        return server;
+    }
 
     /*
         GOAL: To test that under normal operation that we get the return codes
@@ -33,99 +52,114 @@ describe('message API', function() {
     */
     describe('when the request has been fulfilled', function() {
 
+        var messaging;
+
         before(function(){
-            
-            //setting how the fake mongo handler will behave
-            testHandlerConfig  = {
+
+            var mockMongoHandler = require('./helpers/mockMongoHandler')({
                 throwErrors : false,
                 returnNone : false
-            };
+            });
 
-            fakeCrud = require('./helpers/fakeMongoHandler')(testHandlerConfig);
-            testingHelper.initAndStartService(fakeCrud);
+            messaging = setupAPI(mockMongoHandler);
+        
         });
-
-        after(function(){
-            testingHelper.stopService();
-        });
-
         
 
         it('GET /doesnotexist should return 404', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/doesnotexist')
-            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(404,done);
         });
 
-        it('GET read/:msgid returns 401 when session token not used', function(done) {
-            supertest
-            .get('/api/message/read/123456743')
-            .expect(401,done);
-        });
-
         it('GET read/:msgid returns 200', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/read/123456743')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(200,done);
-        });
-
-        it('GET all/:groupid with no sessionToken returns 401', function(done) {
-            supertest
-            .get('/api/message/all/88883288?starttime=2013-11-25')
-            .expect(401,done);
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                var message = res.body.message;
+                message.should.have.property('id');
+                message.should.have.property('userid');
+                message.should.have.property('groupid');
+                message.should.have.property('messagetext');
+                message.should.have.property('timestamp');
+                done();
+            });
         });
 
         it('GET all/:groupid with a starttime returns 200', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(200,done);
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                var messages = res.body.messages;
+                messages.should.be.instanceOf(Array);
+
+                messages.forEach(function(message){
+                    message.should.have.property('id');
+                    message.should.have.property('userid');
+                    message.should.have.property('groupid');
+                    message.should.have.property('messagetext');
+                    message.should.have.property('timestamp');
+                });
+                
+                done();
+            });
         });
 
         it('GET all/:groupid with a starttime and end time returns 200', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(200,done);
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                var messages = res.body.messages;
+                messages.should.be.instanceOf(Array);
+
+                messages.forEach(function(message){
+                    message.should.have.property('id');
+                    message.should.have.property('userid');
+                    message.should.have.property('groupid');
+                    message.should.have.property('messagetext');
+                    message.should.have.property('timestamp');
+                });
+
+                done();
+            });
         });
 
         it('POST send/:groupid returns 201', function(done) {
 
-            supertest
+            supertest(messaging)
             .post('/api/message/send/88883288')
-            .set('X-Tidepool-Session-Token', sessionToken)
             .send({message:testMessage})
-            .expect(201,done);
-        });
-
-        it('GET /status with no token returns 401 ', function(done) {
-            supertest
-            .get('/api/message/status')
-            .expect(401,done);
+            .expect(201)
+            .end(function(err, res) {
+                if (err) return done(err);
+                res.body.should.have.property('id');
+                done();
+            });
         });
 
         it('GET /status', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/status')
-            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200,done);
         });
 
         it('GET /status?status=201 returns 201 ', function(done) {
 
-            supertest
+            supertest(messaging)
             .get('/api/message/status?status=201')
-            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(201,done);
         });
 
         it('GET /status?randomParam=401 returns 200 as randomParam is ignored', function(done) {
 
-            supertest
+            supertest(messaging)
             .get('/api/message/status?randomParam=401')
-            .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200,done);
         });
 
@@ -135,43 +169,38 @@ describe('message API', function() {
         GOAL: To test we get the correct return code when no data match's what we requested.
     */
     describe('when no match for Request-URI', function() {
-        before(function(){
-           
+        var messaging;
 
-            // just a  way of setting the path that the fake 
-            testHandlerConfig  = {
+        before(function(){
+
+            var mockMongoHandler = require('./helpers/mockMongoHandler')({
                 throwErrors : false,
                 returnNone : true
-            };
+            });
 
-            fakeCrud = require('./helpers/fakeMongoHandler')(testHandlerConfig);
-            testingHelper.initAndStartService(fakeCrud);
-
-        });
-
-        after(function(){
-           testingHelper.stopService();
+            messaging = setupAPI(mockMongoHandler);
+        
         });
 
         it('GET read/:msgid returns 404', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/read/123456743')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(404,done);
+            
+            .expect(204,done);
         });
 
         it('GET all/:groupid with a starttime returns 404', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(404,done);
+            
+            .expect(204,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 404', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
-            .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(404,done);
+            
+            .expect(204,done);
         });
        
     });
@@ -181,41 +210,37 @@ describe('message API', function() {
         that no implementation details are leaked. 
     */
     describe('when an error occurs', function() {
+        var messaging;
+
         before(function(){
-            
-            // just a  way of setting the path that the fake 
-            testHandlerConfig  = {
+
+            var mockMongoHandler = require('./helpers/mockMongoHandler')({
                 throwErrors : true,
                 returnNone : false
-            };
+            });
 
-            fakeCrud = require('./helpers/fakeMongoHandler')(testHandlerConfig);
-            testingHelper.initAndStartService(fakeCrud);
-
-        });
-
-        after(function(){
-            testingHelper.stopService();
+            messaging = setupAPI(mockMongoHandler);
+        
         });
 
         it('GET read/:msgid returns 500', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/read/123456743')
-            .set('X-Tidepool-Session-Token', sessionToken)
+            
             .expect(500,done);
         });
 
         it('GET all/:groupid with a starttime returns 500', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25')
-            .set('X-Tidepool-Session-Token', sessionToken)
+            
             .expect(500,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 500', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
-            .set('X-Tidepool-Session-Token', sessionToken)
+            
             .expect(500,done);
         });
 
@@ -228,17 +253,17 @@ describe('message API', function() {
                 messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
             };
 
-            supertest
+            supertest(messaging)
             .post('/api/message/send/88883288')
-            .set('X-Tidepool-Session-Token', sessionToken)
+            
             .send({message:message})
             .expect(500,done);
         });
 
         it('GET status', function(done) {
-            supertest
+            supertest(messaging)
             .get('/api/message/status')
-            .set('X-Tidepool-Session-Token', sessionToken)
+            
             .expect(500,done);
         });
         

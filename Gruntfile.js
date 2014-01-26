@@ -82,13 +82,13 @@ module.exports = function(grunt) {
                 options: {
                     reporter: 'spec'
                 },
-                src: ['test/messages_api_tests.js']
+                src: ['test/messageApi_tests.js']
             },
             integration: {
                 options: {
                     reporter: 'spec'
                 },
-                src: ['test/messages_api_integration_tests.js']  
+                src: ['test/messages_service_integration_tests.js']  
             }
         }
     });
@@ -103,6 +103,7 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('default', ['mochaTest']);
     // Standard tasks
+    grunt.registerTask('test', ['mochaTest:unit','mochaTest:integration']);
     grunt.registerTask('unit-test', ['mochaTest:unit']);
     grunt.registerTask('integration-test', ['mochaTest:integration']);
     grunt.registerTask('start-mongo', ['shell:startMongo']);
