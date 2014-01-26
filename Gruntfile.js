@@ -88,7 +88,7 @@ module.exports = function(grunt) {
                 options: {
                     reporter: 'spec'
                 },
-                src: ['test/messages_service_integration_tests.js']  
+                src: ['test/messagesService_integration_tests.js']  
             }
         }
     });

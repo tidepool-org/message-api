@@ -10,9 +10,9 @@ user = {
   	password: 'R6LvLQ$=aTBgfj&4jqAq'
 };
 
-mockUserApi = restify.createServer({name: 'TidepoolUserMock'}});
+mockUserApi = restify.createServer({name: 'TidepoolUserMock'});
 mockUserApi.use(restify.queryParser());
-server.use(restify.bodyParser());
+mockUserApi.use(restify.bodyParser());
 
 mockUserApi.post('/serverlogin', function(req, res, next) {
 

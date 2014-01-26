@@ -19,26 +19,38 @@ var should = require('chai').should(),
 /* jshint +W079 *//* jshint +W098 */
     mongojs = require('mongojs'),
     messagesToSave = require('./helpers/testMessagesData').relatedSet,
-    testingHelper = require('./helpers/testingHelper')({integrationTest:true}),
-    supertest = require('supertest')(testingHelper.serviceEndpoint()),
-    sessionToken = testingHelper.sessionToken,
+    messageServiceTestHelper = require('./helpers/messageServiceTestHelper'),
+    supertest = require('supertest')(messageServiceTestHelper.testServiceEndpoint()),
+    sessionToken = messageServiceTestHelper.sessiontoken,
     testDbInstance,
+    apiEndPoint,
     crud;
 
 describe('message API', function() {
 
     before(function(done){
         
-        var testConfig = testingHelper.testConfig();
+        var config = messageServiceTestHelper.testConfig;
 
-        crud = require('../lib/handler/mongoHandler')(testConfig.mongoDbConnectionString);
+        //fake hakken functionality 
+        var fakeHostGetter = {};
+        fakeHostGetter.get = function(){
+            return [{host:'http://localhost:'+config.userApiPort}];
+        };
+
+        crud = require('../lib/handler/mongoHandler')(config.mongoDbConnectionString);
 
         //using the test helper setup the service and load test data
-        testingHelper.initAndStartService(crud);
-        testDbInstance = testingHelper.mongoTestInstance();
+        messageServiceTestHelper.initMessagesService(crud,fakeHostGetter);
+        testDbInstance = messageServiceTestHelper.createMongoInstance();
+        apiEndPoint = messageServiceTestHelper.testServiceEndpoint();
+
+        console.log('sessionToken ',sessionToken);
+
+        
         testDbInstance.messages.remove();
 
-        var fakeRootId = testingHelper.createMongoId();
+        var fakeRootId = '8c4159e8-cf2d-4b28-b862-2c06f6aa9f93'
 
         for (var index = 0; index < messagesToSave.length; ++index) {
             
@@ -54,7 +66,7 @@ describe('message API', function() {
     });
 
     after(function(){
-        testingHelper.stopService();
+        messageServiceTestHelper.stopTestService();
     });
 
     describe('GET /api/message/:msgId', function() {
@@ -120,24 +132,24 @@ describe('message API', function() {
             });
         });
 
-        it('returns 404 if no message found for id', function(done) {
+        it('returns 204 if no message found for id', function(done) {
 
             var dummyId = mongojs.ObjectId().toString();
 
             supertest.get('/api/message/read/'+dummyId)
             .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(404)
+            .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
                 done();
             });
         });
 
-        it('returns 404 if a bad id is given', function(done) {
+        it('returns 204 if a bad id is given', function(done) {
 
             supertest.get('/api/message/read/badIdGiven')
             .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(404)
+            .expect(204)
             .end(function(err, res) {
                 if (err) return done(err);
                 done();
@@ -154,11 +166,11 @@ describe('message API', function() {
             .expect(404,done);
         });
 
-        it('returns 404 when there are no messages for path', function(done) {
+        it('returns 204 when there are no messages for path', function(done) {
             
             supertest.get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
             .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(404,done);
+            .expect(204,done);
         });
 
         it('returns 3 messages', function(done) {
@@ -205,15 +217,15 @@ describe('message API', function() {
                     message.should.have.property('messagetext');
                     message.should.have.property('timestamp');
                 });
-                
+
                 done();
             });
         });
 
-        it('returns 404 when no messages', function(done) {
+        it('returns 204 when no messages', function(done) {
             supertest.get('/api/message/all/99977777?starttime=2013-11-25')
             .set('X-Tidepool-Session-Token', sessionToken)
-            .expect(404,done);
+            .expect(204,done);
         });
 
     });
@@ -258,7 +270,7 @@ describe('message API', function() {
             .send({message:testMessage})
             .end(function(err, res) {
                 if (err) return done(err);
-                res.body.should.have.property('Id');
+                res.body.should.have.property('id');
                 done();
             });
         });
