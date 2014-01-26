@@ -30,12 +30,12 @@ mockUserApi.post('/serverlogin', function(req, res, next) {
   
 });
 
-mockUserApi.get('/user/:id', function(req, res, next) {
+mockUserApi.get('/token/:usertoken', function(req, res, next) {
 
-	var token = req.headers['x-tidepool-session-token'];
+	var token = req.params.usertoken;
 
-	if(token === sessiontoken){
-		res.send(200,user);
+	if(token){
+		res.send(200,{userid: user.userid});
 		return next();
 	}
 
