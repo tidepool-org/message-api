@@ -17,7 +17,7 @@
 /* jshint -W079 *//* jshint -W098 */
 var should = require('chai').should(),
 /* jshint +W079 *//* jshint +W098 */
-    testMessage = require('./helpers/testMessagesData').individual,
+    testMessage = require('../helpers/testMessagesData').individual,
     supertest = require('supertest'),
     restify = require('restify');
 
@@ -33,7 +33,7 @@ describe('message API', function() {
         server.use(restify.queryParser());
         server.use(restify.bodyParser());
 
-        var messageApi = require('../lib/routes/messageApi')(crudHandler);
+        var messageApi = require('../../lib/routes/messageApi')(crudHandler);
 
         server.get('/api/message/status',messageApi.status);
 
@@ -56,7 +56,7 @@ describe('message API', function() {
 
         before(function(){
 
-            var mockMongoHandler = require('./helpers/mockMongoHandler')({
+            var mockMongoHandler = require('../helpers/mockMongoHandler')({
                 throwErrors : false,
                 returnNone : false
             });
@@ -173,7 +173,7 @@ describe('message API', function() {
 
         before(function(){
 
-            var mockMongoHandler = require('./helpers/mockMongoHandler')({
+            var mockMongoHandler = require('../helpers/mockMongoHandler')({
                 throwErrors : false,
                 returnNone : true
             });
@@ -214,7 +214,7 @@ describe('message API', function() {
 
         before(function(){
 
-            var mockMongoHandler = require('./helpers/mockMongoHandler')({
+            var mockMongoHandler = require('../helpers/mockMongoHandler')({
                 throwErrors : true,
                 returnNone : false
             });

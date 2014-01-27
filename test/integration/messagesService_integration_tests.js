@@ -18,8 +18,8 @@
 var should = require('chai').should(),
 /* jshint +W079 *//* jshint +W098 */
     mongojs = require('mongojs'),
-    messagesToSave = require('./helpers/testMessagesData').relatedSet,
-    messageServiceTestHelper = require('./helpers/messageServiceTestHelper'),
+    messagesToSave = require('../helpers/testMessagesData').relatedSet,
+    messageServiceTestHelper = require('../helpers/messageServiceTestHelper'),
     supertest = require('supertest')(messageServiceTestHelper.testServiceEndpoint()),
     sessionToken = messageServiceTestHelper.sessiontoken,
     testDbInstance,
@@ -38,7 +38,7 @@ describe('message API', function() {
             return [{host:'http://localhost:'+config.userApiPort}];
         };
 
-        crud = require('../lib/handler/mongoHandler')(config.mongoDbConnectionString);
+        crud = require('../../lib/handler/mongoHandler')(config.mongoDbConnectionString);
 
         //using the test helper setup the service and load test data
         messageServiceTestHelper.initMessagesService(crud,fakeHostGetter);
@@ -247,7 +247,7 @@ describe('message API', function() {
 
         it('returns 201', function(done) {
 
-            var testMessage = require('./helpers/testMessagesData').individual;
+            var testMessage = require('../helpers/testMessagesData').individual;
 
             supertest.post('/api/message/send/12345')
             .set('X-Tidepool-Session-Token', sessionToken)
@@ -262,7 +262,7 @@ describe('message API', function() {
 
         it('return Id when message added', function(done) {
 
-            var testMessage = require('./helpers/testMessagesData').individual;
+            var testMessage = require('../helpers/testMessagesData').individual;
 
             supertest.post('/api/message/send/12345')
             .set('X-Tidepool-Session-Token', sessionToken)
