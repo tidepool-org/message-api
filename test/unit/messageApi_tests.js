@@ -35,13 +35,13 @@ describe('message API', function() {
 
         var messageApi = require('../../lib/routes/messageApi')(crudHandler);
 
-        server.get('/api/message/status',messageApi.status);
+        server.get('/status',messageApi.status);
 
-        server.get('/api/message/read/:msgid', messageApi.findById);
-        server.get('/api/message/all/:groupid?starttime&endtime', messageApi.findAllById);
+        server.get('/read/:msgid', messageApi.findById);
+        server.get('/all/:groupid?starttime&endtime', messageApi.findAllById);
     
         //adding messages
-        server.post('/api/message/send/:groupid', messageApi.add);
+        server.post('/send/:groupid', messageApi.add);
 
         return server;
     }
@@ -68,13 +68,13 @@ describe('message API', function() {
 
         it('GET /doesnotexist should return 404', function(done) {
             supertest(messaging)
-            .get('/api/message/doesnotexist')
+            .get('/doesnotexist')
             .expect(404,done);
         });
 
         it('GET read/:msgid returns 200', function(done) {
             supertest(messaging)
-            .get('/api/message/read/123456743')
+            .get('/read/123456743')
             .expect(200)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -90,7 +90,7 @@ describe('message API', function() {
 
         it('GET all/:groupid with a starttime returns 200', function(done) {
             supertest(messaging)
-            .get('/api/message/all/88883288?starttime=2013-11-25')
+            .get('/all/88883288?starttime=2013-11-25')
             .expect(200)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -111,7 +111,7 @@ describe('message API', function() {
 
         it('GET all/:groupid with a starttime and end time returns 200', function(done) {
             supertest(messaging)
-            .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(200)
             .end(function(err, res) {
                 if (err) return done(err);
@@ -133,7 +133,7 @@ describe('message API', function() {
         it('POST send/:groupid returns 201', function(done) {
 
             supertest(messaging)
-            .post('/api/message/send/88883288')
+            .post('/send/88883288')
             .send({message:testMessage})
             .expect(201)
             .end(function(err, res) {
@@ -145,21 +145,21 @@ describe('message API', function() {
 
         it('GET /status', function(done) {
             supertest(messaging)
-            .get('/api/message/status')
+            .get('/status')
             .expect(200,done);
         });
 
         it('GET /status?status=201 returns 201 ', function(done) {
 
             supertest(messaging)
-            .get('/api/message/status?status=201')
+            .get('/status?status=201')
             .expect(201,done);
         });
 
         it('GET /status?randomParam=401 returns 200 as randomParam is ignored', function(done) {
 
             supertest(messaging)
-            .get('/api/message/status?randomParam=401')
+            .get('/status?randomParam=401')
             .expect(200,done);
         });
 
@@ -184,21 +184,21 @@ describe('message API', function() {
 
         it('GET read/:msgid returns 404', function(done) {
             supertest(messaging)
-            .get('/api/message/read/123456743')
+            .get('/read/123456743')
             
             .expect(204,done);
         });
 
         it('GET all/:groupid with a starttime returns 404', function(done) {
             supertest(messaging)
-            .get('/api/message/all/88883288?starttime=2013-11-25')
+            .get('/all/88883288?starttime=2013-11-25')
             
             .expect(204,done);
         });
 
         it('GET all/:groupid with a starttime and end time returns 404', function(done) {
             supertest(messaging)
-            .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             
             .expect(204,done);
         });
@@ -225,20 +225,20 @@ describe('message API', function() {
 
         it('GET read/:msgid returns 500', function(done) {
             supertest(messaging)
-            .get('/api/message/read/123456743')
+            .get('/read/123456743')
             
             .expect(500,done);
         });
 
         it('GET all/:groupid?starttime=xxx returns 500', function(done) {
             supertest(messaging)
-            .get('/api/message/all/88883288?starttime=2013-11-25')
+            .get('/all/88883288?starttime=2013-11-25')
             .expect(500,done);
         });
 
         it('GET all/:groupid?starttime=xxx&endtime=yyy returns 500', function(done) {
             supertest(messaging)
-            .get('/api/message/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+            .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
             .expect(500,done);
         });
 
@@ -252,14 +252,14 @@ describe('message API', function() {
             };
 
             supertest(messaging)
-            .post('/api/message/send/88883288')
+            .post('/send/88883288')
             .send({message:message})
             .expect(500,done);
         });
 
         it('GET status returns 500', function(done) {
             supertest(messaging)
-            .get('/api/message/status')
+            .get('/status')
             .expect(500,done);
         });
         

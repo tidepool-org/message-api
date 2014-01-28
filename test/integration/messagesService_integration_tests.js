@@ -69,7 +69,7 @@ describe('message API', function() {
         messageServiceTestHelper.stopTestService();
     });
 
-    describe('GET /api/message/:msgId', function() {
+    describe('GET /read/:msgId', function() {
 
         var messageFromMongo;
 
@@ -85,14 +85,14 @@ describe('message API', function() {
         });
 
         it('404 when path is incorrect', function(done) {
-            supertest.get('/api/message/read')
+            supertest.get('/read')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(404,done);
         });
 
         it('returns 200 and valid message', function(done) {
 
-            supertest.get('/api/message/read/'+messageFromMongo._id)
+            supertest.get('/read/'+messageFromMongo._id)
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200)
             .expect('Content-Type', 'application/json')
@@ -116,7 +116,7 @@ describe('message API', function() {
 
             var messageFields = ['id', 'parentmessage', 'userid','groupid', 'timestamp', 'messagetext'];
 
-            supertest.get('/api/message/read/'+String(messageFromMongo._id))
+            supertest.get('/read/'+String(messageFromMongo._id))
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200)
             .expect('Content-Type', 'application/json')
@@ -136,7 +136,7 @@ describe('message API', function() {
 
             var dummyId = mongojs.ObjectId().toString();
 
-            supertest.get('/api/message/read/'+dummyId)
+            supertest.get('/read/'+dummyId)
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(204)
             .end(function(err, res) {
@@ -147,7 +147,7 @@ describe('message API', function() {
 
         it('returns 204 if a bad id is given', function(done) {
 
-            supertest.get('/api/message/read/badIdGiven')
+            supertest.get('/read/badIdGiven')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(204)
             .end(function(err, res) {
@@ -157,25 +157,25 @@ describe('message API', function() {
         });
     });
 
-    describe('GET /api/message/all/:groupid?starttime=xxx&endtime=yyy', function() {
+    describe('GET /all/:groupid?starttime=xxx&endtime=yyy', function() {
 
         it('returns 404 for invalid path', function(done) {
             
-            supertest.get('/api/message/all')
+            supertest.get('/all')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(404,done);
         });
 
         it('returns 204 when there are no messages for path', function(done) {
             
-            supertest.get('/api/message/all/12342?starttime=2013-11-25&endtime=2013-11-30')
+            supertest.get('/all/12342?starttime=2013-11-25&endtime=2013-11-30')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(204,done);
         });
 
         it('returns 3 messages', function(done) {
 
-            supertest.get('/api/message/all/777?starttime=2013-11-25&endtime=2013-11-30')
+            supertest.get('/all/777?starttime=2013-11-25&endtime=2013-11-30')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200)
             .expect('Content-Type', 'application/json')
@@ -198,10 +198,10 @@ describe('message API', function() {
 
     });
 
-    describe('GET /api/message/all/:groupid?starttime=xxx ', function() {
+    describe('GET /all/:groupid?starttime=xxx ', function() {
 
         it('returns 4 messages', function(done) {
-            supertest.get('/api/message/all/777?starttime=2013-11-25')
+            supertest.get('/all/777?starttime=2013-11-25')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(200)
             .expect('Content-Type','application/json')
@@ -223,18 +223,18 @@ describe('message API', function() {
         });
 
         it('returns 204 when no messages', function(done) {
-            supertest.get('/api/message/all/99977777?starttime=2013-11-25')
+            supertest.get('/all/99977777?starttime=2013-11-25')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(204,done);
         });
 
     });
 
-    describe('POST /api/message/send/:groupid', function() {
+    describe('POST /send/:groupid', function() {
         
         it('should not work without groupid parameter', function(done) {
 
-            supertest.post('/api/message/send')
+            supertest.post('/send')
             .set('X-Tidepool-Session-Token', sessionToken)
             .send({message:'here it is'})
             .expect(404)
@@ -249,7 +249,7 @@ describe('message API', function() {
 
             var testMessage = require('../helpers/testMessagesData').individual;
 
-            supertest.post('/api/message/send/12345')
+            supertest.post('/send/12345')
             .set('X-Tidepool-Session-Token', sessionToken)
             .send({message:testMessage})
             .expect(201)
@@ -264,7 +264,7 @@ describe('message API', function() {
 
             var testMessage = require('../helpers/testMessagesData').individual;
 
-            supertest.post('/api/message/send/12345')
+            supertest.post('/send/12345')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(201)
             .send({message:testMessage})
@@ -284,7 +284,7 @@ describe('message API', function() {
                 messagetext: ''
             };
 
-            supertest.post('/api/message/send/12345')
+            supertest.post('/send/12345')
             .set('X-Tidepool-Session-Token', sessionToken)
             .expect(400)
             .send({message:invalidMessage})
