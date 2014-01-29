@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Tidepool Messages API.",
   "main": "lib/index.js",
   "directories": {
@@ -20,9 +20,9 @@
     "mongojs": "0.9.8",
     "lodash": "2.4.1",
     "bunyan": "0.22.1",
-    "hakken": "0.0.9",
     "amoeba": "0.0.3",
-    "user-api-client": "tidepool-org/user-api-client"
+    "user-api-client": "0.0.1",
+    "hakken": "0.0.10"
   },
   "devDependencies": {
     "supertest": "0.8.1",
