@@ -1,3 +1,3 @@
 #! /bin/bash -eu
 
-grunt start
+exec grunt start
