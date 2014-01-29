@@ -33,9 +33,10 @@ describe('message API', function() {
         var config = messageServiceTestHelper.testConfig;
 
         //fake hakken functionality 
-        var fakeHostGetter = {};
-        fakeHostGetter.get = function(){
-            return [{host:'http://localhost:'+config.userApiPort}];
+        var fakeHostGetter = {
+          get: function(){
+            return [{ protocol: 'http', host:'localhost:'+config.userApiPort }];
+          }
         };
 
         crud = require('../../lib/handler/mongoHandler')(config.mongoDbConnectionString);
