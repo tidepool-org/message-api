@@ -1,5 +1,5 @@
 #! /bin/bash -eu
 
-grunt unit-test
+./node_modules/.bin/grunt unit-test
 
 

@@ -1,3 +1,3 @@
 #! /bin/bash -eu
 
-exec grunt start
+exec ./node_modules/.bin/grunt start
