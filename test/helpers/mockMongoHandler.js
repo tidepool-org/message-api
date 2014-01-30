@@ -38,7 +38,8 @@ var mockMongoHandler = function(testingConfig) {
     status: handleStatus,
     createMessage : handleCreateMessage,
     getMessage : handleGetMessage,
-    getAllMessages : handleGetAllMessages
+    getAllMessages : handleGetAllMessages,
+    getMessagesInThread : handleGetMessagesInThread
   };
 
 };
@@ -81,6 +82,7 @@ function handleGetMessage(messageId,callback) {
 
   var message = {
     id : '1299999299',
+    parentmessage: '',
     userid: '12121212',
     groupid: '44J88FD76',
     timestamp: '2013-11-28T23:07:40+00:00',
@@ -90,12 +92,53 @@ function handleGetMessage(messageId,callback) {
   return resolveCallbackValues(callback,message);
 }
 
+function handleGetMessagesInThread(messageId, callback) {
+  log.debug('Finding all messages for thread[%s] ', messageId);
+
+  var messages =
+  [{
+    id : messageId,
+    parentmessage :'',
+    userid: '12121212',
+    groupid: '999777',
+    timestamp: '2013-11-28T23:07:40+00:00',
+    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+  },
+  {
+    id : '12999333444',
+    parentmessage :messageId,
+    userid: '232323',
+    groupid: '999777',
+    timestamp: '2013-11-29T23:05:40+00:00',
+    messagetext: 'Second message.'
+  },
+  {
+    id : '12990000000',
+    parentmessage :messageId,
+    userid: '232323',
+    groupid: '999777',
+    timestamp: '2013-11-30T23:05:40+00:00',
+    messagetext: 'Third message.'
+  },
+  {
+    id : '1299554433',
+    parentmessage :messageId,
+    userid: '232323',
+    groupid: '999777',
+    timestamp: '2013-11-25T23:05:40+00:00',
+    messagetext: 'First message.'
+  }];
+
+  return resolveCallbackValues(callback,messages);
+}
+
 function handleGetAllMessages(groupId, startTime, endTime, callback) {
   log.debug('Finding all messages for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
 
   var messages =
   [{
     id : '1299999299',
+    parentmessage: '',
     userid: '12121212',
     groupid: groupId,
     timestamp: '2013-11-28T23:07:40+00:00',
@@ -103,6 +146,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   },
   {
     id : '12999333444',
+    parentmessage: '',
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-29T23:05:40+00:00',
@@ -110,6 +154,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   },
   {
     id : '12990000000',
+    parentmessage: '',
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-30T23:05:40+00:00',
@@ -117,6 +162,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   },
   {
     id : '1299554433',
+    parentmessage: '',
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-25T23:05:40+00:00',
