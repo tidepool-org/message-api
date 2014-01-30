@@ -38,9 +38,11 @@ describe('message API', function() {
 
     server.get('/read/:msgid', messageApi.findById);
     server.get('/all/:groupid?starttime&endtime', messageApi.findAllById);
+    server.get('/thread/:msgid', messageApi.getThread);
 
     //adding messages
-    server.post('/send/:groupid', messageApi.add);
+    server.post('/send/:groupid', messageApi.addThread);
+    server.post('/reply/:msgid',messageApi.replyToThread);
 
     return server;
   };
@@ -79,6 +81,7 @@ describe('message API', function() {
         if (err) return done(err);
         var message = res.body.message;
         message.should.have.property('id');
+        message.should.have.property('parentmessage');
         message.should.have.property('userid');
         message.should.have.property('groupid');
         message.should.have.property('messagetext');
@@ -98,6 +101,7 @@ describe('message API', function() {
 
         messages.forEach(function(message){
           message.should.have.property('id');
+          message.should.have.property('parentmessage');
           message.should.have.property('userid');
           message.should.have.property('groupid');
           message.should.have.property('messagetext');
@@ -119,6 +123,7 @@ describe('message API', function() {
 
         messages.forEach(function(message){
           message.should.have.property('id');
+          message.should.have.property('parentmessage');
           message.should.have.property('userid');
           message.should.have.property('groupid');
           message.should.have.property('messagetext');
@@ -129,10 +134,45 @@ describe('message API', function() {
       });
     });
 
-    it('POST send/:groupid returns 201', function(done) {
+    it('GET thread/:msgid return 200', function(done) {
+      supertest(messaging)
+      .get('/thread/123456743')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        var messages = res.body.messages;
+        messages.should.be.instanceOf(Array);
+
+        messages.forEach(function(message){
+          message.should.have.property('id');
+          message.should.have.property('parentmessage');
+          message.should.have.property('userid');
+          message.should.have.property('groupid');
+          message.should.have.property('messagetext');
+          message.should.have.property('timestamp');
+        });
+
+        done();
+      });
+    });
+
+    it('POST send/:groupid returns 201 and the id of the message', function(done) {
 
       supertest(messaging)
       .post('/send/88883288')
+      .send({message:testMessage})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.have.property('id');
+        done();
+      });
+    });
+
+    it('POST reply/:msgid returns 201 and the id of the message', function(done) {
+
+      supertest(messaging)
+      .post('/reply/123456743')
       .send({message:testMessage})
       .expect(201)
       .end(function(err, res) {
@@ -243,16 +283,17 @@ describe('message API', function() {
 
     it('POST send/:groupid returns 500', function(done) {
 
-      var message = {
-        userid: '12121212',
-        groupid: '999',
-        timestamp: '2013-11-28T23:07:40+00:00',
-        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
-      };
-
       supertest(messaging)
       .post('/send/88883288')
-      .send({message:message})
+      .send({message:testMessage})
+      .expect(500,done);
+    });
+
+    it('POST /reply/:msgid returns 500', function(done) {
+
+      supertest(messaging)
+      .post('/reply/123456743')
+      .send({message:testMessage})
       .expect(500,done);
     });
 

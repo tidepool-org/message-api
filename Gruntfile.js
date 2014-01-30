@@ -78,22 +78,20 @@ module.exports = function(grunt) {
         }
       },
       mochaTest: {
-        mochaTest: {
-            unit: {
-              options: {
-                reporter: 'spec'
-              },
-              src: ['test/unit/*.js']
-            },
-            integration: {
-              options: {
-                reporter: 'spec'
-              },
-              src: ['test/integration/*.js']
-            }
-          }
+        unit: {
+          options: {
+            reporter: 'spec'
+          },
+          src: ['test/unit/*.js']
+        },
+        integration: {
+          options: {
+            reporter: 'spec'
+          },
+          src: ['test/integration/*.js']
         }
-      });
+      }
+    });
 
   // Load the plugins
   grunt.loadNpmTasks('grunt-contrib-jshint');

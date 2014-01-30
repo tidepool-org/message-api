@@ -27,7 +27,7 @@ messagingTestHelper.testConfig = {
   httpPort : 10001,
   userApiPort: 10004,
   mongoDbConnectionString : 'mongodb://localhost/tidepool-platform',
-  userApi: { serverName: 'armadaService', serverSecret: 'sharedMachineSecret' }
+  userApi: { serverName: 'messageService', serverSecret: 'sharedMachineSecret' }
 };
 
 messagingTestHelper.sessiontoken = '99406ced-8052-49c5-97ee-547cc3347da6';

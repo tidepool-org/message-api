@@ -27,6 +27,8 @@ crud;
 
 describe('message API', function() {
 
+  var fakeRootId = '8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
+
   before(function(done){
 
     var config = messageServiceTestHelper.testConfig;
@@ -49,8 +51,6 @@ describe('message API', function() {
 
 
     testDbInstance.messages.remove();
-
-    var fakeRootId = '8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
 
     for (var index = 0; index < messagesToSave.length; ++index) {
 
@@ -186,6 +186,7 @@ describe('message API', function() {
         res.body.messages.forEach(function(message){
           message.should.have.property('id');
           message.should.have.property('userid');
+          message.should.have.property('parentmessage');
           message.should.have.property('groupid');
           message.should.have.property('messagetext');
           message.should.have.property('timestamp');
@@ -212,6 +213,7 @@ describe('message API', function() {
         res.body.messages.forEach(function(message){
           message.should.have.property('id');
           message.should.have.property('userid');
+          message.should.have.property('parentmessage');
           message.should.have.property('groupid');
           message.should.have.property('messagetext');
           message.should.have.property('timestamp');
@@ -223,6 +225,40 @@ describe('message API', function() {
 
     it('returns 204 when no messages', function(done) {
       supertest.get('/all/99977777?starttime=2013-11-25')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(204,done);
+    });
+
+  });
+
+  describe('GET /thread/:msgid ', function() {
+
+    it('returns 3 messages with thread id', function(done) {
+      supertest.get('/thread/'+fakeRootId)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.have.property('messages').and.be.instanceof(Array);
+        res.body.messages.length.should.equal(3);
+
+        res.body.messages.forEach(function(message){
+          message.should.have.property('id');
+          message.should.have.property('userid');
+          message.should.have.property('parentmessage');
+          message.parentmessage.should.equal(fakeRootId);
+          message.should.have.property('groupid');
+          message.should.have.property('messagetext');
+          message.should.have.property('timestamp');
+        });
+
+        done();
+      });
+    });
+
+    it('returns 204 when no messages', function(done) {
+      supertest.get('/thread/8888888888')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(204,done);
     });
@@ -284,6 +320,70 @@ describe('message API', function() {
       };
 
       supertest.post('/send/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400)
+      .send({message:invalidMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+    });
+  });
+
+  describe('POST /reply/:msgid', function() {
+
+    it('should not work without msgid parameter', function(done) {
+
+      supertest.post('/reply')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:'here it is'})
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+
+    });
+
+    it('returns 201', function(done) {
+
+      var testMessage = require('../helpers/testMessagesData').individual;
+
+      supertest.post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:testMessage})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+
+    });
+
+    it('return Id when message added', function(done) {
+
+      var testMessage = require('../helpers/testMessagesData').individual;
+
+      supertest.post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(201)
+      .send({message:testMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.have.property('id');
+        done();
+      });
+    });
+
+    it('return 400 when messages to add does not meet the requirements', function(done) {
+
+      var invalidMessage = {
+        userid: '12345',
+        timestamp: '2013-12-04T23:05:40+00:00',
+        messagetext: ''
+      };
+
+      supertest.post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(400)
       .send({message:invalidMessage})
