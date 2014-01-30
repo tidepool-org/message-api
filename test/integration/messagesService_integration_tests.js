@@ -294,4 +294,68 @@ describe('message API', function() {
     });
   });
 
+  describe('POST /reply/:msgid', function() {
+
+    it('should not work without msgid parameter', function(done) {
+
+      supertest.post('/reply')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:'here it is'})
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+
+    });
+
+    it('returns 201', function(done) {
+
+      var testMessage = require('../helpers/testMessagesData').individual;
+
+      supertest.post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:testMessage})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+
+    });
+
+    it('return Id when message added', function(done) {
+
+      var testMessage = require('../helpers/testMessagesData').individual;
+
+      supertest.post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(201)
+      .send({message:testMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.have.property('id');
+        done();
+      });
+    });
+
+    it('return 400 when messages to add does not meet the requirements', function(done) {
+
+      var invalidMessage = {
+        userid: '12345',
+        timestamp: '2013-12-04T23:05:40+00:00',
+        messagetext: ''
+      };
+
+      supertest.post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400)
+      .send({message:invalidMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+    });
+  });
+
 });
