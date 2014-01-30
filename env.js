@@ -65,7 +65,7 @@ module.exports = (function(){
   env.userApi.serviceName = config.fromEnvironment('USER_API_SERVICE');
 
   // Name of this server to pass to user-api when getting a server token
-  env.userApi.serverName = config.fromEnvironment('SERVER_NAME', 'armada');
+  env.userApi.serverName = config.fromEnvironment('SERVER_NAME', 'message-api');
 
   // The secret to use when getting a server token from user-api
   env.userApi.serverSecret = config.fromEnvironment('SERVER_SECRET');
