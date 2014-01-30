@@ -27,6 +27,8 @@ crud;
 
 describe('message API', function() {
 
+  var fakeRootId = '8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
+
   before(function(done){
 
     var config = messageServiceTestHelper.testConfig;
@@ -49,8 +51,6 @@ describe('message API', function() {
 
 
     testDbInstance.messages.remove();
-
-    var fakeRootId = '8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
 
     for (var index = 0; index < messagesToSave.length; ++index) {
 
@@ -186,6 +186,7 @@ describe('message API', function() {
         res.body.messages.forEach(function(message){
           message.should.have.property('id');
           message.should.have.property('userid');
+          message.should.have.property('parentmessage');
           message.should.have.property('groupid');
           message.should.have.property('messagetext');
           message.should.have.property('timestamp');
@@ -212,6 +213,7 @@ describe('message API', function() {
         res.body.messages.forEach(function(message){
           message.should.have.property('id');
           message.should.have.property('userid');
+          message.should.have.property('parentmessage');
           message.should.have.property('groupid');
           message.should.have.property('messagetext');
           message.should.have.property('timestamp');
@@ -223,6 +225,40 @@ describe('message API', function() {
 
     it('returns 204 when no messages', function(done) {
       supertest.get('/all/99977777?starttime=2013-11-25')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(204,done);
+    });
+
+  });
+
+  describe('GET /thread/:msgid ', function() {
+
+    it('returns 3 messages with thread id', function(done) {
+      supertest.get('/thread/'+fakeRootId)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.have.property('messages').and.be.instanceof(Array);
+        res.body.messages.length.should.equal(3);
+
+        res.body.messages.forEach(function(message){
+          message.should.have.property('id');
+          message.should.have.property('userid');
+          message.should.have.property('parentmessage');
+          message.parentmessage.should.equal(fakeRootId);
+          message.should.have.property('groupid');
+          message.should.have.property('messagetext');
+          message.should.have.property('timestamp');
+        });
+
+        done();
+      });
+    });
+
+    it('returns 204 when no messages', function(done) {
+      supertest.get('/thread/8888888888')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(204,done);
     });
