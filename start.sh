@@ -1,3 +1,4 @@
 #! /bin/bash -eu
 
-exec ./node_modules/.bin/grunt start
+. config/env.sh
+exec node lib/index.js
