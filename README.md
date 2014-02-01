@@ -3,6 +3,9 @@ message-api
 
 Repository for the message API
 
+The documentation for the API lives here: [http://docs.tidepoolarmada.apiary.io/](http://docs.tidepoolarmada.apiary.io/)
+
+
 ## Install
 
 Requirements:
