@@ -280,19 +280,6 @@ describe('message API', function() {
 
     });
 
-    it('should ignore the parentmessage as it is the parent', function(done) {
-
-      supertest.post('/send')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .send({message:'here it is'})
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
-
-    });
-
     it('returns 201', function(done) {
 
       var testMessage = require('../helpers/testMessagesData').note;
