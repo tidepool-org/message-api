@@ -62,7 +62,7 @@ Returns the contents of a message by its ID number
             }
         }
         
-+ Response 204
++ Response 404
 
 + Response 400
 
@@ -103,12 +103,12 @@ Returns the contents of a message by its ID number
             ]
         }
         
-+ Response 204
++ Response 404
 
 
 ## Retrieve a thread [/thread/{messageid}]
 ### Get all the messages in a single thread [GET]
-Get the messages in a thread starting at the messageid passed in. 200 if it succeeds, 204 if the message
+Get the messages in a thread starting at the messageid passed in. 200 if it succeeds, 404 if the message
 ID was not valid.
 + Parameters
     + messageid (required, string, `123abcd`) ... The ID of the message being requested.
@@ -143,7 +143,7 @@ ID was not valid.
         }
         
         
-+ Response 204
++ Response 404
 
 + Response 400
 
