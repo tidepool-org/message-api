@@ -48,72 +48,105 @@ describe('message API', function() {
     return server;
   };
 
-  describe('helpers', function() {
+  describe('validity of messages being added', function() {
 
-    it('messageIsValid rejects messages with a parentmessage set', function(done) {
-      var messageApi = require('../../lib/routes/messageApi')();
+    var messaging;
 
-      var badParent = {
-        parentmessage : '5555',
-        userid: '12121212',
-        groupid: '777',
-        timestamp: '2013-11-28T23:07:40+00:00',
-        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
-      };
+    before(function(){
 
-      messageApi.messageIsValid(badParent).should.be.false;
-      done();
+      var mockMongoHandler = require('../helpers/mockMongoHandler')({
+        throwErrors : false,
+        returnNone : false
+      });
+
+      messaging = setupAPI(mockMongoHandler);
 
     });
 
-    it('messageIsValid accepts messages userid, groupid, timestamp and messagetext set ', function(done) {
-      var messageApi = require('../../lib/routes/messageApi')();
+    it('POST send/:groupid rejects an invalid parent message', function(done) {
 
-      var goodParent = {
-        parentmessage : '',
-        userid: '12121212',
-        groupid: '777',
-        timestamp: '2013-11-28T23:07:40+00:00',
-        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      var invalidParentNoMessageText = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:'',
+        timestamp:'2013-11-28T23:07:40+00:00',
+        messagetext:''
       };
 
-      messageApi.messageIsValid(goodParent).should.be.true;
-      done();
 
+      supertest(messaging)
+      .post('/send/88883288')
+      .send({message:invalidParentNoMessageText})
+      .expect(400)
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.not.have.property('id');
+        done();
+      });
     });
 
-    it('replyToMessageIsValid rejects messages with NO parentmessage set', function(done) {
-      var messageApi = require('../../lib/routes/messageApi')();
+    it('POST send/:groupid accepts a parent message with the parentmessage set as the parentmessage will be made to equal null', function(done) {
 
-      var badReply = {
-        parentmessage : '',
-        userid: '12121212',
-        groupid: '777',
-        timestamp: '2013-11-28T23:07:40+00:00',
-        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      var parentMessage = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:'',
+        timestamp:'2013-11-28T23:07:40+00:00',
+        messagetext:'my new message thread'
       };
 
-      messageApi.replyToMessageIsValid(badReply).should.be.false;
-      done();
-
+      supertest(messaging)
+      .post('/send/88883288')
+      .send({message:parentMessage})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.have.property('id');
+        done();
+      });
     });
 
-    it('replyToMessageIsValid accepts messages userid, groupid, parentmessage, timestamp and messagetext set ', function(done) {
-      var messageApi = require('../../lib/routes/messageApi')();
+    it('POST reply/:msgid allows with no parent set as it will be set to the reply msgid', function(done) {
 
-      var goodReply = {
-        parentmessage : '2232',
-        userid: '12121212',
-        groupid: '777',
-        timestamp: '2013-11-28T23:07:40+00:00',
-        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      var invalidReplyParentNotSet = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:null,
+        timestamp:'2013-11-28T23:07:40+00:00',
+        messagetext:'my reply'
       };
 
-      messageApi.replyToMessageIsValid(goodReply).should.be.true;
-      done();
-
+      supertest(messaging)
+      .post('/reply/123456743')
+      .send({message:invalidReplyParentNotSet})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.have.property('id');
+        done();
+      });
     });
 
+    it('POST reply/:msgid rejects an invalid reply', function(done) {
+
+      var invalidReplyNoTimeStamp = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:'123456743',
+        timestamp:'',
+        messagetext:'my reply'
+      };
+
+      supertest(messaging)
+      .post('/reply/123456743')
+      .send({message:invalidReplyNoTimeStamp})
+      .expect(400)
+      .end(function(err, res) {
+        if (err) return done(err);
+        res.body.should.not.have.property('id');
+        done();
+      });
+    });
   });
 
   /*
@@ -239,7 +272,7 @@ describe('message API', function() {
     });
 
     it('POST reply/:msgid returns 201 and the id of the message', function(done) {
-      
+
       supertest(messaging)
       .post('/reply/123456743')
       .send({message:testReply})
