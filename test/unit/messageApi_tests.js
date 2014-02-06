@@ -16,7 +16,8 @@
 'use strict';
 /* jshint -W098, -W079 */
 var should = require('chai').should(),
-testMessage = require('../helpers/testMessagesData').individual,
+testNote = require('../helpers/testMessagesData').note,
+testReply = require('../helpers/testMessagesData').noteAndComments[1],
 supertest = require('supertest'),
 restify = require('restify');
 
@@ -46,6 +47,74 @@ describe('message API', function() {
 
     return server;
   };
+
+  describe('helpers', function() {
+
+    it('messageIsValid rejects messages with a parentmessage set', function(done) {
+      var messageApi = require('../../lib/routes/messageApi')();
+
+      var badParent = {
+        parentmessage : '5555',
+        userid: '12121212',
+        groupid: '777',
+        timestamp: '2013-11-28T23:07:40+00:00',
+        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      };
+
+      messageApi.messageIsValid(badParent).should.be.false;
+      done();
+
+    });
+
+    it('messageIsValid accepts messages userid, groupid, timestamp and messagetext set ', function(done) {
+      var messageApi = require('../../lib/routes/messageApi')();
+
+      var goodParent = {
+        parentmessage : '',
+        userid: '12121212',
+        groupid: '777',
+        timestamp: '2013-11-28T23:07:40+00:00',
+        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      };
+
+      messageApi.messageIsValid(goodParent).should.be.true;
+      done();
+
+    });
+
+    it('replyToMessageIsValid rejects messages with NO parentmessage set', function(done) {
+      var messageApi = require('../../lib/routes/messageApi')();
+
+      var badReply = {
+        parentmessage : '',
+        userid: '12121212',
+        groupid: '777',
+        timestamp: '2013-11-28T23:07:40+00:00',
+        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      };
+
+      messageApi.replyToMessageIsValid(badReply).should.be.false;
+      done();
+
+    });
+
+    it('replyToMessageIsValid accepts messages userid, groupid, parentmessage, timestamp and messagetext set ', function(done) {
+      var messageApi = require('../../lib/routes/messageApi')();
+
+      var goodReply = {
+        parentmessage : '2232',
+        userid: '12121212',
+        groupid: '777',
+        timestamp: '2013-11-28T23:07:40+00:00',
+        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      };
+
+      messageApi.replyToMessageIsValid(goodReply).should.be.true;
+      done();
+
+    });
+
+  });
 
   /*
   GOAL: To test that under normal operation that we get the return codes
@@ -160,7 +229,7 @@ describe('message API', function() {
 
       supertest(messaging)
       .post('/send/88883288')
-      .send({message:testMessage})
+      .send({message:testNote})
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
@@ -170,10 +239,10 @@ describe('message API', function() {
     });
 
     it('POST reply/:msgid returns 201 and the id of the message', function(done) {
-
+      
       supertest(messaging)
       .post('/reply/123456743')
-      .send({message:testMessage})
+      .send({message:testReply})
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
@@ -285,7 +354,7 @@ describe('message API', function() {
 
       supertest(messaging)
       .post('/send/88883288')
-      .send({message:testMessage})
+      .send({message:testNote})
       .expect(500,done);
     });
 
@@ -293,7 +362,7 @@ describe('message API', function() {
 
       supertest(messaging)
       .post('/reply/123456743')
-      .send({message:testMessage})
+      .send({message:testNote})
       .expect(500,done);
     });
 

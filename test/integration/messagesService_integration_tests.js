@@ -17,7 +17,7 @@
 /* jshint -W098, -W079 */
 var should = require('chai').should(),
 mongojs = require('mongojs'),
-messagesToSave = require('../helpers/testMessagesData').relatedSet,
+noteAndComments = require('../helpers/testMessagesData').noteAndComments,
 messageServiceTestHelper = require('../helpers/messageServiceTestHelper'),
 supertest = require('supertest')(messageServiceTestHelper.testServiceEndpoint()),
 sessionToken = messageServiceTestHelper.sessiontoken,
@@ -52,13 +52,13 @@ describe('message API', function() {
 
     testDbInstance.messages.remove();
 
-    for (var index = 0; index < messagesToSave.length; ++index) {
+    for (var index = 0; index < noteAndComments.length; ++index) {
 
       if(index === 0){
-        testDbInstance.messages.save(messagesToSave[index]);
+        testDbInstance.messages.save(noteAndComments[index]);
       }else{
-        messagesToSave[index].parentmessage = fakeRootId;
-        testDbInstance.messages.save(messagesToSave[index]);
+        noteAndComments[index].parentmessage = fakeRootId;
+        testDbInstance.messages.save(noteAndComments[index]);
       }
     }
     done();
@@ -280,9 +280,22 @@ describe('message API', function() {
 
     });
 
+    it('should ignore the parentmessage as it is the parent', function(done) {
+
+      supertest.post('/send')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:'here it is'})
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+
+    });
+
     it('returns 201', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
       supertest.post('/send/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -297,7 +310,7 @@ describe('message API', function() {
 
     it('return Id when message added', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
       supertest.post('/send/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -347,7 +360,7 @@ describe('message API', function() {
 
     it('returns 201', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
       supertest.post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -362,7 +375,7 @@ describe('message API', function() {
 
     it('return Id when message added', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
       supertest.post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
