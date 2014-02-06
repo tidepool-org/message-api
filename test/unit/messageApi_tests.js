@@ -225,21 +225,21 @@ describe('message API', function() {
       supertest(messaging)
       .get('/read/123456743')
 
-      .expect(204,done);
+      .expect(404,done);
     });
 
     it('GET all/:groupid with a starttime returns 404', function(done) {
       supertest(messaging)
       .get('/all/88883288?starttime=2013-11-25')
 
-      .expect(204,done);
+      .expect(404,done);
     });
 
     it('GET all/:groupid with a starttime and end time returns 404', function(done) {
       supertest(messaging)
       .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
 
-      .expect(204,done);
+      .expect(404,done);
     });
 
   });

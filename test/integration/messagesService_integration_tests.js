@@ -131,24 +131,24 @@ describe('message API', function() {
       });
     });
 
-    it('returns 204 if no message found for id', function(done) {
+    it('returns 404 if no message found for id', function(done) {
 
       var dummyId = mongojs.ObjectId().toString();
 
       supertest.get('/read/'+dummyId)
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204)
+      .expect(404)
       .end(function(err, res) {
         if (err) return done(err);
         done();
       });
     });
 
-    it('returns 204 if a bad id is given', function(done) {
+    it('returns 404 if a bad id is given', function(done) {
 
       supertest.get('/read/badIdGiven')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204)
+      .expect(404)
       .end(function(err, res) {
         if (err) return done(err);
         done();
@@ -165,11 +165,11 @@ describe('message API', function() {
       .expect(404,done);
     });
 
-    it('returns 204 when there are no messages for path', function(done) {
+    it('returns 404 when there are no messages for path', function(done) {
 
       supertest.get('/all/12342?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204,done);
+      .expect(404,done);
     });
 
     it('returns 3 messages', function(done) {
@@ -223,10 +223,10 @@ describe('message API', function() {
       });
     });
 
-    it('returns 204 when no messages', function(done) {
+    it('returns 404 when no messages', function(done) {
       supertest.get('/all/99977777?starttime=2013-11-25')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204,done);
+      .expect(404,done);
     });
 
   });
@@ -257,10 +257,10 @@ describe('message API', function() {
       });
     });
 
-    it('returns 204 when no messages', function(done) {
+    it('returns 404 when no messages', function(done) {
       supertest.get('/thread/8888888888')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204,done);
+      .expect(404,done);
     });
 
   });
