@@ -14,12 +14,14 @@
 // == BSD2 LICENSE ==
 
 'use strict';
-/* jshint -W098, -W079 */
-var should = require('chai').should(),
-testNote = require('../helpers/testMessagesData').note,
-testReply = require('../helpers/testMessagesData').noteAndComments[1],
-supertest = require('supertest'),
-restify = require('restify');
+var salinity = require('salinity');
+
+var expect = salinity.expect;
+
+var testNote = require('../helpers/testMessagesData').note;
+var testReply = require('../helpers/testMessagesData').noteAndComments[1];
+var supertest = require('supertest');
+var restify = require('restify');
 
 
 describe('message API', function() {
@@ -80,7 +82,7 @@ describe('message API', function() {
       .expect(400)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.not.have.property('id');
+        expect(res.body).to.not.have.property('id');
         done();
       });
     });
@@ -101,7 +103,7 @@ describe('message API', function() {
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expect(res.body).to.have.property('id');
         done();
       });
     });
@@ -122,7 +124,7 @@ describe('message API', function() {
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expect(res.body).to.have.property('id');
         done();
       });
     });
@@ -143,7 +145,7 @@ describe('message API', function() {
       .expect(400)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.not.have.property('id');
+        expect(res.body).to.not.have.property('id');
         done();
       });
     });
@@ -182,12 +184,12 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var message = res.body.message;
-        message.should.have.property('id');
-        message.should.have.property('parentmessage');
-        message.should.have.property('userid');
-        message.should.have.property('groupid');
-        message.should.have.property('messagetext');
-        message.should.have.property('timestamp');
+        expect(message).to.have.property('id');
+        expect(message).to.have.property('parentmessage');
+        expect(message).to.have.property('userid');
+        expect(message).to.have.property('groupid');
+        expect(message).to.have.property('messagetext');
+        expect(message).to.have.property('timestamp');
         done();
       });
     });
@@ -199,15 +201,15 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var messages = res.body.messages;
-        messages.should.be.instanceOf(Array);
+        expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('parentmessage');
-          message.should.have.property('userid');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
@@ -221,15 +223,15 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var messages = res.body.messages;
-        messages.should.be.instanceOf(Array);
+        expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('parentmessage');
-          message.should.have.property('userid');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
@@ -243,15 +245,15 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var messages = res.body.messages;
-        messages.should.be.instanceOf(Array);
+        expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('parentmessage');
-          message.should.have.property('userid');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
@@ -266,7 +268,7 @@ describe('message API', function() {
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expect(res.body).to.have.property('id');
         done();
       });
     });
@@ -279,7 +281,7 @@ describe('message API', function() {
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expect(res.body).to.have.property('id');
         done();
       });
     });
