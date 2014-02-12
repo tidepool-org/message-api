@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Tidepool Messages API.",
   "main": "lib/index.js",
   "directories": {
@@ -19,15 +19,14 @@
     "amoeba": "0.0.3",
     "bunyan": "0.22.1",
     "cookies": "0.3.6",
-    "hakken": "0.0.10",
+    "hakken": "0.1.0",
     "lodash": "2.4.1",
     "mongojs": "0.9.8",
     "restify": "2.6.0",
     "request": "2.25.0",
-    "user-api-client": "0.0.1"
+    "user-api-client": "0.1.4"
   },
   "devDependencies": {
-    "chai": "1.8.1",
     "grunt": "0.4.2",
     "grunt-cli": "0.1.13",
     "grunt-contrib-jshint": "0.7.2",
@@ -35,7 +34,7 @@
     "grunt-docco2": "0.1.5",
     "grunt-shell-spawn": "0.3.0",
     "grunt-mocha-test": "0.8.1",
-    "mocha": "1.14.0",
-    "supertest": "0.8.1"
+    "supertest": "0.8.1",
+    "salinity": "0.0.3"
   }
 }

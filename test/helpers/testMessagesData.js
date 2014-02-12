@@ -15,12 +15,12 @@
 
 var testMessagesData = {
 
-  relatedSet : {},
-  individual : {}
+  noteAndComments : {},
+  note : {}
 };
 
 // A related set of messages
-testMessagesData.relatedSet = [
+testMessagesData.noteAndComments = [
   {
     parentmessage : '',
     userid: '12121212',
@@ -52,7 +52,7 @@ testMessagesData.relatedSet = [
 ];
 
 // One off group with no other related groups
-testMessagesData.individual = {
+testMessagesData.note = {
   parentmessage:'',
   userid: '12121212',
   groupid: '999',

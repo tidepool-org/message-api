@@ -14,59 +14,64 @@
 // == BSD2 LICENSE ==
 
 'use strict';
-/* jshint -W098, -W079 */
-var should = require('chai').should(),
-mongojs = require('mongojs'),
-messagesToSave = require('../helpers/testMessagesData').relatedSet,
-messageServiceTestHelper = require('../helpers/messageServiceTestHelper'),
-supertest = require('supertest')(messageServiceTestHelper.testServiceEndpoint()),
-sessionToken = messageServiceTestHelper.sessiontoken,
-testDbInstance,
-apiEndPoint,
-crud;
+
+var salinity = require('salinity');
+
+var expect = salinity.expect;
+var sinon = salinity.sinon;
+var mockableObject = salinity.mockableObject;
+
+
+var env = {
+  httpPort: 21000,
+  mongoConnectionString: 'mongodb://localhost/test_messages'
+};
+
+var userApiClient = mockableObject.make('checkToken');
+
+var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
+var messageService = require('../../lib/messagesService')(env,mongoHandler,userApiClient);
+var supertest = require('supertest')('http://localhost:' + env.httpPort);
+var testDbInstance = require('mongojs')(env.mongoConnectionString, ['messages']);
+
+var messageUser = { userid: 'message', isserver: true };
+var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
+var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
 describe('message API', function() {
 
   var fakeRootId = '8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
 
-  before(function(done){
+  function setupToken(user) {
+    sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
+  }
 
-    var config = messageServiceTestHelper.testConfig;
+  function expectToken(token) {
+    expect(userApiClient.checkToken).to.have.been.calledWith(token, sinon.match.func);
+  }
 
-    //fake hakken functionality
-    var fakeHostGetter = {
-      get: function(){
-        return [{ protocol: 'http', host:'localhost:'+config.userApiPort }];
-      }
-    };
-
-    crud = require('../../lib/handler/mongoHandler')(config.mongoDbConnectionString);
-
-    //using the test helper setup the service and load test data
-    messageServiceTestHelper.initMessagesService(crud,fakeHostGetter);
-    testDbInstance = messageServiceTestHelper.createMongoInstance();
-    apiEndPoint = messageServiceTestHelper.testServiceEndpoint();
-
-    console.log('sessionToken ',sessionToken);
-
+  before(function (done) {
 
     testDbInstance.messages.remove();
 
-    for (var index = 0; index < messagesToSave.length; ++index) {
+    for (var index = 0; index < noteAndComments.length; ++index) {
 
       if(index === 0){
-        testDbInstance.messages.save(messagesToSave[index]);
+        testDbInstance.messages.save(noteAndComments[index]);
       }else{
-        messagesToSave[index].parentmessage = fakeRootId;
-        testDbInstance.messages.save(messagesToSave[index]);
+        noteAndComments[index].parentmessage = fakeRootId;
+        testDbInstance.messages.save(noteAndComments[index]);
       }
     }
-    done();
+
+    messageService.start(done);
+
+    setupToken(messageUser);
 
   });
 
-  after(function(){
-    messageServiceTestHelper.stopTestService();
+  after(function () {
+    messageService.stop();
   });
 
   describe('GET /read/:msgId', function() {
@@ -84,28 +89,32 @@ describe('message API', function() {
     });
 
     it('404 when path is incorrect', function(done) {
-      supertest.get('/read')
+      supertest
+      .get('/read')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(404,done);
     });
 
     it('returns 200 and valid message', function(done) {
 
-      supertest.get('/read/'+messageFromMongo._id)
+      supertest
+      .get('/read/'+messageFromMongo._id)
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type', 'application/json')
       .end(function(err, res) {
         if (err) return done(err);
 
+        expectToken(sessionToken);
+
         var theMessage = res.body.message;
 
-        theMessage.id.should.equal(String(messageFromMongo._id));
-        theMessage.parentmessage.should.equal(String(messageFromMongo.parentmessage));
-        theMessage.timestamp.should.equal(String(messageFromMongo.timestamp));
-        theMessage.groupid.should.equal(String(messageFromMongo.groupid));
-        theMessage.userid.should.equal(String(messageFromMongo.userid));
-        theMessage.messagetext.should.equal(String(messageFromMongo.messagetext));
+        expect(theMessage.id).to.equal(String(messageFromMongo._id));
+        expect(theMessage.parentmessage).to.equal(String(messageFromMongo.parentmessage));
+        expect(theMessage.timestamp).to.equal(String(messageFromMongo.timestamp));
+        expect(theMessage.groupid).to.equal(String(messageFromMongo.groupid));
+        expect(theMessage.userid).to.equal(String(messageFromMongo.userid));
+        expect(theMessage.messagetext).to.equal(String(messageFromMongo.messagetext));
 
         done();
       });
@@ -115,44 +124,36 @@ describe('message API', function() {
 
       var messageFields = ['id', 'parentmessage', 'userid','groupid', 'timestamp', 'messagetext'];
 
-      supertest.get('/read/'+String(messageFromMongo._id))
+      supertest
+      .get('/read/'+String(messageFromMongo._id))
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type', 'application/json')
       .end(function(err, res) {
         if (err) return done(err);
-
-        var message = res.body.message;
-        var theMessage = message;
-
-        theMessage.should.have.keys(messageFields);
+        expectToken(sessionToken);
+        expect(res.body.message).to.have.keys(messageFields);
 
         done();
       });
     });
 
-    it('returns 204 if no message found for id', function(done) {
+    it('returns 404 if no message found for id', function(done) {
 
-      var dummyId = mongojs.ObjectId().toString();
-
-      supertest.get('/read/'+dummyId)
+      supertest
+      .get('/read/3344556754')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(404,done);
+
     });
 
-    it('returns 204 if a bad id is given', function(done) {
+    it('returns 404 if a bad id is given', function(done) {
 
-      supertest.get('/read/badIdGiven')
+      supertest
+      .get('/read/badIdGiven')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(404,done);
+
     });
   });
 
@@ -160,36 +161,42 @@ describe('message API', function() {
 
     it('returns 404 for invalid path', function(done) {
 
-      supertest.get('/all')
+      supertest
+      .get('/all')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(404,done);
+
     });
 
-    it('returns 204 when there are no messages for path', function(done) {
+    it('returns 404 when there are no messages for path', function(done) {
 
-      supertest.get('/all/12342?starttime=2013-11-25&endtime=2013-11-30')
+      supertest
+      .get('/all/12342?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204,done);
+      .expect(404,done);
+
     });
 
     it('returns 3 messages', function(done) {
 
-      supertest.get('/all/777?starttime=2013-11-25&endtime=2013-11-30')
+      supertest
+      .get('/all/777?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type', 'application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('messages').and.be.instanceof(Array);
-        res.body.messages.length.should.equal(3);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(3);
 
         res.body.messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('userid');
-          message.should.have.property('parentmessage');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
@@ -201,32 +208,34 @@ describe('message API', function() {
   describe('GET /all/:groupid?starttime=xxx ', function() {
 
     it('returns 4 messages', function(done) {
-      supertest.get('/all/777?starttime=2013-11-25')
+      supertest
+      .get('/all/777?starttime=2013-11-25')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('messages').and.be.instanceof(Array);
-        res.body.messages.length.should.equal(4);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(4);
 
         res.body.messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('userid');
-          message.should.have.property('parentmessage');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
       });
     });
 
-    it('returns 204 when no messages', function(done) {
+    it('returns 404 when no messages', function(done) {
       supertest.get('/all/99977777?starttime=2013-11-25')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204,done);
+      .expect(404,done);
     });
 
   });
@@ -234,33 +243,36 @@ describe('message API', function() {
   describe('GET /thread/:msgid ', function() {
 
     it('returns 3 messages with thread id', function(done) {
-      supertest.get('/thread/'+fakeRootId)
+      supertest
+      .get('/thread/'+fakeRootId)
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('messages').and.be.instanceof(Array);
-        res.body.messages.length.should.equal(3);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).equal(3);
 
         res.body.messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('userid');
-          message.should.have.property('parentmessage');
-          message.parentmessage.should.equal(fakeRootId);
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('parentmessage');
+          expect(message.parentmessage).to.equal(fakeRootId);
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
       });
     });
 
-    it('returns 204 when no messages', function(done) {
-      supertest.get('/thread/8888888888')
+    it('returns 404 when no messages', function(done) {
+      supertest
+      .get('/thread/8888888888')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(204,done);
+      .expect(404,done);
     });
 
   });
@@ -272,40 +284,35 @@ describe('message API', function() {
       supertest.post('/send')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:'here it is'})
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(404,done);
 
     });
 
     it('returns 201', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
-      supertest.post('/send/12345')
+      supertest
+      .post('/send/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:testMessage})
-      .expect(201)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(201,done);
 
     });
 
     it('return Id when message added', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
-      supertest.post('/send/12345')
+      supertest
+      .post('/send/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(201)
       .send({message:testMessage})
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('id');
         done();
       });
     });
@@ -319,14 +326,11 @@ describe('message API', function() {
         messagetext: ''
       };
 
-      supertest.post('/send/12345')
+      supertest
+      .post('/send/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(400)
       .send({message:invalidMessage})
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(400,done);
     });
   });
 
@@ -334,43 +338,39 @@ describe('message API', function() {
 
     it('should not work without msgid parameter', function(done) {
 
-      supertest.post('/reply')
+      supertest
+      .post('/reply')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:'here it is'})
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(404,done);
 
     });
 
     it('returns 201', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
-      supertest.post('/reply/12345')
+      supertest
+      .post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:testMessage})
-      .expect(201)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(201,done);
 
     });
 
     it('return Id when message added', function(done) {
 
-      var testMessage = require('../helpers/testMessagesData').individual;
+      var testMessage = require('../helpers/testMessagesData').note;
 
-      supertest.post('/reply/12345')
+      supertest
+      .post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(201)
       .send({message:testMessage})
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('id');
         done();
       });
     });
@@ -383,14 +383,11 @@ describe('message API', function() {
         messagetext: ''
       };
 
-      supertest.post('/reply/12345')
+      supertest
+      .post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(400)
       .send({message:invalidMessage})
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(400,done);
     });
   });
 

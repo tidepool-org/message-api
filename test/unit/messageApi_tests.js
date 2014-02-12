@@ -14,11 +14,14 @@
 // == BSD2 LICENSE ==
 
 'use strict';
-/* jshint -W098, -W079 */
-var should = require('chai').should(),
-testMessage = require('../helpers/testMessagesData').individual,
-supertest = require('supertest'),
-restify = require('restify');
+var salinity = require('salinity');
+
+var expect = salinity.expect;
+
+var testNote = require('../helpers/testMessagesData').note;
+var testReply = require('../helpers/testMessagesData').noteAndComments[1];
+var supertest = require('supertest');
+var restify = require('restify');
 
 
 describe('message API', function() {
@@ -46,6 +49,107 @@ describe('message API', function() {
 
     return server;
   };
+
+  describe('validity of messages being added', function() {
+
+    var messaging;
+
+    before(function(){
+
+      var mockMongoHandler = require('../helpers/mockMongoHandler')({
+        throwErrors : false,
+        returnNone : false
+      });
+
+      messaging = setupAPI(mockMongoHandler);
+
+    });
+
+    it('POST send/:groupid rejects an invalid parent message', function(done) {
+
+      var invalidParentNoMessageText = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:'',
+        timestamp:'2013-11-28T23:07:40+00:00',
+        messagetext:''
+      };
+
+
+      supertest(messaging)
+      .post('/send/88883288')
+      .send({message:invalidParentNoMessageText})
+      .expect(400)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.not.have.property('id');
+        done();
+      });
+    });
+
+    it('POST send/:groupid accepts a parent message with the parentmessage set as the parentmessage will be made to equal null', function(done) {
+
+      var parentMessage = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:'',
+        timestamp:'2013-11-28T23:07:40+00:00',
+        messagetext:'my new message thread'
+      };
+
+      supertest(messaging)
+      .post('/send/88883288')
+      .send({message:parentMessage})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.have.property('id');
+        done();
+      });
+    });
+
+    it('POST reply/:msgid allows with no parent set as it will be set to the reply msgid', function(done) {
+
+      var invalidReplyParentNotSet = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:null,
+        timestamp:'2013-11-28T23:07:40+00:00',
+        messagetext:'my reply'
+      };
+
+      supertest(messaging)
+      .post('/reply/123456743')
+      .send({message:invalidReplyParentNotSet})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.have.property('id');
+        done();
+      });
+    });
+
+    it('POST reply/:msgid rejects an invalid reply', function(done) {
+
+      var invalidReplyNoTimeStamp = {
+        userid: '12345',
+        groupid: '4567',
+        parentmessage:'123456743',
+        timestamp:'',
+        messagetext:'my reply'
+      };
+
+      supertest(messaging)
+      .post('/reply/123456743')
+      .send({message:invalidReplyNoTimeStamp})
+      .expect(400)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.not.have.property('id');
+        done();
+      });
+    });
+  });
 
   /*
   GOAL: To test that under normal operation that we get the return codes
@@ -80,12 +184,12 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var message = res.body.message;
-        message.should.have.property('id');
-        message.should.have.property('parentmessage');
-        message.should.have.property('userid');
-        message.should.have.property('groupid');
-        message.should.have.property('messagetext');
-        message.should.have.property('timestamp');
+        expect(message).to.have.property('id');
+        expect(message).to.have.property('parentmessage');
+        expect(message).to.have.property('userid');
+        expect(message).to.have.property('groupid');
+        expect(message).to.have.property('messagetext');
+        expect(message).to.have.property('timestamp');
         done();
       });
     });
@@ -97,15 +201,15 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var messages = res.body.messages;
-        messages.should.be.instanceOf(Array);
+        expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('parentmessage');
-          message.should.have.property('userid');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
@@ -119,15 +223,15 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var messages = res.body.messages;
-        messages.should.be.instanceOf(Array);
+        expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('parentmessage');
-          message.should.have.property('userid');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
@@ -141,15 +245,15 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var messages = res.body.messages;
-        messages.should.be.instanceOf(Array);
+        expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          message.should.have.property('id');
-          message.should.have.property('parentmessage');
-          message.should.have.property('userid');
-          message.should.have.property('groupid');
-          message.should.have.property('messagetext');
-          message.should.have.property('timestamp');
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
         });
 
         done();
@@ -160,11 +264,11 @@ describe('message API', function() {
 
       supertest(messaging)
       .post('/send/88883288')
-      .send({message:testMessage})
+      .send({message:testNote})
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expect(res.body).to.have.property('id');
         done();
       });
     });
@@ -173,11 +277,11 @@ describe('message API', function() {
 
       supertest(messaging)
       .post('/reply/123456743')
-      .send({message:testMessage})
+      .send({message:testReply})
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
-        res.body.should.have.property('id');
+        expect(res.body).to.have.property('id');
         done();
       });
     });
@@ -225,21 +329,21 @@ describe('message API', function() {
       supertest(messaging)
       .get('/read/123456743')
 
-      .expect(204,done);
+      .expect(404,done);
     });
 
     it('GET all/:groupid with a starttime returns 404', function(done) {
       supertest(messaging)
       .get('/all/88883288?starttime=2013-11-25')
 
-      .expect(204,done);
+      .expect(404,done);
     });
 
     it('GET all/:groupid with a starttime and end time returns 404', function(done) {
       supertest(messaging)
       .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
 
-      .expect(204,done);
+      .expect(404,done);
     });
 
   });
@@ -285,7 +389,7 @@ describe('message API', function() {
 
       supertest(messaging)
       .post('/send/88883288')
-      .send({message:testMessage})
+      .send({message:testNote})
       .expect(500,done);
     });
 
@@ -293,7 +397,7 @@ describe('message API', function() {
 
       supertest(messaging)
       .post('/reply/123456743')
-      .send({message:testMessage})
+      .send({message:testNote})
       .expect(500,done);
     });
 
