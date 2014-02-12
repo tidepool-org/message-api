@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Tidepool Messages API.",
   "main": "lib/index.js",
   "directories": {
@@ -19,7 +19,7 @@
     "amoeba": "0.0.3",
     "bunyan": "0.22.1",
     "cookies": "0.3.6",
-    "hakken": "0.0.10",
+    "hakken": "0.1.0",
     "lodash": "2.4.1",
     "mongojs": "0.9.8",
     "restify": "2.6.0",
