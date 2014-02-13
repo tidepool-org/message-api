@@ -40,7 +40,7 @@ var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
 describe('message API', function() {
 
-  var fakeRootId = '8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
+  var fakeRootId = String(testDbInstance.ObjectId());//'8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
 
   function setupToken(user) {
     sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
@@ -269,8 +269,9 @@ describe('message API', function() {
     });
 
     it('returns 404 when no messages', function(done) {
+
       supertest
-      .get('/thread/8888888888')
+      .get('/thread/'+String(testDbInstance.ObjectId()))
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(404,done);
     });
