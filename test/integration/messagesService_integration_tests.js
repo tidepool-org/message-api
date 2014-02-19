@@ -83,7 +83,6 @@ describe('message API', function() {
       // grab a message that has been saved already
       testDbInstance.messages.findOne({},function(err, doc) {
         messageFromMongo = doc;
-        console.log('message to test wth ',messageFromMongo);
         done();
       });
     });
@@ -98,7 +97,7 @@ describe('message API', function() {
     it('returns 200 and valid message', function(done) {
 
       supertest
-      .get('/read/'+messageFromMongo._id)
+      .get('/read/'+String(messageFromMongo._id))
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type', 'application/json')

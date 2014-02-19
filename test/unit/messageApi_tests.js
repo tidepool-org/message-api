@@ -195,8 +195,11 @@ describe('message API', function() {
     });
 
     it('GET all/:groupid with a starttime returns 200', function(done) {
+
+      var start = new Date();
+
       supertest(messaging)
-      .get('/all/88883288?starttime=2013-11-25')
+      .get('/all/88883288?starttime='+start)
       .expect(200)
       .end(function(err, res) {
         if (err) return done(err);
@@ -217,8 +220,13 @@ describe('message API', function() {
     });
 
     it('GET all/:groupid with a starttime and end time returns 200', function(done) {
+
+
+      var start = new Date();
+      var end = new Date();
+
       supertest(messaging)
-      .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+      .get('/all/88883288?starttime='+start+'&endtime='+end)
       .expect(200)
       .end(function(err, res) {
         if (err) return done(err);
@@ -333,16 +341,17 @@ describe('message API', function() {
     });
 
     it('GET all/:groupid with a starttime returns 404', function(done) {
+      var start = new Date();
       supertest(messaging)
-      .get('/all/88883288?starttime=2013-11-25')
-
+      .get('/all/88883288?starttime='+start)
       .expect(404,done);
     });
 
     it('GET all/:groupid with a starttime and end time returns 404', function(done) {
+      var start = new Date();
+      var end = new Date();
       supertest(messaging)
-      .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
-
+      .get('/all/88883288?starttime='+start+'&endtime='+end)
       .expect(404,done);
     });
 
@@ -374,14 +383,17 @@ describe('message API', function() {
     });
 
     it('GET all/:groupid?starttime=xxx returns 500', function(done) {
+      var start = new Date();
       supertest(messaging)
-      .get('/all/88883288?starttime=2013-11-25')
+      .get('/all/88883288?starttime='+start)
       .expect(500,done);
     });
 
     it('GET all/:groupid?starttime=xxx&endtime=yyy returns 500', function(done) {
+      var start = new Date();
+      var end = new Date();
       supertest(messaging)
-      .get('/all/88883288?starttime=2013-11-25&endtime=2013-12-25')
+      .get('/all/88883288?starttime='+start+'&endtime='+end)
       .expect(500,done);
     });
 

@@ -98,7 +98,7 @@ function handleGetMessagesInThread(messageId, callback) {
   var messages =
   [{
     id : messageId,
-    parentmessage :'',
+    parentmessage :null,
     userid: '12121212',
     groupid: '999777',
     timestamp: '2013-11-28T23:07:40+00:00',
@@ -138,7 +138,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   var messages =
   [{
     id : '1299999299',
-    parentmessage: '',
+    parentmessage: null,
     userid: '12121212',
     groupid: groupId,
     timestamp: '2013-11-28T23:07:40+00:00',
@@ -146,7 +146,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   },
   {
     id : '12999333444',
-    parentmessage: '',
+    parentmessage: null,
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-29T23:05:40+00:00',
@@ -154,7 +154,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   },
   {
     id : '12990000000',
-    parentmessage: '',
+    parentmessage: null,
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-30T23:05:40+00:00',
@@ -162,7 +162,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   },
   {
     id : '1299554433',
-    parentmessage: '',
+    parentmessage: null,
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-25T23:05:40+00:00',
