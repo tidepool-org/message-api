@@ -40,7 +40,7 @@ var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
 describe('message API', function() {
 
-  var fakeRootId = String(testDbInstance.ObjectId());//'8c4159e8-cf2d-4b28-b862-2c06f6aa9f93';
+  var fakeRootId = String(testDbInstance.ObjectId());
 
   function setupToken(user) {
     sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
@@ -109,7 +109,7 @@ describe('message API', function() {
         var theMessage = res.body.message;
 
         expect(theMessage.id).to.equal(String(messageFromMongo._id));
-        expect(theMessage.parentmessage).to.equal(String(messageFromMongo.parentmessage));
+        expect(theMessage.parentmessage).to.equal(messageFromMongo.parentmessage);
         expect(theMessage.timestamp).to.equal(String(messageFromMongo.timestamp));
         expect(theMessage.groupid).to.equal(String(messageFromMongo.groupid));
         expect(theMessage.userid).to.equal(String(messageFromMongo.userid));
@@ -233,6 +233,41 @@ describe('message API', function() {
 
     it('returns 404 when no messages', function(done) {
       supertest.get('/all/99977777?starttime=2013-11-25')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404,done);
+    });
+
+  });
+
+  describe('GET /notes/:groupid ', function() {
+
+    it('returns 1 message', function(done) {
+      supertest
+      .get('/notes/777')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(1);
+
+        res.body.messages.forEach(function(message){
+          expect(message).to.have.property('id');
+          expect(message).to.have.property('userid');
+          expect(message).to.have.property('parentmessage');
+          expect(message).to.have.property('groupid');
+          expect(message).to.have.property('messagetext');
+          expect(message).to.have.property('timestamp');
+        });
+
+        done();
+      });
+    });
+
+    it('returns 404 when no messages', function(done) {
+      supertest.get('/notes/99977777')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(404,done);
     });

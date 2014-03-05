@@ -37,6 +37,7 @@ var mockMongoHandler = function(testingConfig) {
   return {
     status: handleStatus,
     createMessage : handleCreateMessage,
+    getNotes : handleGetNotes,
     getMessage : handleGetMessage,
     getAllMessages : handleGetAllMessages,
     getMessagesInThread : handleGetMessagesInThread
@@ -90,6 +91,38 @@ function handleGetMessage(messageId,callback) {
   };
 
   return resolveCallbackValues(callback,message);
+}
+
+function handleGetNotes(groupId, callback) {
+  log.debug('Finding all notes for group[%s] ', groupId);
+
+  var messages =
+  [{
+    id : '12999337798',
+    parentmessage :null,
+    userid: '12121212',
+    groupid: groupId,
+    timestamp: '2013-11-28T23:07:40+00:00',
+    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+  },
+  {
+    id : '12999333444',
+    parentmessage :null,
+    userid: '232323',
+    groupid: groupId,
+    timestamp: '2013-11-29T23:05:40+00:00',
+    messagetext: 'Second message.'
+  },
+  {
+    id : '12990000000',
+    parentmessage :null,
+    userid: '232323',
+    groupid: groupId,
+    timestamp: '2013-11-30T23:05:40+00:00',
+    messagetext: 'Third message.'
+  }];
+
+  return resolveCallbackValues(callback,messages);
 }
 
 function handleGetMessagesInThread(messageId, callback) {
