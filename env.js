@@ -59,7 +59,6 @@ module.exports = (function(){
 
   env.mongoDbConnectionString = process.env.MONGO_CONNECTION_STRING || 'mongodb://localhost/messages';
 
-  // Name of the hakken service for user-api discovery
   env.userApi = {
     // The config object to discover user-api.  This is just passed through to hakken.watchFromConfig()
     serviceSpec: JSON.parse(config.fromEnvironment('USER_API_SERVICE')),
@@ -71,7 +70,10 @@ module.exports = (function(){
     serverSecret: config.fromEnvironment('SERVER_SECRET')
   };
 
-
+  env.seagull = {
+    // The config object to discover seagull.  This is just passed through to hakken.watchFromConfig()
+    serviceSpec: JSON.parse(config.fromEnvironment("SEAGULL_SERVICE"))
+  };
 
   // The host to contact for discovery
   if (process.env.DISCOVERY_HOST != null) {

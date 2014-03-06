@@ -14,15 +14,16 @@
 // == BSD2 LICENSE ==
 
 'use strict';
+
+var supertest = require('supertest');
+var restify = require('restify');
 var salinity = require('salinity');
 
 var expect = salinity.expect;
 
 var testNote = require('../helpers/testMessagesData').note;
 var testReply = require('../helpers/testMessagesData').noteAndComments[1];
-var supertest = require('supertest');
-var restify = require('restify');
-
+var seagullHandler = require('../helpers/mockSeagullHandler')();
 
 describe('message API', function() {
 
@@ -35,7 +36,7 @@ describe('message API', function() {
     server.use(restify.queryParser());
     server.use(restify.bodyParser());
 
-    var messageApi = require('../../lib/routes/messageApi')(crudHandler);
+    var messageApi = require('../../lib/routes/messageApi')(crudHandler,seagullHandler);
 
     server.get('/status',messageApi.status);
 
@@ -193,6 +194,7 @@ describe('message API', function() {
           expect(message).to.have.property('id');
           expect(message).to.have.property('parentmessage');
           expect(message).to.have.property('userid');
+          //expect(message).to.have.property('username');
           expect(message).to.have.property('groupid');
           expect(message).to.have.property('messagetext');
           expect(message).to.have.property('timestamp');
@@ -212,6 +214,7 @@ describe('message API', function() {
         expect(message).to.have.property('id');
         expect(message).to.have.property('parentmessage');
         expect(message).to.have.property('userid');
+        expect(message).to.have.property('username');
         expect(message).to.have.property('groupid');
         expect(message).to.have.property('messagetext');
         expect(message).to.have.property('timestamp');
@@ -235,6 +238,7 @@ describe('message API', function() {
           expect(message).to.have.property('id');
           expect(message).to.have.property('parentmessage');
           expect(message).to.have.property('userid');
+          //expect(message).to.have.property('username');
           expect(message).to.have.property('groupid');
           expect(message).to.have.property('messagetext');
           expect(message).to.have.property('timestamp');
@@ -262,6 +266,7 @@ describe('message API', function() {
           expect(message).to.have.property('id');
           expect(message).to.have.property('parentmessage');
           expect(message).to.have.property('userid');
+          //expect(message).to.have.property('username');
           expect(message).to.have.property('groupid');
           expect(message).to.have.property('messagetext');
           expect(message).to.have.property('timestamp');
@@ -284,6 +289,7 @@ describe('message API', function() {
           expect(message).to.have.property('id');
           expect(message).to.have.property('parentmessage');
           expect(message).to.have.property('userid');
+          //expect(message).to.have.property('username');
           expect(message).to.have.property('groupid');
           expect(message).to.have.property('messagetext');
           expect(message).to.have.property('timestamp');

@@ -30,7 +30,8 @@ var env = {
 var userApiClient = mockableObject.make('checkToken');
 
 var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
-var messageService = require('../../lib/messagesService')(env,mongoHandler,userApiClient);
+var seagullHandler = require('../helpers/mockSeagullHandler');
+var messageService = require('../../lib/messagesService')(env,mongoHandler,userApiClient,seagullHandler);
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
 var testDbInstance = require('mongojs')(env.mongoConnectionString, ['messages']);
 
@@ -44,6 +45,10 @@ describe('message API', function() {
 
   function setupToken(user) {
     sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
+  }
+
+  function setupProfile(){
+    sinon.stub(seagullClient, 'getProfile').callsArgWith();
   }
 
   function expectToken(token) {
