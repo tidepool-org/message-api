@@ -52,6 +52,25 @@ describe('message API', function() {
     return server;
   };
 
+  /*
+    All expectations for a message
+  */
+  var testMessageContent = function(message){
+    expect(message).to.have.property('id');
+    expect(message.id).to.exist;
+    expect(message).to.have.property('parentmessage');
+    expect(message).to.have.property('userid');
+    expect(message.userid).to.exist;
+    expect(message).to.have.property('username');
+    expect(message.username).to.exist;
+    expect(message).to.have.property('groupid');
+    expect(message.groupid).to.exist;
+    expect(message).to.have.property('messagetext');
+    expect(message.messagetext).to.exist;
+    expect(message).to.have.property('timestamp');
+    expect(message.timestamp).to.exist;
+  };
+
   describe('validity of messages being added', function() {
 
     var messaging;
@@ -191,13 +210,7 @@ describe('message API', function() {
         expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('parentmessage');
-          expect(message).to.have.property('userid');
-          //expect(message).to.have.property('username');
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();
@@ -211,13 +224,7 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var message = res.body.message;
-        expect(message).to.have.property('id');
-        expect(message).to.have.property('parentmessage');
-        expect(message).to.have.property('userid');
-        expect(message).to.have.property('username');
-        expect(message).to.have.property('groupid');
-        expect(message).to.have.property('messagetext');
-        expect(message).to.have.property('timestamp');
+        testMessageContent(message);
         done();
       });
     });
@@ -235,13 +242,7 @@ describe('message API', function() {
         expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('parentmessage');
-          expect(message).to.have.property('userid');
-          //expect(message).to.have.property('username');
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();
@@ -263,13 +264,7 @@ describe('message API', function() {
         expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('parentmessage');
-          expect(message).to.have.property('userid');
-          //expect(message).to.have.property('username');
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();
@@ -286,13 +281,7 @@ describe('message API', function() {
         expect(messages).to.be.instanceOf(Array);
 
         messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('parentmessage');
-          expect(message).to.have.property('userid');
-          //expect(message).to.have.property('username');
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();
