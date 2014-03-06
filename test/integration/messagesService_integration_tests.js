@@ -29,9 +29,13 @@ var env = {
 
 var userApiClient = mockableObject.make('checkToken');
 
-var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
-var seagullHandler = require('../helpers/mockSeagullHandler');
-var messageService = require('../../lib/messagesService')(env,mongoHandler,userApiClient,seagullHandler);
+var messageService = require('../../lib/messagesService')(
+  env,
+  require('../../lib/handler/mongoHandler')(env.mongoConnectionString),
+  userApiClient,
+  require('../helpers/mockSeagullHandler')()
+);
+
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
 var testDbInstance = require('mongojs')(env.mongoConnectionString, ['messages']);
 
@@ -47,12 +51,27 @@ describe('message API', function() {
     sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
   }
 
-  function setupProfile(){
-    sinon.stub(seagullClient, 'getProfile').callsArgWith();
-  }
-
   function expectToken(token) {
     expect(userApiClient.checkToken).to.have.been.calledWith(token, sinon.match.func);
+  }
+
+  /*
+    All expectations for a message
+  */
+  function testMessageContent(message){
+    expect(message).to.have.property('id');
+    expect(message.id).to.exist;
+    expect(message).to.have.property('parentmessage');
+    expect(message).to.have.property('userid');
+    expect(message.userid).to.exist;
+    expect(message).to.have.property('username');
+    expect(message.username).to.exist;
+    expect(message).to.have.property('groupid');
+    expect(message.groupid).to.exist;
+    expect(message).to.have.property('messagetext');
+    expect(message.messagetext).to.exist;
+    expect(message).to.have.property('timestamp');
+    expect(message.timestamp).to.exist;
   }
 
   before(function (done) {
@@ -126,8 +145,6 @@ describe('message API', function() {
 
     it('returns message all required feilds', function(done) {
 
-      var messageFields = ['id', 'parentmessage', 'userid','groupid', 'timestamp', 'messagetext'];
-
       supertest
       .get('/read/'+String(messageFromMongo._id))
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -136,8 +153,7 @@ describe('message API', function() {
       .end(function(err, res) {
         if (err) return done(err);
         expectToken(sessionToken);
-        expect(res.body.message).to.have.keys(messageFields);
-
+        testMessageContent(res.body.message);
         done();
       });
     });
@@ -195,12 +211,7 @@ describe('message API', function() {
         expect(res.body.messages.length).to.equal(3);
 
         res.body.messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('userid');
-          expect(message).to.have.property('parentmessage');
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();
@@ -224,12 +235,7 @@ describe('message API', function() {
         expect(res.body.messages.length).to.equal(4);
 
         res.body.messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('userid');
-          expect(message).to.have.property('parentmessage');
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();
@@ -259,12 +265,7 @@ describe('message API', function() {
         expect(res.body.messages.length).to.equal(1);
 
         res.body.messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('userid');
-          expect(message).to.have.property('parentmessage');
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();
@@ -294,13 +295,7 @@ describe('message API', function() {
         expect(res.body.messages.length).equal(3);
 
         res.body.messages.forEach(function(message){
-          expect(message).to.have.property('id');
-          expect(message).to.have.property('userid');
-          expect(message).to.have.property('parentmessage');
-          expect(message.parentmessage).to.equal(fakeRootId);
-          expect(message).to.have.property('groupid');
-          expect(message).to.have.property('messagetext');
-          expect(message).to.have.property('timestamp');
+          testMessageContent(message);
         });
 
         done();

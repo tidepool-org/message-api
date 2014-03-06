@@ -18,15 +18,13 @@
 var _ = require('lodash');
 
 /*
- Handler for seagull interactions
+ Mock handler for seagull interactions
 */
 module.exports = function() {
 
   return {
 
     resolveNames:  function(userIds, token, callback) {
-
-      console.log('lets start');
 
       var resolvedNames = [];
 
@@ -35,7 +33,6 @@ module.exports = function() {
       });
 
       return callback(resolvedNames);
-
     }
   };
 };
