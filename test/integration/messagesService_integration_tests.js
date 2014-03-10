@@ -111,7 +111,7 @@ describe('message API', function() {
       });
     });
 
-    it('404 when path is incorrect', function(done) {
+    it('404 when no data for path', function(done) {
       supertest
       .get('/read')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -163,16 +163,26 @@ describe('message API', function() {
       supertest
       .get('/read/3344556754')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.message).to.be.empty;
+        done();
+      });
 
     });
 
-    it('returns 404 if a bad id is given', function(done) {
+    it('returns 404 and no message if a non existant id is given', function(done) {
 
       supertest
-      .get('/read/badIdGiven')
+      .get('/read/noMessageId')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.message).to.be.empty;
+        done();
+      });
 
     });
   });
@@ -184,7 +194,12 @@ describe('message API', function() {
       supertest
       .get('/all')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
 
     });
 
@@ -193,7 +208,12 @@ describe('message API', function() {
       supertest
       .get('/all/12342?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
 
     });
 
@@ -245,7 +265,12 @@ describe('message API', function() {
     it('returns 404 when no messages', function(done) {
       supertest.get('/all/99977777?starttime=2013-11-25')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
     });
 
   });
@@ -275,7 +300,12 @@ describe('message API', function() {
     it('returns 404 when no messages', function(done) {
       supertest.get('/notes/99977777')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
     });
 
   });
@@ -307,7 +337,12 @@ describe('message API', function() {
       supertest
       .get('/thread/'+String(testDbInstance.ObjectId()))
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
     });
 
   });
