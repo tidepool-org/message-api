@@ -33,6 +33,19 @@ module.exports = function() {
       });
 
       return callback(resolvedNames);
+    },
+
+    checkPermisson: function(userApiClient) {
+
+      if(userApiClient == null){
+        throw new Error('userApiClient required to be passed');
+      }
+
+      return function(req, res, next) {
+        req._sessionToken = 'fake server token';
+        return next();
+      };
     }
+
   };
 };

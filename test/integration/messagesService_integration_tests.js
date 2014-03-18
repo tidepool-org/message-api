@@ -27,7 +27,9 @@ var env = {
   mongoConnectionString: 'mongodb://localhost/test_messages'
 };
 
-var userApiClient = mockableObject.make('checkToken');
+var userApiClient = mockableObject.make('checkToken','checkPermissons');
+
+console.log('userApiClient: ',userApiClient);
 
 var messageService = require('../../lib/messagesService')(
   env,
