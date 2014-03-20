@@ -72,7 +72,7 @@ module.exports = (function(){
 
   env.seagull = {
     // The config object to discover seagull.  This is just passed through to hakken.watchFromConfig()
-    serviceSpec: JSON.parse(config.fromEnvironment("SEAGULL_SERVICE"))
+    serviceSpec: JSON.parse(config.fromEnvironment('SEAGULL_SERVICE'))
   };
 
   // The host to contact for discovery
