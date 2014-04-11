@@ -59,6 +59,12 @@ module.exports = (function(){
 
   env.mongoDbConnectionString = process.env.MONGO_CONNECTION_STRING || 'mongodb://localhost/messages';
 
+  env.metrics = {
+    // The config object to discover highwater (the metrics API).  
+    // This is just passed through to hakken.watchFromConfig()
+    serviceSpec: JSON.parse(config.fromEnvironment('METRICS_SERVICE'))
+  };
+
   env.userApi = {
     // The config object to discover user-api.  This is just passed through to hakken.watchFromConfig()
     serviceSpec: JSON.parse(config.fromEnvironment('USER_API_SERVICE')),

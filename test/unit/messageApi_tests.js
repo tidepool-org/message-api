@@ -36,7 +36,13 @@ describe('message API', function() {
     server.use(restify.queryParser());
     server.use(restify.bodyParser());
 
-    var messageApi = require('../../lib/routes/messageApi')(crudHandler,seagullHandler);
+    function doNothing() { return null; }
+    var dummyMetrics = {
+      postServer: doNothing,
+      postThisUser: doNothing,
+      postWithUser:doNothing
+    };
+    var messageApi = require('../../lib/routes/messageApi')(crudHandler, seagullHandler, dummyMetrics);
 
     server.get('/status',messageApi.status);
 

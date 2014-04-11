@@ -28,14 +28,23 @@ var env = {
 };
 
 var userApiClient = mockableObject.make('checkToken','checkPermissons');
+var metrics = mockableObject.make('postServer', 'postThisUser', 'postWithUser');
 
 console.log('userApiClient: ',userApiClient);
+
+function doNothing() { return null; }
+var dummyMetrics = {
+  postServer: doNothing,
+  postThisUser: doNothing,
+  postWithUser:doNothing
+};
 
 var messageService = require('../../lib/messagesService')(
   env,
   require('../../lib/handler/mongoHandler')(env.mongoConnectionString),
   userApiClient,
-  require('../helpers/mockSeagullHandler')()
+  require('../helpers/mockSeagullHandler')(),
+  dummyMetrics
 );
 
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
@@ -55,6 +64,12 @@ describe('message API', function() {
 
   function expectToken(token) {
     expect(userApiClient.checkToken).to.have.been.calledWith(token, sinon.match.func);
+  }
+
+  function mockMetrics() {
+    sinon.stub(metrics, 'postServer').callsArg(3);
+    sinon.stub(metrics, 'postWithUser').callsArg(3);
+    sinon.stub(metrics, 'postThisUser').callsArg(3);
   }
 
   /*
@@ -93,6 +108,7 @@ describe('message API', function() {
     messageService.start(done);
 
     setupToken(messageUser);
+    mockMetrics();
 
   });
 
@@ -105,7 +121,6 @@ describe('message API', function() {
     var messageFromMongo;
 
     before(function(done){
-
       // grab a message that has been saved already
       testDbInstance.messages.findOne({},function(err, doc) {
         messageFromMongo = doc;
@@ -145,7 +160,7 @@ describe('message API', function() {
       });
     });
 
-    it('returns message all required feilds', function(done) {
+    it('returns message all required fields', function(done) {
 
       supertest
       .get('/read/'+String(messageFromMongo._id))
