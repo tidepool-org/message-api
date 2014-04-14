@@ -312,6 +312,76 @@ describe('message API', function() {
 
   });
 
+  describe('GET /notes/:groupid?starttime=xxx ', function() {
+
+    it('returns 1 note', function(done) {
+      supertest
+      .get('/notes/777?starttime=2013-11-25')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(1);
+
+        res.body.messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('returns 404 when no notes', function(done) {
+      supertest.get('/notes/99977777?starttime=2013-11-25')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
+    });
+
+  });
+
+  describe('GET /notes/:groupid?starttime=xxx&endtime=yyy ', function() {
+
+    it('returns 1 note', function(done) {
+      supertest
+      .get('/notes/777?starttime=2013-11-25&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(1);
+
+        res.body.messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('returns 404 when no notes', function(done) {
+      supertest.get('/notes/99977777?starttime=2013-11-25&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
+    });
+
+  });
+
   describe('GET /thread/:msgid ', function() {
 
     it('returns 3 messages with thread id', function(done) {
