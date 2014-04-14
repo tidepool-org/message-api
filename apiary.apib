@@ -9,7 +9,7 @@ HOST: http://api.tidepool.io
 The message-api stores and manipulates messages for Tidepool's applications
 
 
-# Group Messages
+# Patient Messages
 
 ## Health Check [/status]
 ### Retrieve status information [GET]
@@ -56,7 +56,7 @@ Returns the contents of a message by its ID number
                 id: "ad8743",
                 parentmessage: null,
                 userid: "324a898",
-                groupid: "678435",
+                patientid: "678435",
                 messagetext: "I can't believe I the whole thing",
                 timestamp: "2013-12-25T12:34:56+0800"
             }
@@ -66,10 +66,10 @@ Returns the contents of a message by its ID number
 
 + Response 400
 
-## Get messages in a group in a range of time [/all/{groupid}{?starttime}{?endtime}]
-### Retrieves all the messages in a given group for a range of time. [GET]
+## Get messages for a patient in a range of time [/all/{patientid}{?starttime}{?endtime}]
+### Retrieves all the messages for a given patient for a range of time. [GET]
 + Parameters
-    + groupid (required, string, `123abcd`) ... Tidepool-assigned user ID
+    + patientid (required, string, `123abcd`) ... Tidepool-assigned user ID
     + starttime (required, string, `2013-11-25`) ... The first message to be returned will be later than or equal to this time.
     + endtime (optional, string, `2013-12-25`) ... The last date to be fetched with be earlier than or equal to this time.
 
@@ -88,7 +88,7 @@ Returns the contents of a message by its ID number
                     id: "ad8743",
                     parentmessage: null,
                     userid: "324a898",
-                    groupid: "678435",
+                    patientid: "678435",
                     messagetext: "Should I?",
                     timestamp: "2013-12-26T12:34:56+0800"
                 },
@@ -96,7 +96,7 @@ Returns the contents of a message by its ID number
                     id: "a6f348",
                     parentmessage: "ad8743",
                     userid: "324a898",
-                    groupid: "678435",
+                    patientid: "678435",
                     messagetext: "No.",
                     timestamp: "2013-12-26T13:04:22+0800"
                 }
@@ -127,7 +127,7 @@ ID was not valid.
                     id: "ad8743",
                     parentmessage: null,
                     userid: "324a898",
-                    groupid: "678435",
+                    patientid: "678435",
                     messagetext: "Should I?",
                     timestamp: "2013-12-26T12:34:56+0800"
                 },
@@ -135,7 +135,7 @@ ID was not valid.
                     id: "a6f348",
                     parentmessage: "ad8743",
                     userid: "324a898",
-                    groupid: "678435",
+                    patientid: "678435",
                     messagetext: "No.",
                     timestamp: "2013-12-26T13:04:22+0800"
                 }
@@ -147,12 +147,12 @@ ID was not valid.
 
 + Response 400
 
-## Send a message [/send/{groupid}]
+## Send a message [/send/{patientid}]
 ### Send a message to a group [POST]
 Sends a message to a given group (start a new thread). If found, returns
 an object containing the id of the message created. 
 + Parameters
-    + groupid (required, string, `123abcd`) ... Tidepool-assigned user ID
+    + patientid (required, string, `123abcd`) ... Tidepool-assigned user ID
 
 + Request
 
@@ -166,7 +166,7 @@ an object containing the id of the message created.
             {
                 parentmessage: '',
                 userid: '12121212',
-                groupid: '999',
+                patientid: '999',
                 timestamp: '2013-11-28T23:07:40+00:00',
                 messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
             }
@@ -198,7 +198,7 @@ created. The parentmessage parameter, if specified, is ignored.
                 message: {
                     parentmessage: '',
                     userid: '12121212',
-                    groupid: '999',
+                    patientid: '999',
                     timestamp: '2013-11-28T23:07:40+00:00',
                     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
                 }

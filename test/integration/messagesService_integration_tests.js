@@ -68,8 +68,8 @@ describe('message API', function() {
     expect(message.userid).to.exist;
     expect(message).to.have.property('username');
     expect(message.username).to.exist;
-    expect(message).to.have.property('groupid');
-    expect(message.groupid).to.exist;
+    expect(message).to.have.property('patientid');
+    expect(message.patientid).to.exist;
     expect(message).to.have.property('messagetext');
     expect(message.messagetext).to.exist;
     expect(message).to.have.property('timestamp');
@@ -137,7 +137,7 @@ describe('message API', function() {
         expect(theMessage.id).to.equal(String(messageFromMongo._id));
         expect(theMessage.parentmessage).to.equal(messageFromMongo.parentmessage);
         expect(theMessage.timestamp).to.equal(String(messageFromMongo.timestamp));
-        expect(theMessage.groupid).to.equal(String(messageFromMongo.groupid));
+        expect(theMessage.patientid).to.equal(String(messageFromMongo.patientid));
         expect(theMessage.userid).to.equal(String(messageFromMongo.userid));
         expect(theMessage.messagetext).to.equal(String(messageFromMongo.messagetext));
 
@@ -189,7 +189,7 @@ describe('message API', function() {
     });
   });
 
-  describe('GET /all/:groupid?starttime=xxx&endtime=yyy', function() {
+  describe('GET /all/:patientid?starttime=xxx&endtime=yyy', function() {
 
     it('returns 404 for invalid path', function(done) {
 
@@ -242,7 +242,7 @@ describe('message API', function() {
 
   });
 
-  describe('GET /all/:groupid?starttime=xxx ', function() {
+  describe('GET /all/:patientid?starttime=xxx ', function() {
 
     it('returns 4 messages', function(done) {
       supertest
@@ -277,7 +277,7 @@ describe('message API', function() {
 
   });
 
-  describe('GET /notes/:groupid ', function() {
+  describe('GET /notes/:patientid ', function() {
 
     it('returns 1 message', function(done) {
       supertest
@@ -349,9 +349,9 @@ describe('message API', function() {
 
   });
 
-  describe('POST /send/:groupid', function() {
+  describe('POST /send/:patientid', function() {
 
-    it('should not work without groupid parameter', function(done) {
+    it('should not work without patientid parameter', function(done) {
 
       supertest.post('/send')
       .set('X-Tidepool-Session-Token', sessionToken)
