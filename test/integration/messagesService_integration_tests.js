@@ -66,8 +66,8 @@ describe('message API', function() {
     expect(message).to.have.property('parentmessage');
     expect(message).to.have.property('userid');
     expect(message.userid).to.exist;
-    expect(message).to.have.property('username');
-    expect(message.username).to.exist;
+    expect(message).to.have.property('user');
+    expect(message.user).to.exist;
     expect(message).to.have.property('groupid');
     expect(message.groupid).to.exist;
     expect(message).to.have.property('messagetext');
