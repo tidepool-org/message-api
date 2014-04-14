@@ -28,7 +28,7 @@ var seagullHandler = require('../helpers/mockSeagullHandler')();
 describe('message API', function() {
 
   /*
-    minimise the components to just groups API and mocked crud handler
+    minimise the components to just message-api and mocked crud handler
   */
   var setupAPI = function(crudHandler){
 
@@ -41,12 +41,12 @@ describe('message API', function() {
     server.get('/status',messageApi.status);
 
     server.get('/read/:msgid', messageApi.findById);
-    server.get('/all/:groupid?starttime&endtime', messageApi.findAllById);
+    server.get('/all/:patientid?starttime&endtime', messageApi.findAllById);
     server.get('/thread/:msgid', messageApi.getThread);
-    server.get('/notes/:groupid', messageApi.getNotes);
+    server.get('/notes/:patientid', messageApi.getNotes);
 
     //adding messages
-    server.post('/send/:groupid', messageApi.addThread);
+    server.post('/send/:patientid', messageApi.addThread);
     server.post('/reply/:msgid',messageApi.replyToThread);
 
     return server;
@@ -63,8 +63,8 @@ describe('message API', function() {
     expect(message.userid).to.exist;
     expect(message).to.have.property('username');
     expect(message.username).to.exist;
-    expect(message).to.have.property('groupid');
-    expect(message.groupid).to.exist;
+    expect(message).to.have.property('patientid');
+    expect(message.patientid).to.exist;
     expect(message).to.have.property('messagetext');
     expect(message.messagetext).to.exist;
     expect(message).to.have.property('timestamp');
@@ -86,11 +86,11 @@ describe('message API', function() {
 
     });
 
-    it('POST send/:groupid rejects an invalid parent message', function(done) {
+    it('POST send/:patientid rejects an invalid parent message', function(done) {
 
       var invalidParentNoMessageText = {
         userid: '12345',
-        groupid: '4567',
+        patientid: '4567',
         parentmessage:'',
         timestamp:'2013-11-28T23:07:40+00:00',
         messagetext:''
@@ -108,11 +108,11 @@ describe('message API', function() {
       });
     });
 
-    it('POST send/:groupid accepts a parent message with the parentmessage set as the parentmessage will be made to equal null', function(done) {
+    it('POST send/:patientid accepts a parent message with the parentmessage set as the parentmessage will be made to equal null', function(done) {
 
       var parentMessage = {
         userid: '12345',
-        groupid: '4567',
+        patientid: '4567',
         parentmessage:'',
         timestamp:'2013-11-28T23:07:40+00:00',
         messagetext:'my new message thread'
@@ -133,7 +133,7 @@ describe('message API', function() {
 
       var invalidReplyParentNotSet = {
         userid: '12345',
-        groupid: '4567',
+        patientid: '4567',
         parentmessage: null ,
         timestamp:'2013-11-28T23:07:40+00:00',
         messagetext:'my reply'
@@ -154,7 +154,7 @@ describe('message API', function() {
 
       var invalidReplyNoTimeStamp = {
         userid: '12345',
-        groupid: '4567',
+        patientid: '4567',
         parentmessage:'123456743',
         timestamp:'',
         messagetext:'my reply'
@@ -199,7 +199,7 @@ describe('message API', function() {
       .expect(404,done);
     });
 
-    it('GET notes/:groupid returns 200', function(done) {
+    it('GET notes/:patientid returns 200', function(done) {
 
       supertest(messaging)
       .get('/notes/88883288')
@@ -229,7 +229,7 @@ describe('message API', function() {
       });
     });
 
-    it('GET all/:groupid with a starttime returns 200', function(done) {
+    it('GET all/:patientid with a starttime returns 200', function(done) {
 
       var start = new Date();
 
@@ -249,7 +249,7 @@ describe('message API', function() {
       });
     });
 
-    it('GET all/:groupid with a starttime and end time returns 200', function(done) {
+    it('GET all/:patientid with a starttime and end time returns 200', function(done) {
 
 
       var start = new Date();
@@ -288,7 +288,7 @@ describe('message API', function() {
       });
     });
 
-    it('POST send/:groupid returns 201 and the id of the message', function(done) {
+    it('POST send/:patientid returns 201 and the id of the message', function(done) {
 
       supertest(messaging)
       .post('/send/88883288')
@@ -360,21 +360,21 @@ describe('message API', function() {
       .expect(404,done);
     });
 
-    it('GET notes/:groupid returns 404', function(done) {
+    it('GET notes/:patientid returns 404', function(done) {
       supertest(messaging)
       .get('/notes/2222233445')
 
       .expect(404,done);
     });
 
-    it('GET all/:groupid with a starttime returns 404', function(done) {
+    it('GET all/:patientid with a starttime returns 404', function(done) {
       var start = new Date();
       supertest(messaging)
       .get('/all/88883288?starttime='+start)
       .expect(404,done);
     });
 
-    it('GET all/:groupid with a starttime and end time returns 404', function(done) {
+    it('GET all/:patientid with a starttime and end time returns 404', function(done) {
       var start = new Date();
       var end = new Date();
       supertest(messaging)
@@ -409,21 +409,21 @@ describe('message API', function() {
       .expect(500,done);
     });
 
-    it('GET notes/:groupid returns 500', function(done) {
+    it('GET notes/:patientid returns 500', function(done) {
       supertest(messaging)
       .get('/notes/2222233445')
 
       .expect(500,done);
     });
 
-    it('GET all/:groupid?starttime=xxx returns 500', function(done) {
+    it('GET all/:patientid?starttime=xxx returns 500', function(done) {
       var start = new Date();
       supertest(messaging)
       .get('/all/88883288?starttime='+start)
       .expect(500,done);
     });
 
-    it('GET all/:groupid?starttime=xxx&endtime=yyy returns 500', function(done) {
+    it('GET all/:patientid?starttime=xxx&endtime=yyy returns 500', function(done) {
       var start = new Date();
       var end = new Date();
       supertest(messaging)
@@ -431,7 +431,7 @@ describe('message API', function() {
       .expect(500,done);
     });
 
-    it('POST send/:groupid returns 500', function(done) {
+    it('POST send/:patientid returns 500', function(done) {
 
       supertest(messaging)
       .post('/send/88883288')

@@ -85,7 +85,7 @@ function handleGetMessage(messageId,callback) {
     id : '1299999299',
     parentmessage: '',
     userid: '12121212',
-    groupid: '44J88FD76',
+    patientid: '44J88FD76',
     timestamp: '2013-11-28T23:07:40+00:00',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   };
@@ -93,15 +93,15 @@ function handleGetMessage(messageId,callback) {
   return resolveCallbackValues(callback,message);
 }
 
-function handleGetNotes(groupId, callback) {
-  log.debug('Finding all notes for group[%s] ', groupId);
+function handleGetNotes(patientid, callback) {
+  log.debug('Finding all notes for patient[%s] ', patientid);
 
   var messages =
   [{
     id : '12999337798',
     parentmessage :null,
     userid: '12121212',
-    groupid: groupId,
+    patientid: patientid,
     timestamp: '2013-11-28T23:07:40+00:00',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
@@ -109,7 +109,7 @@ function handleGetNotes(groupId, callback) {
     id : '12999333444',
     parentmessage :null,
     userid: '232323',
-    groupid: groupId,
+    patientid: patientid,
     timestamp: '2013-11-29T23:05:40+00:00',
     messagetext: 'Second message.'
   },
@@ -117,7 +117,7 @@ function handleGetNotes(groupId, callback) {
     id : '12990000000',
     parentmessage :null,
     userid: '232323',
-    groupid: groupId,
+    patientid: patientid,
     timestamp: '2013-11-30T23:05:40+00:00',
     messagetext: 'Third message.'
   }];
@@ -133,7 +133,7 @@ function handleGetMessagesInThread(messageId, callback) {
     id : messageId,
     parentmessage :null,
     userid: '12121212',
-    groupid: '999777',
+    patientid: '999777',
     timestamp: '2013-11-28T23:07:40+00:00',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
@@ -141,7 +141,7 @@ function handleGetMessagesInThread(messageId, callback) {
     id : '12999333444',
     parentmessage :messageId,
     userid: '232323',
-    groupid: '999777',
+    patientid: '999777',
     timestamp: '2013-11-29T23:05:40+00:00',
     messagetext: 'Second message.'
   },
@@ -149,7 +149,7 @@ function handleGetMessagesInThread(messageId, callback) {
     id : '12990000000',
     parentmessage :messageId,
     userid: '232323',
-    groupid: '999777',
+    patientid: '999777',
     timestamp: '2013-11-30T23:05:40+00:00',
     messagetext: 'Third message.'
   },
@@ -157,7 +157,7 @@ function handleGetMessagesInThread(messageId, callback) {
     id : '1299554433',
     parentmessage :messageId,
     userid: '232323',
-    groupid: '999777',
+    patientid: '999777',
     timestamp: '2013-11-25T23:05:40+00:00',
     messagetext: 'First message.'
   }];
@@ -165,15 +165,15 @@ function handleGetMessagesInThread(messageId, callback) {
   return resolveCallbackValues(callback,messages);
 }
 
-function handleGetAllMessages(groupId, startTime, endTime, callback) {
-  log.debug('Finding all messages for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
+function handleGetAllMessages(patientid, startTime, endTime, callback) {
+  log.debug('Finding all messages for patient[%s] from[%s] to[%s] ', patientid, startTime, endTime);
 
   var messages =
   [{
     id : '1299999299',
     parentmessage: null,
     userid: '12121212',
-    groupid: groupId,
+    patientid: patientid,
     timestamp: '2013-11-28T23:07:40+00:00',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
@@ -181,7 +181,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     id : '12999333444',
     parentmessage: null,
     userid: '232323',
-    groupid: groupId,
+    patientid: patientid,
     timestamp: '2013-11-29T23:05:40+00:00',
     messagetext: 'Second message.'
   },
@@ -189,7 +189,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     id : '12990000000',
     parentmessage: null,
     userid: '232323',
-    groupid: groupId,
+    patientid: patientid,
     timestamp: '2013-11-30T23:05:40+00:00',
     messagetext: 'Third message.'
   },
@@ -197,7 +197,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     id : '1299554433',
     parentmessage: null,
     userid: '232323',
-    groupid: groupId,
+    patientid: patientid,
     timestamp: '2013-11-25T23:05:40+00:00',
     messagetext: 'First message.'
   }];
