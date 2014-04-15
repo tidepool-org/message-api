@@ -29,7 +29,7 @@ module.exports = function() {
       var resolvedUsers = {};
 
       _(userIds).forEach(function(userId) {
-        resolvedUsers[userId] = {fistName: 'Joe',lastName : userId};
+        resolvedUsers[userId] = {firstName: 'Mc Hammer',lastName : userId};
       });
 
       return callback(resolvedUsers);
