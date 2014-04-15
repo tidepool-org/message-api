@@ -26,13 +26,10 @@ module.exports = function() {
 
     resolveUsers:  function(userIds, token, callback) {
 
-      var resolvedUsers = [];
+      var resolvedUsers = {};
 
       _(userIds).forEach(function(userId) {
-
-        var resolved={};
-        resolved[userId] = {fistName: 'Joe',lastName : userId};
-        resolvedUsers.push(resolved);
+        resolvedUsers[userId] = {fistName: 'Joe',lastName : userId};
       });
 
       return callback(resolvedUsers);
