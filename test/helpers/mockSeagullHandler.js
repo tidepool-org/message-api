@@ -24,15 +24,18 @@ module.exports = function() {
 
   return {
 
-    resolveNames:  function(userIds, token, callback) {
+    resolveUsers:  function(userIds, token, callback) {
 
-      var resolvedNames = [];
+      var resolvedUsers = [];
 
       _(userIds).forEach(function(userId) {
-        resolvedNames.push({ userid: userId , user : {fistName: 'Joe',lastName : userId} });
+
+        var resolved={};
+        resolved[userId] = {fistName: 'Joe',lastName : userId};
+        resolvedUsers.push(resolved);
       });
 
-      return callback(resolvedNames);
+      return callback(resolvedUsers);
     },
 
     checkPermisson: function(userApiClient) {
