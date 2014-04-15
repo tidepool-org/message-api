@@ -219,6 +219,13 @@ describe('message API', function() {
 
     });
 
+    it('returns 400 when an invalid date param is give', function(done) {
+      supertest
+      .get('/all/12342?starttime=not-a-date&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400,done);
+    });
+
     it('returns 3 messages', function(done) {
 
       supertest
@@ -277,6 +284,36 @@ describe('message API', function() {
 
   });
 
+  describe('GET /all/:groupid?endtime=yyy ', function() {
+
+    it('returns all messages before endtime', function(done) {
+      supertest
+      .get('/all/777?endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(3);
+
+        res.body.messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('returns 400 when the endtime is invalid', function(done) {
+      supertest.get('/all/777?endtime=not-a-date')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400,done);
+    });
+
+  });
+
   describe('GET /notes/:groupid ', function() {
 
     it('returns 1 message', function(done) {
@@ -308,6 +345,118 @@ describe('message API', function() {
         expect(res.body.messages).to.be.empty;
         done();
       });
+    });
+
+  });
+
+  describe('GET /notes/:groupid?starttime=xxx ', function() {
+
+    it('returns 1 note', function(done) {
+      supertest
+      .get('/notes/777?starttime=2013-11-25')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(1);
+
+        res.body.messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('returns 400 for invalid date param', function(done) {
+      supertest.get('/notes/99977777?starttime=not-a-date')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400,done);
+    });
+
+    it('returns 404 when no notes', function(done) {
+      supertest.get('/notes/99977777?starttime=2013-11-25')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
+    });
+
+  });
+
+  describe('GET /notes/:groupid?starttime=xxx&endtime=yyy ', function() {
+
+    it('returns 1 note', function(done) {
+      supertest
+      .get('/notes/777?starttime=2013-11-25&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(1);
+
+        res.body.messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('returns 404 when no notes', function(done) {
+      supertest.get('/notes/99977777?starttime=2013-11-25&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
+    });
+
+    it('returns 400 when one date param is invalid', function(done) {
+      supertest.get('/notes/99977777?starttime=2013-11-25&endtime=not-a-date')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400,done);
+    });
+
+  });
+
+  describe('GET /notes/:groupid?endtime=yyy ', function() {
+
+    it('allows only an endtime param', function(done) {
+      supertest
+      .get('/notes/777?endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .expect('Content-Type','application/json')
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
+        expect(res.body.messages.length).to.equal(1);
+
+        res.body.messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('returns 400 when the endtime is invalid', function(done) {
+      supertest.get('/notes/99977777?endtime=not-a-date')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400,done);
     });
 
   });
