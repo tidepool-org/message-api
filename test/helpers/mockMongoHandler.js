@@ -93,8 +93,8 @@ function handleGetMessage(messageId,callback) {
   return resolveCallbackValues(callback,message);
 }
 
-function handleGetNotes(groupId, callback) {
-  log.debug('Finding all notes for group[%s] ', groupId);
+function handleGetNotes(groupId, startTime, endTime, callback) {
+  log.debug('Finding all notes for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
 
   var messages =
   [{

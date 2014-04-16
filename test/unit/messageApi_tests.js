@@ -49,7 +49,7 @@ describe('message API', function() {
     server.get('/read/:msgid', messageApi.findById);
     server.get('/all/:groupid?starttime&endtime', messageApi.findAllById);
     server.get('/thread/:msgid', messageApi.getThread);
-    server.get('/notes/:groupid', messageApi.getNotes);
+    server.get('/notes/:groupid?starttime&endtime', messageApi.getNotes);
 
     //adding messages
     server.post('/send/:groupid', messageApi.addThread);
@@ -67,8 +67,8 @@ describe('message API', function() {
     expect(message).to.have.property('parentmessage');
     expect(message).to.have.property('userid');
     expect(message.userid).to.exist;
-    expect(message).to.have.property('username');
-    expect(message.username).to.exist;
+    expect(message).to.have.property('user');
+    expect(message.user).to.exist;
     expect(message).to.have.property('groupid');
     expect(message.groupid).to.exist;
     expect(message).to.have.property('messagetext');
@@ -209,6 +209,48 @@ describe('message API', function() {
 
       supertest(messaging)
       .get('/notes/88883288')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        var messages = res.body.messages;
+        expect(messages).to.be.instanceOf(Array);
+
+        messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('GET notes/:groupid?starttime returns 200', function(done) {
+
+      var start = new Date();
+
+      supertest(messaging)
+      .get('/notes/88883288?starttime='+start)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        var messages = res.body.messages;
+        expect(messages).to.be.instanceOf(Array);
+
+        messages.forEach(function(message){
+          testMessageContent(message);
+        });
+
+        done();
+      });
+    });
+
+    it('GET notes/:groupid with a starttime and end time returns 200', function(done) {
+
+
+      var start = new Date();
+      var end = new Date();
+
+      supertest(messaging)
+      .get('/notes/88883288?starttime='+start+'&endtime='+end)
       .expect(200)
       .end(function(err, res) {
         if (err) return done(err);
