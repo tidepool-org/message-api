@@ -16,16 +16,16 @@
   },
   "license": "Tidepool",
   "dependencies": {
-    "amoeba": "0.0.3",
-    "bunyan": "0.22.1",
+    "amoeba": "0.0.8",
+    "bunyan": "0.22.3",
     "cookies": "0.3.6",
     "hakken": "0.1.4",
     "lodash": "2.4.1",
     "mongojs": "0.9.8",
-    "restify": "2.6.0",
-    "request": "2.25.0",
+    "restify": "2.7.0",
+    "request": "2.34.0",
     "tidepool-seagull-client": "0.0.2",
-    "user-api-client": "0.1.4"
+    "user-api-client": "0.2.2"
   },
   "devDependencies": {
     "grunt": "0.4.2",
