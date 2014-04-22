@@ -60,7 +60,7 @@ module.exports = (function(){
   env.mongoDbConnectionString = process.env.MONGO_CONNECTION_STRING || 'mongodb://localhost/messages';
 
   env.metrics = {
-    // The config object to discover highwater (the metrics API).  
+    // The config object to discover highwater (the metrics API).
     // This is just passed through to hakken.watchFromConfig()
     serviceSpec: JSON.parse(config.fromEnvironment('METRICS_SERVICE'))
   };
@@ -79,6 +79,11 @@ module.exports = (function(){
   env.seagull = {
     // The config object to discover seagull.  This is just passed through to hakken.watchFromConfig()
     serviceSpec: JSON.parse(config.fromEnvironment('SEAGULL_SERVICE'))
+  };
+
+  env.armada = {
+    // The config object to discover armada.  This is just passed through to hakken.watchFromConfig()
+    serviceSpec: JSON.parse(config.fromEnvironment("ARMADA_SERVICE"))
   };
 
   // The host to contact for discovery
