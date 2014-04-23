@@ -57,7 +57,7 @@ var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
 describe('message API', function() {
 
-  var fakeRootId = String(testDbInstance.ObjectId());
+  var parentmessageId;
 
   function setupToken(user) {
     sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
@@ -90,21 +90,29 @@ describe('message API', function() {
     expect(message.messagetext).to.exist;
     expect(message).to.have.property('timestamp');
     expect(message.timestamp).to.exist;
+    expect(message).to.have.property('comments');
+  }
+
+  function saveMessages(){
+    testDbInstance.messages.remove();
+
+    //save the first as a note
+
+    var note = noteAndComments[0];
+    var comments = noteAndComments.slice(1);
+
+    testDbInstance.messages.save(note,function(error,details){
+      parentmessageId = details._id;
+      comments.forEach(function(comment){
+        comment.parentmessage = String(parentmessageId);
+        testDbInstance.messages.save(comment);
+      });
+    });
   }
 
   before(function (done) {
 
-    testDbInstance.messages.remove();
-
-    for (var index = 0; index < noteAndComments.length; ++index) {
-
-      if(index === 0){
-        testDbInstance.messages.save(noteAndComments[index]);
-      }else{
-        noteAndComments[index].parentmessage = fakeRootId;
-        testDbInstance.messages.save(noteAndComments[index]);
-      }
-    }
+    saveMessages();
 
     messageService.start(done);
 
@@ -332,7 +340,7 @@ describe('message API', function() {
 
   describe('GET /notes/:groupid ', function() {
 
-    it('returns 1 message', function(done) {
+    it('returns 1 message and has three comments', function(done) {
       supertest
       .get('/notes/777')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -346,6 +354,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -373,7 +382,7 @@ describe('message API', function() {
 
   describe('GET /notes/:groupid?starttime=xxx ', function() {
 
-    it('returns 1 note', function(done) {
+    it('returns 1 note with three comments', function(done) {
       supertest
       .get('/notes/777?starttime=2013-11-25')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -387,6 +396,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -414,7 +424,7 @@ describe('message API', function() {
 
   describe('GET /notes/:groupid?starttime=xxx&endtime=yyy ', function() {
 
-    it('returns 1 note', function(done) {
+    it('returns 1 note with three comments', function(done) {
       supertest
       .get('/notes/777?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -428,6 +438,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -469,6 +480,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -485,9 +497,9 @@ describe('message API', function() {
 
   describe('GET /thread/:msgid ', function() {
 
-    it('returns 3 messages with thread id', function(done) {
+    it('returns 4 messages with thread id', function(done) {
       supertest
-      .get('/thread/'+fakeRootId)
+      .get('/thread/'+parentmessageId)
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type','application/json')
@@ -495,7 +507,7 @@ describe('message API', function() {
         if (err) return done(err);
         expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
-        expect(res.body.messages.length).equal(3);
+        expect(res.body.messages.length).equal(4);
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);

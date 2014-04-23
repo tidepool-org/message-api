@@ -75,6 +75,7 @@ describe('message API', function() {
     expect(message.messagetext).to.exist;
     expect(message).to.have.property('timestamp');
     expect(message.timestamp).to.exist;
+    expect(message).to.have.property('comments');
   };
 
   describe('validity of messages being added', function() {
