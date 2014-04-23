@@ -15,24 +15,27 @@
 
 'use strict';
 
-var _ = require('lodash');
-
 /*
- Mock handler for seagull interactions
+ Mock handler for gatekeeper interactions
 */
 module.exports = function() {
 
   return {
 
-    resolveUsers:  function(userIds, token, callback) {
+    checkPermissionsFromGroup: function(req, res, next) {
+      if(req.params.groupid == 'no-permission'){
+        res.send(401);
+        return next(false);
+      }
+      return next(true);
+    },
 
-      var resolvedUsers = {};
-
-      _(userIds).forEach(function(userId) {
-        resolvedUsers[userId] = {firstName: 'Mc Hammer',lastName : userId};
-      });
-
-      return callback(resolvedUsers);
+    checkPermissionsFromMessage: function(req, res, next) {
+      if(req.params.message.groupid == 'no-permission'){
+        res.send(401);
+        return next(false);
+      }
+      return next(true);
     }
 
   };
