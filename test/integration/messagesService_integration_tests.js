@@ -27,12 +27,12 @@ var env = {
   mongoConnectionString: 'mongodb://localhost/test_messages'
 };
 
-var userApiClient = mockableObject.make('checkToken','checkPermissons');
+var userApiClient = mockableObject.make('checkToken');
 var metrics = mockableObject.make('postServer', 'postThisUser', 'postWithUser');
-
-console.log('userApiClient: ',userApiClient);
+var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
 
 function doNothing() { return null; }
+
 var dummyMetrics = {
   postServer: doNothing,
   postThisUser: doNothing,
@@ -44,6 +44,7 @@ var messageService = require('../../lib/messagesService')(
   require('../../lib/handler/mongoHandler')(env.mongoConnectionString),
   userApiClient,
   require('../helpers/mockSeagullHandler')(),
+  gatekeeperHandler,
   dummyMetrics
 );
 
@@ -362,6 +363,12 @@ describe('message API', function() {
       });
     });
 
+    it('returns 401 when the user does not have permission', function(done) {
+      supertest.get('/notes/no-permission')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(401,done);
+    });
+
   });
 
   describe('GET /notes/:groupid?starttime=xxx ', function() {
@@ -438,10 +445,10 @@ describe('message API', function() {
       });
     });
 
-    it('returns 400 when one date param is invalid', function(done) {
-      supertest.get('/notes/99977777?starttime=2013-11-25&endtime=not-a-date')
+    it('returns 401 when one date param is invalid', function(done) {
+      supertest.get('/notes/no-permission?starttime=2013-11-25&endtime=not-a-date')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(400,done);
+      .expect(401,done);
     });
 
   });
@@ -568,6 +575,22 @@ describe('message API', function() {
       .send({message:invalidMessage})
       .expect(400,done);
     });
+
+    it('return 401 when we do not have permission to add a message', function(done) {
+
+      var message = {
+        userid: '12345',
+        groupid: 'no-permission',
+        timestamp: '2013-12-04T23:05:40+00:00',
+        messagetext: 'no permission'
+      };
+
+      supertest
+      .post('/send/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:message})
+      .expect(401,done);
+    });
   });
 
   describe('POST /reply/:msgid', function() {
@@ -624,6 +647,22 @@ describe('message API', function() {
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:invalidMessage})
       .expect(400,done);
+    });
+
+    it('return 401 when we do not have permission to reply to a message', function(done) {
+
+      var replyWithNoPermission = {
+        userid: '12345',
+        groupid: 'no-permission',
+        timestamp: '2013-12-04T23:05:40+00:00',
+        messagetext: 'no permission to reply'
+      };
+
+      supertest
+      .post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:replyWithNoPermission})
+      .expect(401,done);
     });
   });
 
