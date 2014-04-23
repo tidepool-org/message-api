@@ -576,7 +576,7 @@ describe('message API', function() {
       .expect(400,done);
     });
 
-    it('return 401 when we do not have permisson to add a message', function(done) {
+    it('return 401 when we do not have permission to add a message', function(done) {
 
       var message = {
         userid: '12345',
@@ -649,9 +649,9 @@ describe('message API', function() {
       .expect(400,done);
     });
 
-    it('return 401 when we do not have permisson to reply to a message', function(done) {
+    it('return 401 when we do not have permission to reply to a message', function(done) {
 
-      var replyWithNoPermisson = {
+      var replyWithNoPermission = {
         userid: '12345',
         groupid: 'no-permission',
         timestamp: '2013-12-04T23:05:40+00:00',
@@ -661,7 +661,7 @@ describe('message API', function() {
       supertest
       .post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .send({message:replyWithNoPermisson})
+      .send({message:replyWithNoPermission})
       .expect(401,done);
     });
   });
