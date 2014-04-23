@@ -89,6 +89,7 @@ describe('message API', function() {
     expect(message.messagetext).to.exist;
     expect(message).to.have.property('timestamp');
     expect(message.timestamp).to.exist;
+    expect(message).to.have.property('comments');
   }
 
   before(function (done) {
@@ -331,7 +332,7 @@ describe('message API', function() {
 
   describe('GET /notes/:groupid ', function() {
 
-    it('returns 1 message', function(done) {
+    it('returns 1 message and has three comments', function(done) {
       supertest
       .get('/notes/777')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -345,6 +346,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -366,7 +368,7 @@ describe('message API', function() {
 
   describe('GET /notes/:groupid?starttime=xxx ', function() {
 
-    it('returns 1 note', function(done) {
+    it('returns 1 note with three comments', function(done) {
       supertest
       .get('/notes/777?starttime=2013-11-25')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -380,6 +382,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -407,7 +410,7 @@ describe('message API', function() {
 
   describe('GET /notes/:groupid?starttime=xxx&endtime=yyy ', function() {
 
-    it('returns 1 note', function(done) {
+    it('returns 1 note with three comments', function(done) {
       supertest
       .get('/notes/777?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -421,6 +424,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -462,6 +466,7 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          expect(message.comments).to.equal(3);
         });
 
         done();
@@ -492,6 +497,9 @@ describe('message API', function() {
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
+          if(!message.parentmessage){
+            expect(message.comments).to.equal(2);
+          }
         });
 
         done();

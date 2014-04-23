@@ -83,11 +83,12 @@ function handleGetMessage(messageId,callback) {
 
   var message = {
     id : '1299999299',
-    parentmessage: '',
+    parentmessage: null,
     userid: '12121212',
     groupid: '44J88FD76',
     timestamp: '2013-11-28T23:07:40+00:00',
-    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
+    comments:null
   };
 
   return resolveCallbackValues(callback,message);
@@ -103,7 +104,8 @@ function handleGetNotes(groupId, startTime, endTime, callback) {
     userid: '12121212',
     groupid: groupId,
     timestamp: '2013-11-28T23:07:40+00:00',
-    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
+    comments:null
   },
   {
     id : '12999333444',
@@ -111,7 +113,8 @@ function handleGetNotes(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-29T23:05:40+00:00',
-    messagetext: 'Second message.'
+    messagetext: 'Second message.',
+    comments:null
   },
   {
     id : '12990000000',
@@ -119,7 +122,8 @@ function handleGetNotes(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-30T23:05:40+00:00',
-    messagetext: 'Third message.'
+    messagetext: 'Third message.',
+    comments:null
   }];
 
   return resolveCallbackValues(callback,messages);
@@ -135,7 +139,8 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '12121212',
     groupid: '999777',
     timestamp: '2013-11-28T23:07:40+00:00',
-    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
+    comments : 3
   },
   {
     id : '12999333444',
@@ -143,7 +148,8 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '232323',
     groupid: '999777',
     timestamp: '2013-11-29T23:05:40+00:00',
-    messagetext: 'Second message.'
+    messagetext: 'Second message.',
+    comments:null
   },
   {
     id : '12990000000',
@@ -151,7 +157,8 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '232323',
     groupid: '999777',
     timestamp: '2013-11-30T23:05:40+00:00',
-    messagetext: 'Third message.'
+    messagetext: 'Third message.',
+    comments:null
   },
   {
     id : '1299554433',
@@ -159,7 +166,8 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '232323',
     groupid: '999777',
     timestamp: '2013-11-25T23:05:40+00:00',
-    messagetext: 'First message.'
+    messagetext: 'First message.',
+    comments:null
   }];
 
   return resolveCallbackValues(callback,messages);
@@ -175,7 +183,8 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '12121212',
     groupid: groupId,
     timestamp: '2013-11-28T23:07:40+00:00',
-    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+    messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
+    comments:null
   },
   {
     id : '12999333444',
@@ -183,7 +192,8 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-29T23:05:40+00:00',
-    messagetext: 'Second message.'
+    messagetext: 'Second message.',
+    comments:null
   },
   {
     id : '12990000000',
@@ -191,7 +201,8 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-30T23:05:40+00:00',
-    messagetext: 'Third message.'
+    messagetext: 'Third message.',
+    comments:null
   },
   {
     id : '1299554433',
@@ -199,7 +210,8 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-25T23:05:40+00:00',
-    messagetext: 'First message.'
+    messagetext: 'First message.',
+    comments:null
   }];
 
   return resolveCallbackValues(callback,messages);
