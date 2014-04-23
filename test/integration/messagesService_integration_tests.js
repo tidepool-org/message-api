@@ -30,8 +30,6 @@ var env = {
 var userApiClient = mockableObject.make('checkToken','checkPermissons');
 var metrics = mockableObject.make('postServer', 'postThisUser', 'postWithUser');
 
-console.log('userApiClient: ',userApiClient);
-
 function doNothing() { return null; }
 var dummyMetrics = {
   postServer: doNothing,
@@ -56,7 +54,7 @@ var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
 describe('message API', function() {
 
-  var fakeRootId = String(testDbInstance.ObjectId());
+  var parentmessageId;
 
   function setupToken(user) {
     sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
@@ -92,19 +90,26 @@ describe('message API', function() {
     expect(message).to.have.property('comments');
   }
 
-  before(function (done) {
-
+  function saveMessages(){
     testDbInstance.messages.remove();
 
-    for (var index = 0; index < noteAndComments.length; ++index) {
+    //save the first as a note
 
-      if(index === 0){
-        testDbInstance.messages.save(noteAndComments[index]);
-      }else{
-        noteAndComments[index].parentmessage = fakeRootId;
-        testDbInstance.messages.save(noteAndComments[index]);
-      }
-    }
+    var note = noteAndComments[0];
+    var comments = noteAndComments.slice(1);
+
+    testDbInstance.messages.save(note,function(error,details){
+      parentmessageId = details._id;
+      comments.forEach(function(comment){
+        comment.parentmessage = String(parentmessageId);
+        testDbInstance.messages.save(comment);
+      });
+    });
+  }
+
+  before(function (done) {
+
+    saveMessages();
 
     messageService.start(done);
 
@@ -483,9 +488,9 @@ describe('message API', function() {
 
   describe('GET /thread/:msgid ', function() {
 
-    it('returns 3 messages with thread id', function(done) {
+    it('returns 4 messages with thread id', function(done) {
       supertest
-      .get('/thread/'+fakeRootId)
+      .get('/thread/'+parentmessageId)
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(200)
       .expect('Content-Type','application/json')
@@ -493,13 +498,10 @@ describe('message API', function() {
         if (err) return done(err);
         expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
-        expect(res.body.messages.length).equal(3);
+        expect(res.body.messages.length).equal(4);
 
         res.body.messages.forEach(function(message){
           testMessageContent(message);
-          if(!message.parentmessage){
-            expect(message.comments).to.equal(2);
-          }
         });
 
         done();
