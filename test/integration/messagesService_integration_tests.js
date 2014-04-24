@@ -90,6 +90,8 @@ describe('message API', function() {
     expect(message.messagetext).to.exist;
     expect(message).to.have.property('timestamp');
     expect(message.timestamp).to.exist;
+    expect(message).to.have.property('offsetminutes');
+    expect(message.offsetminutes).to.exist;
   }
 
   before(function (done) {
@@ -153,6 +155,7 @@ describe('message API', function() {
         expect(theMessage.id).to.equal(String(messageFromMongo._id));
         expect(theMessage.parentmessage).to.equal(messageFromMongo.parentmessage);
         expect(theMessage.timestamp).to.equal(String(messageFromMongo.timestamp));
+        expect(theMessage.offsetminutes).to.equal(String(messageFromMongo.offsetminutes));
         expect(theMessage.groupid).to.equal(String(messageFromMongo.groupid));
         expect(theMessage.userid).to.equal(String(messageFromMongo.userid));
         expect(theMessage.messagetext).to.equal(String(messageFromMongo.messagetext));
@@ -566,6 +569,7 @@ describe('message API', function() {
         parentmessage : '',
         userid: '12345',
         timestamp: '2013-12-04T23:05:40+00:00',
+        offsetminutes:'-720',
         messagetext: ''
       };
 
@@ -582,6 +586,7 @@ describe('message API', function() {
         userid: '12345',
         groupid: 'no-permission',
         timestamp: '2013-12-04T23:05:40+00:00',
+        offsetminutes:'-720',
         messagetext: 'no permission'
       };
 
@@ -655,6 +660,7 @@ describe('message API', function() {
         userid: '12345',
         groupid: 'no-permission',
         timestamp: '2013-12-04T23:05:40+00:00',
+        offsetminutes:'-720',
         messagetext: 'no permission to reply'
       };
 

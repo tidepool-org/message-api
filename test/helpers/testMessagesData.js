@@ -26,6 +26,7 @@ testMessagesData.noteAndComments = [
     userid: '12121212',
     groupid: '777',
     timestamp: '2013-11-28T23:07:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
   {
@@ -33,6 +34,7 @@ testMessagesData.noteAndComments = [
     userid: '232323',
     groupid: '777',
     timestamp: '2013-11-29T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Second message.'
   },
   {
@@ -40,6 +42,7 @@ testMessagesData.noteAndComments = [
     userid: '232323',
     groupid: '777',
     timestamp: '2013-11-30T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Third message.'
   },
   {
@@ -47,6 +50,7 @@ testMessagesData.noteAndComments = [
     userid: '232323',
     groupid: '777',
     timestamp: '2013-11-25T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'First message.'
   }
 ];
@@ -57,6 +61,7 @@ testMessagesData.note = {
   userid: '12121212',
   groupid: '999',
   timestamp: '2013-11-28T23:07:40+00:00',
+  offsetminutes: '-720',
   messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
 };
 
