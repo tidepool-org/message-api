@@ -87,6 +87,7 @@ function handleGetMessage(messageId,callback) {
     userid: '12121212',
     groupid: '44J88FD76',
     timestamp: '2013-11-28T23:07:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   };
 
@@ -103,6 +104,7 @@ function handleGetNotes(groupId, startTime, endTime, callback) {
     userid: '12121212',
     groupid: groupId,
     timestamp: '2013-11-28T23:07:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
   {
@@ -111,6 +113,7 @@ function handleGetNotes(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-29T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Second message.'
   },
   {
@@ -119,6 +122,7 @@ function handleGetNotes(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-30T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Third message.'
   }];
 
@@ -135,6 +139,7 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '12121212',
     groupid: '999777',
     timestamp: '2013-11-28T23:07:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
   {
@@ -143,6 +148,7 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '232323',
     groupid: '999777',
     timestamp: '2013-11-29T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Second message.'
   },
   {
@@ -151,6 +157,7 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '232323',
     groupid: '999777',
     timestamp: '2013-11-30T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Third message.'
   },
   {
@@ -159,6 +166,7 @@ function handleGetMessagesInThread(messageId, callback) {
     userid: '232323',
     groupid: '999777',
     timestamp: '2013-11-25T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'First message.'
   }];
 
@@ -175,6 +183,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '12121212',
     groupid: groupId,
     timestamp: '2013-11-28T23:07:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
   {
@@ -183,6 +192,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-29T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Second message.'
   },
   {
@@ -191,6 +201,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-30T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'Third message.'
   },
   {
@@ -199,6 +210,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     userid: '232323',
     groupid: groupId,
     timestamp: '2013-11-25T23:05:40+00:00',
+    offsetminutes: '-720',
     messagetext: 'First message.'
   }];
 
