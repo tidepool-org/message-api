@@ -75,8 +75,6 @@ describe('message API', function() {
     expect(message.messagetext).to.exist;
     expect(message).to.have.property('timestamp');
     expect(message.timestamp).to.exist;
-    expect(message).to.have.property('offsetminutes');
-    expect(message.offsetminutes).to.exist;
   };
 
   describe('validity of messages being added', function() {
@@ -123,8 +121,7 @@ describe('message API', function() {
         groupid: '4567',
         parentmessage:'',
         timestamp:'2013-11-28T23:07:40+00:00',
-        messagetext:'my new message thread',
-        offsetminutes:'-720'
+        messagetext:'my new message thread'
       };
 
       supertest(messaging)
@@ -145,7 +142,6 @@ describe('message API', function() {
         groupid: '4567',
         parentmessage: null ,
         timestamp:'2013-11-28T23:07:40+00:00',
-        offsetminutes:'-720',
         messagetext:'my reply'
       };
 
@@ -167,7 +163,6 @@ describe('message API', function() {
         groupid: '4567',
         parentmessage:'123456743',
         timestamp:'',
-        offsetminutes:'-720',
         messagetext:'my reply'
       };
 
