@@ -116,7 +116,7 @@ describe('message API', function() {
   });
 
   after(function () {
-    messageService.stop();
+    messageService.close();
   });
 
   describe('GET /read/:msgId', function() {
