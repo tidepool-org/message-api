@@ -39,13 +39,17 @@ var dummyMetrics = {
   postWithUser:doNothing
 };
 
+var messageApi = require('../../lib/routes/messageApi')(
+  require('../../lib/handler/mongoHandler')(env.mongoConnectionString),
+  require('../helpers/mockSeagullHandler')(),
+  dummyMetrics
+);
+
 var messageService = require('../../lib/messagesService')(
   env,
-  require('../../lib/handler/mongoHandler')(env.mongoConnectionString),
+  messageApi,
   userApiClient,
-  require('../helpers/mockSeagullHandler')(),
-  gatekeeperHandler,
-  dummyMetrics
+  gatekeeperHandler
 );
 
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
@@ -55,7 +59,7 @@ var messageUser = { userid: 'message', isserver: true };
 var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
 var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
-describe('message API', function() {
+describe('message API integration', function() {
 
   var fakeRootId = String(testDbInstance.ObjectId());
 
