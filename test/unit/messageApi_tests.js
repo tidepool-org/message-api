@@ -25,7 +25,7 @@ var testNote = require('../helpers/testMessagesData').note;
 var testReply = require('../helpers/testMessagesData').noteAndComments[1];
 var seagullHandler = require('../helpers/mockSeagullHandler')();
 
-describe('message API', function() {
+describe('message API unit', function() {
 
   /*
     minimise the components to just groups API and mocked crud handler
