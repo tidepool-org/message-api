@@ -39,8 +39,10 @@ var dummyMetrics = {
   postWithUser:doNothing
 };
 
+var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
+
 var messageApi = require('../../lib/routes/messageApi')(
-  require('../../lib/handler/mongoHandler')(env.mongoConnectionString),
+  mongoHandler,
   require('../helpers/mockSeagullHandler')(),
   dummyMetrics
 );
@@ -78,22 +80,30 @@ describe('message API integration', function() {
   }
 
   /*
-    All expectations for a message
+  * The expectations for a message
   */
   function testMessageContent(message){
-    expect(message).to.have.property('id');
+    //should be these properties
+    console.log(message);
+
+    expect(message).to.contain.keys(
+      'id',
+      'parentmessage',
+      'groupid',
+      'userid',
+      'user',
+      'messagetext',
+      'timestamp'
+    );
+    //and only 7 properties
+    expect(Object.keys(message).length).to.equal(7);
+    //these properties must be returned with a value
     expect(message.id).to.exist;
-    expect(message).to.have.property('parentmessage');
-    expect(message).to.have.property('userid');
-    expect(message.userid).to.exist;
-    expect(message).to.have.property('user');
-    expect(message.user).to.exist;
-    expect(message).to.have.property('groupid');
     expect(message.groupid).to.exist;
-    expect(message).to.have.property('messagetext');
-    expect(message.messagetext).to.exist;
-    expect(message).to.have.property('timestamp');
+    expect(message.userid).to.exist;
     expect(message.timestamp).to.exist;
+    expect(message.messagetext).to.exist;
+
   }
 
   before(function (done) {
@@ -535,7 +545,45 @@ describe('message API integration', function() {
 
     });
 
-    it('returns 201', function(done) {
+    it('only saves core message fields', function(done) {
+
+      var messageWithExtras = {
+        parentmessage : null,
+        userid: '12121212',
+        groupid: '777',
+        timestamp: '2013-11-28T23:07:40+00:00',
+        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
+        stuff : {one:'one',two:'two'}
+      };
+
+      /*
+       * Save message with extra data
+       */
+      supertest
+      .post('/send/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:messageWithExtras})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+
+        /*
+         * Now lets see what we get back
+         */
+        var extrasId = res.body.id;
+        expect(extrasId).to.exist;
+
+        mongoHandler.getMessage(extrasId,function(error,inMongo){
+          if (error) return done(error);
+          expect(inMongo.stuff).to.not.exist;
+          done();
+        });
+
+      });
+
+    });
+
+    it('returns 201 for success', function(done) {
 
       var testMessage = require('../helpers/testMessagesData').note;
 
@@ -618,6 +666,44 @@ describe('message API integration', function() {
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:testMessage})
       .expect(201,done);
+
+    });
+
+    it('only saves core message fields', function(done) {
+
+      var replyWithExtras = {
+        userid: '12121212',
+        groupid: '777',
+        timestamp: '2013-11-28T23:07:40+00:00',
+        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
+        stuff : {one:'one',two:'two'},
+        morestuff : 'some more stuff we should not save'
+      };
+
+      /*
+       * Save a reply to a message with extras attached
+       */
+      supertest
+      .post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:replyWithExtras})
+      .expect(201)
+      .end(function(err, res) {
+        if (err) return done(err);
+
+        var extrasId = res.body.id;
+
+        /*
+         * Now test what was saved
+         */
+        mongoHandler.getMessage(extrasId,function(error,inMongo){
+          if (error) return done(error);
+          expect(inMongo.stuff).to.not.exist;
+          expect(inMongo.morestuff).to.not.exist;
+          done();
+        });
+
+      });
 
     });
 
