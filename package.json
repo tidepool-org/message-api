@@ -26,7 +26,7 @@
     "restify": "2.7.0",
     "tidepool-gatekeeper": "0.1.5",
     "tidepool-seagull-client": "0.1.0",
-    "user-api-client": "0.2.2"
+    "user-api-client": "0.3.0"
   },
   "devDependencies": {
     "grunt": "0.4.2",

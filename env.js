@@ -83,7 +83,7 @@ module.exports = (function(){
 
   env.gatekeeper = {
     // The config object to discover gatekeeper.  This is just passed through to hakken.watchFromConfig()
-    serviceSpec: JSON.parse(config.fromEnvironment("GATEKEEPER_SERVICE"))
+    serviceSpec: JSON.parse(config.fromEnvironment('GATEKEEPER_SERVICE'))
   };
 
   // The host to contact for discovery
@@ -94,6 +94,10 @@ module.exports = (function(){
     // The service name to expose to discovery
     env.serviceName = config.fromEnvironment('SERVICE_NAME');
 
+    // info for properly tagging metrics
+    env.metricsSource = env.serviceName;
+    env.metricsVersion = require('./package.json').version;
+  
     // The local host to expose to discovery
     env.publishHost = config.fromEnvironment('PUBLISH_HOST');
   }
