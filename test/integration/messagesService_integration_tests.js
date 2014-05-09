@@ -84,8 +84,6 @@ describe('message API integration', function() {
   */
   function testMessageContent(message){
     //should be these properties
-    console.log(message);
-
     expect(message).to.contain.keys(
       'id',
       'parentmessage',
@@ -625,7 +623,13 @@ describe('message API integration', function() {
       .post('/send/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:invalidMessage})
-      .expect(400,done);
+      .expect(400)
+      .end(function(err, res) {
+        if (err) return done(err);
+        var message = res.body;
+        expect(message).equal('{"groupid":"property is required","messagetext":"property is required"}');
+        done();
+      });
     });
 
     it('return 401 when we do not have permission to add a message', function(done) {
@@ -736,7 +740,13 @@ describe('message API integration', function() {
       .post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:invalidMessage})
-      .expect(400,done);
+      .expect(400)
+      .end(function(err, res) {
+        if (err) return done(err);
+        var message = res.body;
+        expect(message).equal('{"groupid":"property is required","messagetext":"property is required"}');
+        done();
+      });
     });
 
     it('return 401 when we do not have permission to reply to a message', function(done) {
