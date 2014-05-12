@@ -135,9 +135,9 @@ describe('message API unit', function() {
       });
     });
 
-    it('POST reply/:msgid allows with no parent set as it will be set to the reply msgid', function(done) {
+    it('POST reply/:msgid allows parentmessage to not be set as it will be set to the id of the message you reply to', function(done) {
 
-      var invalidReplyParentNotSet = {
+      var replyWithParentNotSet = {
         userid: '12345',
         groupid: '4567',
         parentmessage: null ,
@@ -147,7 +147,7 @@ describe('message API unit', function() {
 
       supertest(messaging)
       .post('/reply/123456743')
-      .send({message:invalidReplyParentNotSet})
+      .send({message:replyWithParentNotSet})
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
