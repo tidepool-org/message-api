@@ -766,4 +766,36 @@ describe('message API integration', function() {
     });
   });
 
+  describe('POST /edit', function() {
+
+    it('is not yet implemented', function(done) {
+
+      var updatedNote = {
+        timestamp: '2013-12-04T23:05:40+00:00',
+        messagetext: 'some updated text'
+      };
+
+      supertest
+      .post('/edit')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:updatedNote})
+      .expect(501,done);
+
+    });
+  });
+
+  describe('DELETE /remove/:msgid', function() {
+
+    it('is not yet implemented', function(done) {
+
+      var fakeId = '123-you-know-me';
+
+      supertest
+      .del('/remove/'+fakeId)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(501,done);
+
+    });
+  });
+
 });

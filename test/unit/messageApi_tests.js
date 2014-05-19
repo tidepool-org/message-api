@@ -55,6 +55,10 @@ describe('message API unit', function() {
     server.post('/send/:groupid', messageApi.addThread);
     server.post('/reply/:msgid',messageApi.replyToThread);
 
+    //updates
+    server.post('/edit', messageApi.editNote);
+    server.del('/remove/:msgid',messageApi.removeNote);
+
     return server;
   };
 
@@ -380,6 +384,26 @@ describe('message API unit', function() {
       supertest(messaging)
       .get('/status?randomParam=401')
       .expect(200,done);
+    });
+
+    it('POST /edit', function(done) {
+
+      var updates = {
+        timestamp: '2013-11-28T23:07:40+00:00',
+        messagetext: 'correction - should have been 12 units'
+      };
+
+      supertest(messaging)
+      .post('/edit')
+      .send({message:updates})
+      .expect(501,done);
+    });
+
+    it('DELETE /remove', function(done) {
+
+      supertest(messaging)
+      .del('/remove/123456')
+      .expect(501,done);
     });
 
   });
