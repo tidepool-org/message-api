@@ -56,8 +56,8 @@ describe('message API unit', function() {
     server.post('/reply/:msgid',messageApi.replyToThread);
 
     //updates
-    server.post('/edit', messageApi.editNote);
-    server.del('/remove/:msgid',messageApi.removeNote);
+    server.put('/edit/:msgid', messageApi.editMessage);
+    server.del('/remove/:msgid',messageApi.removeMessage);
 
     return server;
   };
@@ -394,7 +394,7 @@ describe('message API unit', function() {
       };
 
       supertest(messaging)
-      .post('/edit')
+      .put('/edit/123456')
       .send({message:updates})
       .expect(501,done);
     });

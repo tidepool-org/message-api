@@ -97,10 +97,13 @@ module.exports = (function(){
     // info for properly tagging metrics
     env.metricsSource = env.serviceName;
     env.metricsVersion = require('./package.json').version;
-  
+
     // The local host to expose to discovery
     env.publishHost = config.fromEnvironment('PUBLISH_HOST');
   }
+
+  //delete window for cleaning up messages
+  env.deleteWindow = config.fromEnvironment('DELETE_TIME_WINDOW', 14);
 
   return env;
 })();

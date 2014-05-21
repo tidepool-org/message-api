@@ -766,17 +766,18 @@ describe('message API integration', function() {
     });
   });
 
-  describe('POST /edit', function() {
+  describe('PUT /edit', function() {
 
     it('is not yet implemented', function(done) {
 
       var updatedNote = {
-        timestamp: '2013-12-04T23:05:40+00:00',
         messagetext: 'some updated text'
       };
 
+      var fakeId = '123-you-know-me';
+
       supertest
-      .post('/edit')
+      .put('/edit/'+fakeId)
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:updatedNote})
       .expect(501,done);

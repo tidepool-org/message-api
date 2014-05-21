@@ -17,7 +17,7 @@
 
 var salinity = require('salinity');
 var expect = salinity.expect;
-
+var async = require('async');
 
 /*
  * SETUP
@@ -121,6 +121,107 @@ describe('mongo handler', function() {
         expect(notes.length).to.equal(1);
         messageContentToReturn(toSave,notes[0],done);
       });
+    });
+  });
+
+  it('will edit an existing note', function(done) {
+
+    var originalMessage = {
+      parentmessage : null,
+      groupid : '98-99-100',
+      userid : '456-234',
+      messagetext : 'yay!',
+      timestamp : new Date().toISOString()
+    };
+
+    var edit = {
+      messagetext : 'we just edited this',
+      id : null
+    };
+
+    async.waterfall([
+      function(callback){
+        /*
+         * create note
+         */
+        mongoHandler.createMessage(originalMessage,function(error,id){
+          expect(error).to.not.exist;
+          expect(id).to.exist;
+          callback(null, id);
+        });
+      },
+      function(messageId, callback){
+        /*
+         * edit the note we created
+         */
+        edit.id = messageId;
+        mongoHandler.editMessage(edit,function(error,details){
+          expect(error).to.not.exist;
+          expect(details).to.exist;
+          expect(details.statuscode).to.equal(200);
+          callback(null, messageId);
+        });
+      },
+      function(messageId, callback){
+        /*
+         * get the note and make sure it is updated
+         */
+        mongoHandler.getMessage(messageId,function(error,message){
+          expect(error).to.not.exist;
+          expect(message.id).to.equal(messageId);
+          expect(message.messagetext).to.equal(edit.messagetext);
+          callback(null, null);
+        });
+      }
+    ], function (err, result) {
+      done();
+    });
+  });
+
+  it('will remove an existing note', function(done) {
+
+    var originalMessage = {
+      parentmessage : null,
+      groupid : '98-99-100',
+      userid : '456-234',
+      messagetext : 'yay! yay!',
+      timestamp : new Date().toISOString()
+    };
+
+    async.waterfall([
+      function(callback){
+        /*
+         * create note
+         */
+        mongoHandler.createMessage(originalMessage,function(error,id){
+          expect(error).to.not.exist;
+          expect(id).to.exist;
+          callback(null, id);
+        });
+      },
+      function(messageId, callback){
+        /*
+         * remove the note we created
+         */
+        mongoHandler.removeMessage(messageId,function(error,details){
+          expect(error).to.not.exist;
+          expect(details).to.exist;
+          expect(details.statuscode).to.equal(200);
+          callback(null, messageId);
+        });
+      },
+      function(messageId, callback){
+        /*
+         * try and get the note we just removed
+         */
+        mongoHandler.getMessage(messageId,function(error,message){
+          expect(error).to.not.exist;
+          expect(message).not.exist;
+          callback(null, null);
+        });
+      }
+    ], function (err, result) {
+      done();
     });
   });
 
