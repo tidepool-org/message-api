@@ -40,7 +40,9 @@ var mockMongoHandler = function(testingConfig) {
     getNotes : handleGetNotes,
     getMessage : handleGetMessage,
     getAllMessages : handleGetAllMessages,
-    getMessagesInThread : handleGetMessagesInThread
+    getMessagesInThread : handleGetMessagesInThread,
+    editMessage : handleEditMessage,
+    deleteMessage : handleDeleteMessage
   };
 
 };
@@ -203,6 +205,24 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
   }];
 
   return resolveCallbackValues(callback,messages);
+}
+
+function handleEditMessage(updateDetails,callback){
+
+  var updated = {
+    id : updateDetails.id,
+    parentmessage: null,
+    userid: 'c3p0',
+    groupid: '11-22',
+    timestamp: updateDetails.timestamp || new Date().toISOString(),
+    messagetext: updateDetails.messagetext || 'some text'
+  };
+
+  return resolveCallbackValues(callback,updated);
+}
+
+function handleDeleteMessage(deletionDetails,callback){
+  return resolveCallbackValues(callback,deletionDetails.id);
 }
 
 module.exports = mockMongoHandler;

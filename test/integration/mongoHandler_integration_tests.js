@@ -154,27 +154,16 @@ describe('mongo handler', function() {
         /*
          * edit the note we created
          */
-        edit.id = messageId;
+        edit.id = String(messageId);
         mongoHandler.editMessage(edit,function(error,details){
           expect(error).to.not.exist;
           expect(details).to.exist;
-          expect(details.statuscode).to.equal(200);
-          callback(null, messageId);
-        });
-      },
-      function(messageId, callback){
-        /*
-         * get the note and make sure it is updated
-         */
-        mongoHandler.getMessage(messageId,function(error,message){
-          expect(error).to.not.exist;
-          expect(message.id).to.equal(messageId);
-          expect(message.messagetext).to.equal(edit.messagetext);
-          callback(null, null);
+          expect(details.messagetext).to.equal(edit.messagetext);
+          callback(error, messageId);
         });
       }
     ], function (err, result) {
-      done();
+      done(err);
     });
   });
 
@@ -193,7 +182,7 @@ describe('mongo handler', function() {
         /*
          * create note
          */
-        mongoHandler.createMessage(originalMessage,function(error,id){
+        mongoHandler.createMessage(originalMessage, function(error,id){
           expect(error).to.not.exist;
           expect(id).to.exist;
           callback(null, id);
@@ -203,25 +192,21 @@ describe('mongo handler', function() {
         /*
          * remove the note we created
          */
-        mongoHandler.removeMessage(messageId,function(error,details){
+
+        var deleteDetails = {
+          id : String(messageId),
+          deleteflag : new Date().toISOString()
+        };
+
+        mongoHandler.deleteMessage(deleteDetails, function(error,details){
           expect(error).to.not.exist;
-          expect(details).to.exist;
-          expect(details.statuscode).to.equal(200);
-          callback(null, messageId);
-        });
-      },
-      function(messageId, callback){
-        /*
-         * try and get the note we just removed
-         */
-        mongoHandler.getMessage(messageId,function(error,message){
-          expect(error).to.not.exist;
-          expect(message).not.exist;
-          callback(null, null);
+          expect(details.deleteflag).to.exist;
+          expect(details.deleteflag).to.equal(deleteDetails.deleteflag);
+          callback(error, details);
         });
       }
     ], function (err, result) {
-      done();
+      done(err);
     });
   });
 

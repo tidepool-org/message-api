@@ -25,6 +25,8 @@ var testNote = require('../helpers/testMessagesData').note;
 var testReply = require('../helpers/testMessagesData').noteAndComments[1];
 var seagullHandler = require('../helpers/mockSeagullHandler')();
 
+var config = { deleteWindow : 5 };
+
 describe('message API unit', function() {
 
   /*
@@ -42,7 +44,7 @@ describe('message API unit', function() {
       postThisUser: doNothing,
       postWithUser:doNothing
     };
-    var messageApi = require('../../lib/routes/messageApi')(crudHandler, seagullHandler, dummyMetrics);
+    var messageApi = require('../../lib/routes/messageApi')(config,crudHandler, seagullHandler, dummyMetrics);
 
     server.get('/status',messageApi.status);
 
@@ -386,24 +388,23 @@ describe('message API unit', function() {
       .expect(200,done);
     });
 
-    it('POST /edit', function(done) {
+    it('PUT /edit', function(done) {
 
       var updates = {
-        timestamp: '2013-11-28T23:07:40+00:00',
         messagetext: 'correction - should have been 12 units'
       };
 
       supertest(messaging)
       .put('/edit/123456')
       .send({message:updates})
-      .expect(501,done);
+      .expect(200,done);
     });
 
     it('DELETE /remove', function(done) {
 
       supertest(messaging)
       .del('/remove/123456')
-      .expect(501,done);
+      .expect(202,done);
     });
 
   });
