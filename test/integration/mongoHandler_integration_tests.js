@@ -270,7 +270,7 @@ describe('mongo handler', function() {
       });
     });
 
-    it('getNotes will only return those notes not flagged for deletion', function() {
+    it('getNotes will only return those notes not flagged for deletion', function(done) {
 
       mongoHandler.getNotes(groupId, function(messageError,notes){
         expect(messageError).to.not.exist;

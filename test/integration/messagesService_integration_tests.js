@@ -826,30 +826,23 @@ describe('message API integration', function() {
 
     it('allows you to start a delete on a message', function(done) {
 
+      expect(messageToRemove).to.exist;
+
       supertest
       .del('/remove/'+messageToRemove)
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(202)
-      .end(function(err, res) {
-        if (err) return done(err);
-        done();
-      });
+      .expect(202,done);
 
     });
 
     it('means you will not get the deleted message back if you try to find it', function(done) {
 
-      console.log('## Finding the deleted message ## ',messageToRemove);
+      expect(messageToRemove).to.exist;
 
       supertest
       .get('/read/'+messageToRemove)
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body.message).to.be.empty;
-        done();
-      });
+      .expect(404,done);
 
     });
   });
