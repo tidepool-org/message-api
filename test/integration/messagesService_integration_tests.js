@@ -829,7 +829,27 @@ describe('message API integration', function() {
       supertest
       .del('/remove/'+messageToRemove)
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(202,done);
+      .expect(202)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+
+    });
+
+    it('means you will not get the deleted message back if you try to find it', function(done) {
+
+      console.log('## Finding the deleted message ## ',messageToRemove);
+
+      supertest
+      .get('/read/'+messageToRemove)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.message).to.be.empty;
+        done();
+      });
 
     });
   });

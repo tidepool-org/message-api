@@ -95,8 +95,8 @@ function handleGetMessage(messageId,callback) {
   return resolveCallbackValues(callback,message);
 }
 
-function handleGetNotes(groupId, startTime, endTime, callback) {
-  log.debug('Finding all notes for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
+function handleGetNotes(groupId, options, callback) {
+  log.debug('Finding all notes for group[%s] from[%s] to[%s] ', groupId, options.startTime, options.endTime);
 
   var messages =
   [{
@@ -167,8 +167,8 @@ function handleGetMessagesInThread(messageId, callback) {
   return resolveCallbackValues(callback, messages);
 }
 
-function handleGetAllMessages(groupId, startTime, endTime, callback) {
-  log.debug('Finding all messages for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
+function handleGetAllMessages(groupId, options, callback) {
+  log.debug('Finding all messages for group[%s] from[%s] to[%s] ', groupId, options.startTime, options.endTime);
 
   var messages =
   [{

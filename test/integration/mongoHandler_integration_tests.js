@@ -17,7 +17,8 @@
 
 var salinity = require('salinity');
 var expect = salinity.expect;
-var async = require('async');
+
+var _ = require('lodash');
 
 /*
  * SETUP
@@ -57,12 +58,6 @@ describe('mongo handler', function() {
       return cb();
     }
 
-    afterEach(function (done) {
-      //cleanup each time
-      testDbInstance.messages.remove();
-      done();
-    });
-
     it('will return the id of the saved message', function(done) {
 
       var message = {
@@ -91,8 +86,9 @@ describe('mongo handler', function() {
       };
 
       mongoHandler.createMessage(messageToSave,function(error,id){
-        expect(error).to.not.exist;
-        expect(id).to.exist;
+        if(error){
+          done(error);
+        }
         mongoHandler.getMessage(String(id),function(messageError,foundMessage){
           expect(messageError).to.not.exist;
           expect(foundMessage).to.exist;
@@ -113,17 +109,17 @@ describe('mongo handler', function() {
         timestamp : new Date().toISOString()
       };
 
-      mongoHandler.createMessage(toSave,function(error,id){
-        expect(error).to.not.exist;
-        expect(id).to.exist;
-        mongoHandler.getNotes(notesGroup,null,null,function(messageError,notes){
-          expect(messageError).to.not.exist;
+      mongoHandler.createMessage(toSave, function(createError, createdId){
+        if(createError){
+          done(createError);
+        }
+        mongoHandler.getNotes(notesGroup,function(notesError,notes){
+          expect(notesError).to.not.exist;
           expect(notes).to.exist;
-          expect(notes).to.be.an.array;
-          expect(notes.length).to.equal(1);
-          messageContentToReturn(toSave,notes[0],done);
+          done();
         });
       });
+
     });
 
     it('will edit an existing note', function(done) {
@@ -141,32 +137,20 @@ describe('mongo handler', function() {
         id : null
       };
 
-      async.waterfall([
-        function(callback){
-          /*
-           * create note
-           */
-          mongoHandler.createMessage(originalMessage,function(error,id){
-            expect(error).to.not.exist;
-            expect(id).to.exist;
-            callback(null, id);
-          });
-        },
-        function(messageId, callback){
-          /*
-           * edit the note we created
-           */
-          edit.id = String(messageId);
-          mongoHandler.editMessage(edit,function(error,details){
-            expect(error).to.not.exist;
-            expect(details).to.exist;
-            expect(details.messagetext).to.equal(edit.messagetext);
-            callback(error, messageId);
-          });
+      mongoHandler.createMessage(originalMessage, function(createError,createdId){
+        if(createError){
+          done(createError);
         }
-      ], function (err, result) {
-        done(err);
+        edit.id = String(createdId);
+
+        mongoHandler.editMessage(edit, function(error,details){
+          expect(error).to.not.exist;
+          expect(details).to.exist;
+          expect(details.messagetext).to.equal(edit.messagetext);
+          done();
+        });
       });
+
     });
 
     it('will remove an existing note', function(done) {
@@ -179,44 +163,30 @@ describe('mongo handler', function() {
         timestamp : new Date().toISOString()
       };
 
-      async.waterfall([
-        function(callback){
-          /*
-           * create note
-           */
-          mongoHandler.createMessage(originalMessage, function(error,id){
-            expect(error).to.not.exist;
-            expect(id).to.exist;
-            callback(null, id);
-          });
-        },
-        function(messageId, callback){
-          /*
-           * remove the note we created
-           */
+      mongoHandler.createMessage(originalMessage, function(createError,createdId){
+        if(createError){
+          done(createError);
+        }
+        var deleteDetails = {
+          id : String(createdId),
+          deleteflag : new Date().toISOString()
+        };
 
-          var deleteDetails = {
-            id : String(messageId),
-            deleteflag : new Date().toISOString()
-          };
-
-          mongoHandler.deleteMessage(deleteDetails, function(error,details){
+        mongoHandler.deleteMessage(deleteDetails, function(error,details){
             expect(error).to.not.exist;
             expect(details.deleteflag).to.exist;
             expect(details.deleteflag).to.equal(deleteDetails.deleteflag);
-            callback(error, details);
+            done();
           });
-        }
-      ], function (err, result) {
-        done(err);
       });
+
     });
 
   });
 
   describe('getting messages using ', function() {
 
-    var notesGroup = '123-456-99-100';
+    var groupId = '123-456-99-100';
     var idOfParentMessage;
 
     function testMessages(){
@@ -224,14 +194,14 @@ describe('mongo handler', function() {
       return [
         {
           parentmessage : null,
-          groupid : notesGroup,
+          groupid : groupId,
           userid : '456',
           messagetext : 'yay! this is a good one',
           timestamp : new Date().toISOString()
         },
         {
           parentmessage : null,
-          groupid : notesGroup,
+          groupid : groupId,
           userid : '456',
           messagetext : 'this is flagged for deletion',
           deleteflag : new Date().toISOString(),
@@ -239,13 +209,14 @@ describe('mongo handler', function() {
         },
         {
           parentmessage : null,
-          groupid : notesGroup,
+          groupid : groupId,
           userid : '123',
           messagetext : 'this is the parentmessage',
           timestamp : new Date().toISOString()
         },
         {
-          groupid : notesGroup,
+          parentmessage : null,
+          groupid : groupId,
           userid : '999',
           messagetext : 'this reply is flagged for deletion',
           deleteflag : new Date().toISOString(),
@@ -254,67 +225,61 @@ describe('mongo handler', function() {
       ];
     }
 
-    function setParentId(mongoError,mongoDoc){
-      if(mongoDoc){
-        idOfParentMessage = String(mongoDoc._id);
-        //console.log('parent id ',idOfParentMessage);
-      }
-      return;
-    }
-
     before(function (done) {
       /*
        * Load multiple messages for testing
        */
+      testDbInstance.messages.remove();
       var messages = testMessages();
 
-      for (var index = 0; index < messages.length; ++index) {
-
-        if( index === 2 ){
-          testDbInstance.messages.save(messages[index], setParentId);
+      _.forEach(messages, function(message){
+        if(message.messagetext === 'this is the parentmessage'){
+          testDbInstance.messages.save(message,function(err,doc){
+            idOfParentMessage = String(doc._id);
+            done();
+          });
         } else {
-          messages[index].parentmessage = idOfParentMessage;
-          testDbInstance.messages.save(messages[index]);
+          testDbInstance.messages.save(message);
         }
-      }
-      done();
+      });
+
     });
 
     it('getAllMessages will not bring back those flagged for delete', function(done) {
 
-      mongoHandler.getAllMessages(notesGroup,null,null,function(messageError,messages){
+      mongoHandler.getAllMessages(groupId, function(messageError,messages){
         expect(messageError).to.not.exist;
         expect(messages).to.exist;
         expect(messages).to.be.an.array;
         expect(messages.length).to.equal(2);
         expect(messages[0].deleteflag).to.not.exist;
         expect(messages[1].deleteflag).to.not.exist;
-        done(messageError);
+        done();
       });
     });
 
     it('getMessagesInThread will only return those not flagged for deletion', function(done) {
 
-      mongoHandler.getMessagesInThread(idOfParentMessage,function(messageError,messages){
+      mongoHandler.getMessagesInThread(idOfParentMessage, function(messageError,messages){
         expect(messageError).to.not.exist;
         expect(messages).to.exist;
         expect(messages).to.be.an.array;
         expect(messages.length).to.equal(1);
         expect(messages[0].deleteflag).to.not.exist;
-        done(messageError);
+        done();
       });
     });
 
-    it('getNotes will only return those notes not flagged for deletion', function(done) {
+    it('getNotes will only return those notes not flagged for deletion', function() {
 
-      mongoHandler.getNotes(notesGroup,null,null,function(messageError,notes){
+      mongoHandler.getNotes(groupId, function(messageError,notes){
         expect(messageError).to.not.exist;
         expect(notes).to.exist;
         expect(notes).to.be.an.array;
         expect(notes.length).to.equal(2);
         expect(notes[0].deleteflag).to.not.exist;
         expect(notes[1].deleteflag).to.not.exist;
-        done(messageError);
+        done();
       });
     });
   });
