@@ -164,7 +164,7 @@ function handleGetMessagesInThread(messageId, callback) {
     messagetext: 'First message.'
   }];
 
-  return resolveCallbackValues(callback,messages);
+  return resolveCallbackValues(callback, messages);
 }
 
 function handleGetAllMessages(groupId, startTime, endTime, callback) {
@@ -204,7 +204,7 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     messagetext: 'First message.'
   }];
 
-  return resolveCallbackValues(callback,messages);
+  return resolveCallbackValues(callback, messages);
 }
 
 function handleEditMessage(updateDetails,callback){
@@ -218,11 +218,11 @@ function handleEditMessage(updateDetails,callback){
     messagetext: updateDetails.messagetext || 'some text'
   };
 
-  return resolveCallbackValues(callback,updated);
+  return resolveCallbackValues(callback, updated);
 }
 
 function handleDeleteMessage(deletionDetails,callback){
-  return resolveCallbackValues(callback,deletionDetails.id);
+  return resolveCallbackValues(callback, deletionDetails.id);
 }
 
 module.exports = mockMongoHandler;
