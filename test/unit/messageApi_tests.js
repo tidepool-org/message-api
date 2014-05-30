@@ -25,6 +25,8 @@ var testNote = require('../helpers/testMessagesData').note;
 var testReply = require('../helpers/testMessagesData').noteAndComments[1];
 var seagullHandler = require('../helpers/mockSeagullHandler')();
 
+var config = { deleteWindow : 5 };
+
 describe('message API unit', function() {
 
   /*
@@ -37,12 +39,19 @@ describe('message API unit', function() {
     server.use(restify.bodyParser());
 
     function doNothing() { return null; }
+
     var dummyMetrics = {
       postServer: doNothing,
       postThisUser: doNothing,
       postWithUser:doNothing
     };
-    var messageApi = require('../../lib/routes/messageApi')(crudHandler, seagullHandler, dummyMetrics);
+
+    var messageApi = require('../../lib/routes/messageApi')(
+      config,
+      crudHandler,
+      seagullHandler,
+      dummyMetrics
+    );
 
     server.get('/status',messageApi.status);
 
@@ -54,6 +63,10 @@ describe('message API unit', function() {
     //adding messages
     server.post('/send/:groupid', messageApi.addThread);
     server.post('/reply/:msgid',messageApi.replyToThread);
+
+    //updates
+    server.put('/edit/:msgid', messageApi.editMessage);
+    server.del('/remove/:msgid',messageApi.removeMessage);
 
     return server;
   };
@@ -380,6 +393,25 @@ describe('message API unit', function() {
       supertest(messaging)
       .get('/status?randomParam=401')
       .expect(200,done);
+    });
+
+    it('PUT /edit', function(done) {
+
+      var updates = {
+        messagetext: 'correction - should have been 12 units'
+      };
+
+      supertest(messaging)
+      .put('/edit/123456')
+      .send({message:updates})
+      .expect(200,done);
+    });
+
+    it('DELETE /remove', function(done) {
+
+      supertest(messaging)
+      .del('/remove/123456')
+      .expect(202,done);
     });
 
   });

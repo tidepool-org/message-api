@@ -40,7 +40,9 @@ var mockMongoHandler = function(testingConfig) {
     getNotes : handleGetNotes,
     getMessage : handleGetMessage,
     getAllMessages : handleGetAllMessages,
-    getMessagesInThread : handleGetMessagesInThread
+    getMessagesInThread : handleGetMessagesInThread,
+    editMessage : handleEditMessage,
+    deleteMessage : handleDeleteMessage
   };
 
 };
@@ -93,8 +95,8 @@ function handleGetMessage(messageId,callback) {
   return resolveCallbackValues(callback,message);
 }
 
-function handleGetNotes(groupId, startTime, endTime, callback) {
-  log.debug('Finding all notes for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
+function handleGetNotes(groupId, options, callback) {
+  log.debug('Finding all notes for group[%s] from[%s] to[%s] ', groupId, options.startTime, options.endTime);
 
   var messages =
   [{
@@ -162,11 +164,11 @@ function handleGetMessagesInThread(messageId, callback) {
     messagetext: 'First message.'
   }];
 
-  return resolveCallbackValues(callback,messages);
+  return resolveCallbackValues(callback, messages);
 }
 
-function handleGetAllMessages(groupId, startTime, endTime, callback) {
-  log.debug('Finding all messages for group[%s] from[%s] to[%s] ', groupId, startTime, endTime);
+function handleGetAllMessages(groupId, options, callback) {
+  log.debug('Finding all messages for group[%s] from[%s] to[%s] ', groupId, options.startTime, options.endTime);
 
   var messages =
   [{
@@ -202,7 +204,25 @@ function handleGetAllMessages(groupId, startTime, endTime, callback) {
     messagetext: 'First message.'
   }];
 
-  return resolveCallbackValues(callback,messages);
+  return resolveCallbackValues(callback, messages);
+}
+
+function handleEditMessage(updateDetails,callback){
+
+  var updated = {
+    id : updateDetails.id,
+    parentmessage: null,
+    userid: 'c3p0',
+    groupid: '11-22',
+    timestamp: updateDetails.timestamp || new Date().toISOString(),
+    messagetext: updateDetails.messagetext || 'some text'
+  };
+
+  return resolveCallbackValues(callback, updated);
+}
+
+function handleDeleteMessage(deletionDetails,callback){
+  return resolveCallbackValues(callback, deletionDetails.id);
 }
 
 module.exports = mockMongoHandler;

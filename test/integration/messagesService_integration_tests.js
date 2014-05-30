@@ -21,10 +21,10 @@ var expect = salinity.expect;
 var sinon = salinity.sinon;
 var mockableObject = salinity.mockableObject;
 
-
 var env = {
   httpPort: 21000,
-  mongoConnectionString: 'mongodb://localhost/test_messages'
+  mongoConnectionString: 'mongodb://localhost/test_messages',
+  deleteWindow : 5
 };
 
 var userApiClient = mockableObject.make('checkToken');
@@ -42,6 +42,7 @@ var dummyMetrics = {
 var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
 
 var messageApi = require('../../lib/routes/messageApi')(
+  env,
   mongoHandler,
   require('../helpers/mockSeagullHandler')(),
   dummyMetrics
@@ -105,7 +106,9 @@ describe('message API integration', function() {
   }
 
   before(function (done) {
-
+    /*
+     * Refresh data for each test
+     */
     testDbInstance.messages.remove();
 
     for (var index = 0; index < noteAndComments.length; ++index) {
@@ -117,15 +120,18 @@ describe('message API integration', function() {
         testDbInstance.messages.save(noteAndComments[index]);
       }
     }
-
+    /*
+     * Start things up
+     */
     messageService.start(done);
-
     setupToken(messageUser);
     mockMetrics();
-
   });
 
   after(function () {
+    /*
+     * Close things down
+     */
     messageService.close();
   });
 
@@ -763,6 +769,81 @@ describe('message API integration', function() {
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:replyWithNoPermission})
       .expect(401,done);
+    });
+  });
+
+  describe('PUT /edit/:msgid', function() {
+
+    var messageToEdit;
+
+    before(function(done){
+      // grab a message that has been saved already
+      testDbInstance.messages.findOne({},function(err, doc) {
+        messageToEdit = String(doc._id);
+        done();
+      });
+    });
+
+    it('allows us to update the text of a message', function(done) {
+
+      var updatedNoteText = {
+        messagetext: 'some updated text'
+      };
+
+      supertest
+      .put('/edit/'+messageToEdit)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:updatedNoteText})
+      .expect(200,done);
+
+    });
+    it('allows us to update the time of a message', function(done) {
+
+      var updatedNoteTime = {
+        timestamp : new Date().toISOString()
+      };
+
+      supertest
+      .put('/edit/'+messageToEdit)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:updatedNoteTime})
+      .expect(200,done);
+
+    });
+  });
+
+  describe('DELETE /remove/:msgid', function() {
+
+    var messageToRemove;
+
+    before(function(done){
+      // grab a message that has been saved already
+      testDbInstance.messages.findOne({},function(err, doc) {
+        messageToRemove = String(doc._id);
+        done();
+      });
+    });
+
+    it('allows you to start a delete on a message', function(done) {
+
+      expect(messageToRemove).to.exist;
+
+      supertest
+      .del('/remove/'+messageToRemove)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(202,done);
+
+    });
+
+    it('means you will not get the deleted message back if you try to find it', function(done) {
+
+      expect(messageToRemove).to.exist;
+
+      supertest
+      .get('/read/'+messageToRemove)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404,done);
+
     });
   });
 
