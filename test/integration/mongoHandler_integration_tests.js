@@ -44,6 +44,8 @@ describe('mongo handler', function() {
       );
       //and only 6 properties
       expect(Object.keys(toReturn).length).to.equal(6);
+      //we do not want to return the mongo id
+      expect(toReturn._id).to.not.exist;
       //these properties must be returned with a value
       expect(toReturn.id).to.exist;
       expect(toReturn.groupid).to.exist;
@@ -70,6 +72,7 @@ describe('mongo handler', function() {
 
       mongoHandler.createMessage(message,function(error,id){
         expect(error).to.not.exist;
+        expect(id).to.exist;
         expect(id).to.exist;
         done();
       });
@@ -143,11 +146,13 @@ describe('mongo handler', function() {
         }
         edit.id = String(createdId);
 
-        mongoHandler.editMessage(edit, function(error,details){
+        mongoHandler.editMessage(edit, function(error,updatedMessage){
           expect(error).to.not.exist;
-          expect(details).to.exist;
-          expect(details.messagetext).to.equal(edit.messagetext);
-          done();
+          expect(updatedMessage).to.exist;
+          expect(updatedMessage.messagetext).to.equal(edit.messagetext);
+          //need to set the updated text first then test the message that will be returned is complete
+          originalMessage.messagetext = edit.messagetext;
+          messageContentToReturn(originalMessage,updatedMessage,done);
         });
       });
 

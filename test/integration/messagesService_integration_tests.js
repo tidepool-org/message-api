@@ -810,6 +810,25 @@ describe('message API integration', function() {
       .expect(200,done);
 
     });
+
+    it('does not return a message body', function(done) {
+
+      var updatedNoteTime = {
+        timestamp : new Date().toISOString()
+      };
+
+      supertest
+      .put('/edit/'+messageToEdit)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:updatedNoteTime})
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.be.empty;
+        done();
+      });
+
+    });
   });
 
   describe('DELETE /remove/:msgid', function() {
@@ -832,6 +851,22 @@ describe('message API integration', function() {
       .del('/remove/'+messageToRemove)
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(202,done);
+
+    });
+
+    it('does not return a message body', function(done) {
+
+      expect(messageToRemove).to.exist;
+
+      supertest
+      .del('/remove/'+messageToRemove)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(202)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.be.empty;
+        done();
+      });
 
     });
 
