@@ -62,7 +62,7 @@ var messageUser = { userid: 'message', isserver: true };
 var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
 var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
-describe('message API integration', function() {
+describe('message service', function() {
 
   var fakeRootId = String(testDbInstance.ObjectId());
 
@@ -135,7 +135,7 @@ describe('message API integration', function() {
     messageService.close();
   });
 
-  describe('GET /read/:msgId', function() {
+  describe('/read', function() {
 
     var messageFromMongo;
 
@@ -147,40 +147,7 @@ describe('message API integration', function() {
       });
     });
 
-    it('404 when no data for path', function(done) {
-      supertest
-      .get('/read')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
-    });
-
-    it('returns 200 and valid message', function(done) {
-
-      supertest
-      .get('/read/'+String(messageFromMongo._id))
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(200)
-      .expect('Content-Type', 'application/json')
-      .end(function(err, res) {
-        if (err) return done(err);
-
-        expectToken(sessionToken);
-
-        var theMessage = res.body.message;
-
-        expect(theMessage.id).to.equal(String(messageFromMongo._id));
-        expect(theMessage.parentmessage).to.equal(messageFromMongo.parentmessage);
-        expect(theMessage.timestamp).to.equal(String(messageFromMongo.timestamp));
-        expect(theMessage.groupid).to.equal(String(messageFromMongo.groupid));
-        expect(theMessage.userid).to.equal(String(messageFromMongo.userid));
-        expect(theMessage.messagetext).to.equal(String(messageFromMongo.messagetext));
-
-        done();
-      });
-    });
-
-    it('returns message all required fields', function(done) {
-
+    it('returns one message with all expected fields', function(done) {
       supertest
       .get('/read/'+String(messageFromMongo._id))
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -195,7 +162,6 @@ describe('message API integration', function() {
     });
 
     it('returns 404 if no message found for id', function(done) {
-
       supertest
       .get('/read/3344556754')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -205,10 +171,9 @@ describe('message API integration', function() {
         expect(res.body.message).to.be.empty;
         done();
       });
-
     });
 
-    it('returns 404 and no message if a non existant id is given', function(done) {
+    it('returns 404 for an invalid path', function(done) {
 
       supertest
       .get('/read/noMessageId')
@@ -219,49 +184,11 @@ describe('message API integration', function() {
         expect(res.body.message).to.be.empty;
         done();
       });
-
     });
   });
+  describe('/all', function() {
 
-  describe('GET /all/:groupid?starttime=xxx&endtime=yyy', function() {
-
-    it('returns 404 for invalid path', function(done) {
-
-      supertest
-      .get('/all')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body.messages).to.be.empty;
-        done();
-      });
-
-    });
-
-    it('returns 404 when there are no messages for path', function(done) {
-
-      supertest
-      .get('/all/12342?starttime=2013-11-25&endtime=2013-11-30')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body.messages).to.be.empty;
-        done();
-      });
-
-    });
-
-    it('returns 400 when an invalid date param is give', function(done) {
-      supertest
-      .get('/all/12342?starttime=not-a-date&endtime=2013-11-30')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(400,done);
-    });
-
-    it('returns 3 messages', function(done) {
-
+    it('finds messages between given start and end time', function(done) {
       supertest
       .get('/all/777?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -276,51 +203,11 @@ describe('message API integration', function() {
         res.body.messages.forEach(function(message){
           testMessageContent(message);
         });
-
         done();
       });
     });
 
-  });
-
-  describe('GET /all/:groupid?starttime=xxx ', function() {
-
-    it('returns 4 messages', function(done) {
-      supertest
-      .get('/all/777?starttime=2013-11-25')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(200)
-      .expect('Content-Type','application/json')
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectToken(sessionToken);
-        expect(res.body).to.have.property('messages').and.be.instanceof(Array);
-        expect(res.body.messages.length).to.equal(4);
-
-        res.body.messages.forEach(function(message){
-          testMessageContent(message);
-        });
-
-        done();
-      });
-    });
-
-    it('returns 404 when no messages', function(done) {
-      supertest.get('/all/99977777?starttime=2013-11-25')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body.messages).to.be.empty;
-        done();
-      });
-    });
-
-  });
-
-  describe('GET /all/:groupid?endtime=yyy ', function() {
-
-    it('returns all messages before endtime', function(done) {
+    it('find messages before the given endtime', function(done) {
       supertest
       .get('/all/777?endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -340,17 +227,46 @@ describe('message API integration', function() {
       });
     });
 
+    it('returns 404 an unspecified path', function(done) {
+      supertest
+      .get('/all')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
+    });
+
+    it('returns 404 when there are no messages', function(done) {
+      supertest
+      .get('/all/12342?starttime=2013-11-25&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.messages).to.be.empty;
+        done();
+      });
+    });
+
+    it('returns 400 when an invalid starttime is given', function(done) {
+      supertest
+      .get('/all/12342?starttime=not-a-date&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(400,done);
+    });
+
     it('returns 400 when the endtime is invalid', function(done) {
       supertest.get('/all/777?endtime=not-a-date')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(400,done);
     });
-
   });
+  describe('/notes', function() {
 
-  describe('GET /notes/:groupid ', function() {
-
-    it('returns 1 message', function(done) {
+    it('returns valid messages', function(done) {
       supertest
       .get('/notes/777')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -370,7 +286,7 @@ describe('message API integration', function() {
       });
     });
 
-    it('returns 404 when no messages', function(done) {
+    it('returns 404 when no there are no messages', function(done) {
       supertest.get('/notes/99977777')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(404)
@@ -381,17 +297,13 @@ describe('message API integration', function() {
       });
     });
 
-    it('returns 401 when the user does not have permission', function(done) {
+    it('returns 401 when you do not have permisson to see the notes', function(done) {
       supertest.get('/notes/no-permission')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(401,done);
     });
 
-  });
-
-  describe('GET /notes/:groupid?starttime=xxx ', function() {
-
-    it('returns 1 note', function(done) {
+    it('takes a starttime and returns matching messages', function(done) {
       supertest
       .get('/notes/777?starttime=2013-11-25')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -411,28 +323,7 @@ describe('message API integration', function() {
       });
     });
 
-    it('returns 400 for invalid date param', function(done) {
-      supertest.get('/notes/99977777?starttime=not-a-date')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(400,done);
-    });
-
-    it('returns 404 when no notes', function(done) {
-      supertest.get('/notes/99977777?starttime=2013-11-25')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body.messages).to.be.empty;
-        done();
-      });
-    });
-
-  });
-
-  describe('GET /notes/:groupid?starttime=xxx&endtime=yyy ', function() {
-
-    it('returns 1 note', function(done) {
+    it('takes a starttime and endtime returning matching messages', function(done) {
       supertest
       .get('/notes/777?starttime=2013-11-25&endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -452,28 +343,19 @@ describe('message API integration', function() {
       });
     });
 
-    it('returns 404 when no notes', function(done) {
-      supertest.get('/notes/99977777?starttime=2013-11-25&endtime=2013-11-30')
+    it('returns 400 for invalid starttime param', function(done) {
+      supertest.get('/notes/99977777?starttime=not-a-date')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body.messages).to.be.empty;
-        done();
-      });
+      .expect(400,done);
     });
 
-    it('returns 401 when one date param is invalid', function(done) {
-      supertest.get('/notes/no-permission?starttime=2013-11-25&endtime=not-a-date')
+    it('returns 400 for invalid endtime param', function(done) {
+      supertest.get('/notes/777?starttime=2013-11-25&endtime=not-a-date')
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(401,done);
+      .expect(400,done);
     });
 
-  });
-
-  describe('GET /notes/:groupid?endtime=yyy ', function() {
-
-    it('allows only an endtime param', function(done) {
+    it('allows only an endtime returning matching messages', function(done) {
       supertest
       .get('/notes/777?endtime=2013-11-30')
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -493,17 +375,10 @@ describe('message API integration', function() {
       });
     });
 
-    it('returns 400 when the endtime is invalid', function(done) {
-      supertest.get('/notes/99977777?endtime=not-a-date')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(400,done);
-    });
-
   });
+  describe('/thread', function() {
 
-  describe('GET /thread/:msgid ', function() {
-
-    it('returns 3 messages with thread id', function(done) {
+    it('returns an array of messages', function(done) {
       supertest
       .get('/thread/'+fakeRootId)
       .set('X-Tidepool-Session-Token', sessionToken)
@@ -523,7 +398,7 @@ describe('message API integration', function() {
       });
     });
 
-    it('returns 404 when no messages', function(done) {
+    it('returns 404 when there are no messages', function(done) {
 
       supertest
       .get('/thread/'+String(testDbInstance.ObjectId()))
@@ -537,8 +412,7 @@ describe('message API integration', function() {
     });
 
   });
-
-  describe('POST /send/:groupid', function() {
+  describe('/send', function() {
 
     it('should not work without groupid parameter', function(done) {
 
@@ -587,19 +461,7 @@ describe('message API integration', function() {
 
     });
 
-    it('returns 201 for success', function(done) {
-
-      var testMessage = require('../helpers/testMessagesData').note;
-
-      supertest
-      .post('/send/12345')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .send({message:testMessage})
-      .expect(201,done);
-
-    });
-
-    it('return Id when message added', function(done) {
+    it('returns 201 and an id for success', function(done) {
 
       var testMessage = require('../helpers/testMessagesData').note;
 
@@ -614,9 +476,10 @@ describe('message API integration', function() {
         expect(res.body).to.have.property('id');
         done();
       });
+
     });
 
-    it('return 400 when messages to add does not meet the requirements', function(done) {
+    it('returns 400 and a message in the body when the given message is invalid', function(done) {
 
       var invalidMessage = {
         parentmessage : '',
@@ -638,7 +501,7 @@ describe('message API integration', function() {
       });
     });
 
-    it('return 401 when we do not have permission to add a message', function(done) {
+    it('returns 401 when we do not have permission to add a message', function(done) {
 
       var message = {
         userid: '12345',
@@ -651,13 +514,18 @@ describe('message API integration', function() {
       .post('/send/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:message})
-      .expect(401,done);
+      .expect(401)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        console.log(res.body);
+        done();
+      });
     });
   });
+  describe('/reply', function() {
 
-  describe('POST /reply/:msgid', function() {
-
-    it('should not work without msgid parameter', function(done) {
+    it('will not work without msgid parameter', function(done) {
 
       supertest
       .post('/reply')
@@ -666,19 +534,22 @@ describe('message API integration', function() {
       .expect(404,done);
 
     });
-
-    it('returns 201', function(done) {
+    it('returns an id on success', function(done) {
 
       var testMessage = require('../helpers/testMessagesData').note;
 
       supertest
       .post('/reply/12345')
       .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(201)
       .send({message:testMessage})
-      .expect(201,done);
-
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        expect(res.body).to.have.property('id');
+        done();
+      });
     });
-
     it('only saves core message fields', function(done) {
 
       var replyWithExtras = {
@@ -716,25 +587,7 @@ describe('message API integration', function() {
       });
 
     });
-
-    it('return Id when message added', function(done) {
-
-      var testMessage = require('../helpers/testMessagesData').note;
-
-      supertest
-      .post('/reply/12345')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(201)
-      .send({message:testMessage})
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectToken(sessionToken);
-        expect(res.body).to.have.property('id');
-        done();
-      });
-    });
-
-    it('return 400 when messages to add does not meet the requirements', function(done) {
+    it('returns 400 when given an invalid message and an appropriate message as to why', function(done) {
 
       var invalidMessage = {
         userid: '12345',
@@ -754,8 +607,7 @@ describe('message API integration', function() {
         done();
       });
     });
-
-    it('return 401 when we do not have permission to reply to a message', function(done) {
+    it('returns 401 when we do not have permission to reply to a message', function(done) {
 
       var replyWithNoPermission = {
         userid: '12345',
@@ -771,8 +623,7 @@ describe('message API integration', function() {
       .expect(401,done);
     });
   });
-
-  describe('PUT /edit/:msgid', function() {
+  describe('/edit', function() {
 
     var messageToEdit;
 
@@ -811,8 +662,7 @@ describe('message API integration', function() {
 
     });
   });
-
-  describe('DELETE /remove/:msgid', function() {
+  describe('/remove', function() {
 
     var messageToRemove;
 
