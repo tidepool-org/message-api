@@ -28,11 +28,10 @@ var env = {
 };
 
 var userApiClient = mockableObject.make('checkToken');
+var dummyMetrics = mockableObject.make('postServer');
 var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
 
 //mock metrics
-function doNothing() { return true; }
-var dummyMetrics = { postServer: doNothing };
 
 var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
 
@@ -66,6 +65,7 @@ describe.only('message service', function() {
   }
 
   function expectToken(token) {
+    expect(userApiClient.checkToken).to.have.been.calledOnce;
     expect(userApiClient.checkToken).to.have.been.calledWith(token, sinon.match.func);
   }
 
@@ -74,7 +74,7 @@ describe.only('message service', function() {
   }
 
   function expectMetricsToBeCalled() {
-    expect(dummyMetrics.postServer).to.have.been.called;
+    expect(dummyMetrics.postServer).to.have.been.calledOnce;
   }
 
   /*
@@ -102,6 +102,16 @@ describe.only('message service', function() {
 
   }
 
+  /*
+   * Mocks reset each time
+   */
+  beforeEach(function () {
+    mockableObject.reset(userApiClient);
+    mockableObject.reset(dummyMetrics);
+    setupToken(messageUser);
+    mockMetrics();
+  });
+
   before(function (done) {
     /*
      * Refresh data for each test
@@ -121,8 +131,6 @@ describe.only('message service', function() {
      * Start things up
      */
     messageService.start(done);
-    setupToken(messageUser);
-    mockMetrics();
   });
 
   after(function () {
@@ -900,6 +908,32 @@ describe.only('message service', function() {
           .set('X-Tidepool-Session-Token', sessionToken)
           .expect(404,done);
 
+      });
+    });
+
+  });
+  describe('/status', function() {
+
+    it('metrics are NOT called', function(done) {
+      supertest
+      .get('/status')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(dummyMetrics.postServer).to.have.not.been.called;
+        done();
+      });
+    });
+
+    it('the token is NOT used', function(done) {
+      supertest
+      .get('/status')
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(userApiClient.checkToken).to.have.not.been.called;
+        done();
       });
     });
 
