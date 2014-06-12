@@ -28,16 +28,11 @@ var env = {
 };
 
 var userApiClient = mockableObject.make('checkToken');
-var metrics = mockableObject.make('postServer', 'postThisUser', 'postWithUser');
 var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
 
-function doNothing() { return null; }
-
-var dummyMetrics = {
-  postServer: doNothing,
-  postThisUser: doNothing,
-  postWithUser:doNothing
-};
+//mock metrics
+function doNothing() { return true; }
+var dummyMetrics = { postServer: doNothing };
 
 var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
 
@@ -62,7 +57,7 @@ var messageUser = { userid: 'message', isserver: true };
 var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
 var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
-describe('message service', function() {
+describe.only('message service', function() {
 
   var fakeRootId = String(testDbInstance.ObjectId());
 
@@ -75,9 +70,11 @@ describe('message service', function() {
   }
 
   function mockMetrics() {
-    sinon.stub(metrics, 'postServer').callsArg(3);
-    sinon.stub(metrics, 'postWithUser').callsArg(3);
-    sinon.stub(metrics, 'postThisUser').callsArg(3);
+    sinon.stub(dummyMetrics,'postServer');
+  }
+
+  function expectMetricsToBeCalled() {
+    expect(dummyMetrics.postServer).to.have.been.called;
   }
 
   /*
@@ -147,6 +144,32 @@ describe('message service', function() {
       });
     });
 
+    it('metrics are called', function(done) {
+
+      supertest
+      .get('/read/'+String(messageFromMongo._id))
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectMetricsToBeCalled();
+        done();
+      });
+    });
+
+    it('the token is used', function(done) {
+
+      supertest
+      .get('/read/'+String(messageFromMongo._id))
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        done();
+      });
+    });
+
     it('returns one message with all expected fields', function(done) {
       supertest
       .get('/read/'+String(messageFromMongo._id))
@@ -155,7 +178,6 @@ describe('message service', function() {
       .expect('Content-Type', 'application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         testMessageContent(res.body.message);
         done();
       });
@@ -188,6 +210,30 @@ describe('message service', function() {
   });
   describe('/all', function() {
 
+    it('metrics are called', function(done) {
+
+      supertest
+      .get('/all/777?starttime=2013-11-25&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+    });
+
+    it('the token is used', function(done) {
+
+      supertest
+      .get('/all/777?starttime=2013-11-25&endtime=2013-11-30')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+    });
+
     it('finds messages between given start and end time', function(done) {
       supertest
       .get('/all/777?starttime=2013-11-25&endtime=2013-11-30')
@@ -196,7 +242,6 @@ describe('message service', function() {
       .expect('Content-Type', 'application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
         expect(res.body.messages.length).to.equal(3);
 
@@ -215,7 +260,6 @@ describe('message service', function() {
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
         expect(res.body.messages.length).to.equal(3);
 
@@ -266,6 +310,32 @@ describe('message service', function() {
   });
   describe('/notes', function() {
 
+    it('metrics are called', function(done) {
+
+      supertest
+      .get('/notes/777')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectMetricsToBeCalled();
+        done();
+      });
+    });
+
+    it('the token is used', function(done) {
+
+      supertest
+      .get('/notes/777')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        done();
+      });
+    });
+
     it('returns valid messages', function(done) {
       supertest
       .get('/notes/777')
@@ -274,7 +344,6 @@ describe('message service', function() {
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
         expect(res.body.messages.length).to.equal(1);
 
@@ -311,7 +380,6 @@ describe('message service', function() {
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
         expect(res.body.messages.length).to.equal(1);
 
@@ -331,7 +399,6 @@ describe('message service', function() {
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
         expect(res.body.messages.length).to.equal(1);
 
@@ -363,7 +430,6 @@ describe('message service', function() {
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
         expect(res.body.messages.length).to.equal(1);
 
@@ -378,6 +444,32 @@ describe('message service', function() {
   });
   describe('/thread', function() {
 
+    it('metrics are called', function(done) {
+
+      supertest
+      .get('/thread/'+fakeRootId)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectMetricsToBeCalled();
+        done();
+      });
+    });
+
+    it('the token is used', function(done) {
+
+      supertest
+      .get('/thread/'+fakeRootId)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        done();
+      });
+    });
+
     it('returns an array of messages', function(done) {
       supertest
       .get('/thread/'+fakeRootId)
@@ -386,7 +478,6 @@ describe('message service', function() {
       .expect('Content-Type','application/json')
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('messages').and.be.instanceof(Array);
         expect(res.body.messages.length).equal(3);
 
@@ -413,6 +504,36 @@ describe('message service', function() {
 
   });
   describe('/send', function() {
+
+    it('metrics are called', function(done) {
+      var testMessage = require('../helpers/testMessagesData').note;
+
+      supertest
+      .post('/send/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(201)
+      .send({message:testMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectMetricsToBeCalled();
+        done();
+      });
+    });
+
+    it('the token is used', function(done) {
+      var testMessage = require('../helpers/testMessagesData').note;
+
+      supertest
+      .post('/send/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(201)
+      .send({message:testMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        done();
+      });
+    });
 
     it('should not work without groupid parameter', function(done) {
 
@@ -444,7 +565,6 @@ describe('message service', function() {
       .expect(201)
       .end(function(err, res) {
         if (err) return done(err);
-
         /*
          * Now lets see what we get back
          */
@@ -472,7 +592,6 @@ describe('message service', function() {
       .send({message:testMessage})
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         expect(res.body).to.have.property('id');
         done();
       });
@@ -517,13 +636,44 @@ describe('message service', function() {
       .expect(401)
       .end(function(err, res) {
         if (err) return done(err);
-        expectToken(sessionToken);
         console.log(res.body);
         done();
       });
     });
   });
   describe('/reply', function() {
+
+    it('metrics are called', function(done) {
+
+      var testMessage = require('../helpers/testMessagesData').note;
+
+      supertest
+      .post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(201)
+      .send({message:testMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectMetricsToBeCalled();
+        done();
+      });
+    });
+
+    it('the token is used', function(done) {
+
+      var testMessage = require('../helpers/testMessagesData').note;
+
+      supertest
+      .post('/reply/12345')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(201)
+      .send({message:testMessage})
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        done();
+      });
+    });
 
     it('will not work without msgid parameter', function(done) {
 
@@ -546,6 +696,7 @@ describe('message service', function() {
       .end(function(err, res) {
         if (err) return done(err);
         expectToken(sessionToken);
+        expectMetricsToBeCalled();
         expect(res.body).to.have.property('id');
         done();
       });
@@ -635,6 +786,40 @@ describe('message service', function() {
       });
     });
 
+    it('metrics are called', function(done) {
+
+      var updatedNoteText = {
+        messagetext: 'some updated text'
+      };
+
+      supertest
+      .put('/edit/'+messageToEdit)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:updatedNoteText})
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectMetricsToBeCalled();
+        done();
+      });
+    });
+    it('the token is used', function(done) {
+
+      var updatedNoteText = {
+        messagetext: 'some updated text'
+      };
+
+      supertest
+      .put('/edit/'+messageToEdit)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:updatedNoteText})
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        done();
+      });
+    });
     it('allows us to update the text of a message', function(done) {
 
       var updatedNoteText = {
@@ -666,7 +851,7 @@ describe('message service', function() {
 
     var messageToRemove;
 
-    before(function(done){
+    beforeEach(function(done){
       // grab a message that has been saved already
       testDbInstance.messages.findOne({},function(err, doc) {
         messageToRemove = String(doc._id);
@@ -674,27 +859,50 @@ describe('message service', function() {
       });
     });
 
-    it('allows you to start a delete on a message', function(done) {
+    it('metrics are called', function(done) {
+
+      supertest
+      .del('/remove/'+messageToRemove)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(202)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectMetricsToBeCalled();
+        done();
+      });
+    });
+
+    it('the token is used', function(done) {
+
+      supertest
+      .del('/remove/'+messageToRemove)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(202)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expectToken(sessionToken);
+        done();
+      });
+    });
+
+    it('allows you to start a delete on a message and means you can no loger get that message', function(done) {
 
       expect(messageToRemove).to.exist;
 
       supertest
       .del('/remove/'+messageToRemove)
       .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(202,done);
+      .expect(202)
+      .end(function(err, res) {
+        if (err) return done(err);
+        supertest
+          .get('/read/'+messageToRemove)
+          .set('X-Tidepool-Session-Token', sessionToken)
+          .expect(404,done);
 
+      });
     });
 
-    it('means you will not get the deleted message back if you try to find it', function(done) {
-
-      expect(messageToRemove).to.exist;
-
-      supertest
-      .get('/read/'+messageToRemove)
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(404,done);
-
-    });
   });
 
 });
