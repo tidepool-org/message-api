@@ -56,7 +56,7 @@ var messageUser = { userid: 'message', isserver: true };
 var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
 var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
-describe.only('message service', function() {
+describe('message service', function() {
 
   var fakeRootId = String(testDbInstance.ObjectId());
 
