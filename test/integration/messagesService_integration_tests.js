@@ -56,7 +56,7 @@ var messageUser = { userid: 'message', isserver: true };
 var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
 var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
-describe.only('message service', function() {
+describe('message service', function() {
 
   var fakeRootId = String(testDbInstance.ObjectId());
 
@@ -854,6 +854,25 @@ describe.only('message service', function() {
       .expect(200,done);
 
     });
+
+    it('does not return a message body', function(done) {
+
+      var updatedNoteTime = {
+        timestamp : new Date().toISOString()
+      };
+
+      supertest
+      .put('/edit/'+messageToEdit)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .send({message:updatedNoteTime})
+      .expect(200)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.be.empty;
+        done();
+      });
+
+    });
   });
   describe('/remove', function() {
 
@@ -891,6 +910,22 @@ describe.only('message service', function() {
         expectToken(sessionToken);
         done();
       });
+    });
+
+    it('does not return a message body', function(done) {
+
+      expect(messageToRemove).to.exist;
+
+      supertest
+      .del('/remove/'+messageToRemove)
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(202)
+      .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body).to.be.empty;
+        done();
+      });
+
     });
 
     it('allows you to start a delete on a message and means you can no loger get that message', function(done) {

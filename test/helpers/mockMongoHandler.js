@@ -207,10 +207,10 @@ function handleGetAllMessages(groupId, options, callback) {
   return resolveCallbackValues(callback, messages);
 }
 
-function handleEditMessage(updateDetails,callback){
+function handleEditMessage(messageId, updateDetails,callback){
 
   var updated = {
-    id : updateDetails.id,
+    id : messageId,
     parentmessage: null,
     userid: 'c3p0',
     groupid: '11-22',
@@ -221,8 +221,8 @@ function handleEditMessage(updateDetails,callback){
   return resolveCallbackValues(callback, updated);
 }
 
-function handleDeleteMessage(deletionDetails,callback){
-  return resolveCallbackValues(callback, deletionDetails.id);
+function handleDeleteMessage(messageId, deletionDetails, callback){
+  return resolveCallbackValues(callback, messageId);
 }
 
 module.exports = mockMongoHandler;

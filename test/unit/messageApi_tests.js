@@ -27,7 +27,7 @@ var seagullHandler = require('../helpers/mockSeagullHandler')();
 
 var config = { deleteWindow : 5 };
 
-describe('message API unit', function() {
+describe('message API', function() {
 
   /*
     minimise the components to just groups API and mocked crud handler
@@ -71,26 +71,7 @@ describe('message API unit', function() {
     return server;
   };
 
-  /*
-    All expectations for a message
-  */
-  var testMessageContent = function(message){
-    expect(message).to.have.property('id');
-    expect(message.id).to.exist;
-    expect(message).to.have.property('parentmessage');
-    expect(message).to.have.property('userid');
-    expect(message.userid).to.exist;
-    expect(message).to.have.property('user');
-    expect(message.user).to.exist;
-    expect(message).to.have.property('groupid');
-    expect(message.groupid).to.exist;
-    expect(message).to.have.property('messagetext');
-    expect(message.messagetext).to.exist;
-    expect(message).to.have.property('timestamp');
-    expect(message.timestamp).to.exist;
-  };
-
-  describe('validity of messages being added', function() {
+  describe('under normal conditions', function() {
 
     var messaging;
 
@@ -105,321 +86,269 @@ describe('message API unit', function() {
 
     });
 
-    it('POST send/:groupid rejects an invalid parent message', function(done) {
-
-      var invalidParentNoMessageText = {
-        userid: '12345',
-        groupid: '4567',
-        parentmessage:'',
-        timestamp:'2013-11-28T23:07:40+00:00',
-        messagetext:''
-      };
-
-
-      supertest(messaging)
-      .post('/send/88883288')
-      .send({message:invalidParentNoMessageText})
-      .expect(400)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body).to.not.have.property('id');
-        done();
-      });
-    });
-
-    it('POST send/:groupid accepts a parent message with the parentmessage set as the parentmessage will be made to equal null', function(done) {
-
-      var parentMessage = {
-        userid: '12345',
-        groupid: '4567',
-        parentmessage:'',
-        timestamp:'2013-11-28T23:07:40+00:00',
-        messagetext:'my new message thread'
-      };
-
-      supertest(messaging)
-      .post('/send/88883288')
-      .send({message:parentMessage})
-      .expect(201)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body).to.have.property('id');
-        done();
-      });
-    });
-
-    it('POST reply/:msgid allows parentmessage to not be set as it will be set to the id of the message you reply to', function(done) {
-
-      var replyWithParentNotSet = {
-        userid: '12345',
-        groupid: '4567',
-        parentmessage: null ,
-        timestamp:'2013-11-28T23:07:40+00:00',
-        messagetext:'my reply'
-      };
-
-      supertest(messaging)
-      .post('/reply/123456743')
-      .send({message:replyWithParentNotSet})
-      .expect(201)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body).to.have.property('id');
-        done();
-      });
-    });
-
-    it('POST reply/:msgid rejects an invalid reply', function(done) {
-
-      var invalidReplyNoTimeStamp = {
-        userid: '12345',
-        groupid: '4567',
-        parentmessage:'123456743',
-        timestamp:'',
-        messagetext:'my reply'
-      };
-
-      supertest(messaging)
-      .post('/reply/123456743')
-      .send({message:invalidReplyNoTimeStamp})
-      .expect(400)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body).to.not.have.property('id');
-        done();
-      });
-    });
-
-  });
-
-  /*
-  GOAL: To test that under normal operation that we get the return codes
-  and any data (where applicable) that we would expect.
-  */
-  describe('when the request has been fulfilled', function() {
-
-    var messaging;
-
-    before(function(){
-
-      var mockMongoHandler = require('../helpers/mockMongoHandler')({
-        throwErrors : false,
-        returnNone : false
-      });
-
-      messaging = setupAPI(mockMongoHandler);
-
-    });
-
-
-    it('GET /doesnotexist should return 404', function(done) {
+    it('returns 404 for invalid path', function(done) {
       supertest(messaging)
       .get('/doesnotexist')
       .expect(404,done);
     });
 
-    it('GET notes/:groupid returns 200', function(done) {
+    describe('status', function() {
+      it('returns 200', function(done) {
+        supertest(messaging)
+        .get('/status')
+        .expect(200,done);
+      });
+      it('returns thes status code that was passed as the status param', function(done) {
+        supertest(messaging)
+        .get('/status?status=201')
+        .expect(201,done);
+      });
+      it('ignores other passed params', function(done) {
+        supertest(messaging)
+        .get('/status?randomParam=401')
+        .expect(200,done);
+      });
+    });
+    describe('send', function() {
 
-      supertest(messaging)
-      .get('/notes/88883288')
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        var messages = res.body.messages;
-        expect(messages).to.be.instanceOf(Array);
+      it('rejects an invalid parent message', function(done) {
 
-        messages.forEach(function(message){
-          testMessageContent(message);
+        var invalidParentNoMessageText = {
+          userid: '12345',
+          groupid: '4567',
+          parentmessage:'',
+          timestamp:'2013-11-28T23:07:40+00:00',
+          messagetext:''
+        };
+
+        supertest(messaging)
+        .post('/send/88883288')
+        .send({message:invalidParentNoMessageText})
+        .expect(400)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body).to.not.have.property('id');
+          done();
         });
-
-        done();
       });
-    });
 
-    it('GET notes/:groupid?starttime returns 200', function(done) {
+      it('ignores the parentmessage as it will be created the parent', function(done) {
 
-      var start = new Date();
+        var parentMessage = {
+          userid: '12345',
+          groupid: '4567',
+          parentmessage:'',
+          timestamp:'2013-11-28T23:07:40+00:00',
+          messagetext:'my new message thread'
+        };
 
-      supertest(messaging)
-      .get('/notes/88883288?starttime='+start)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        var messages = res.body.messages;
-        expect(messages).to.be.instanceOf(Array);
-
-        messages.forEach(function(message){
-          testMessageContent(message);
+        supertest(messaging)
+        .post('/send/88883288')
+        .send({message:parentMessage})
+        .expect(201)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body).to.have.property('id');
+          done();
         });
-
-        done();
       });
-    });
 
-    it('GET notes/:groupid with a starttime and end time returns 200', function(done) {
+      it('returns 201 and the id of the message', function(done) {
 
-
-      var start = new Date();
-      var end = new Date();
-
-      supertest(messaging)
-      .get('/notes/88883288?starttime='+start+'&endtime='+end)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        var messages = res.body.messages;
-        expect(messages).to.be.instanceOf(Array);
-
-        messages.forEach(function(message){
-          testMessageContent(message);
+        supertest(messaging)
+        .post('/send/88883288')
+        .send({message:testNote})
+        .expect(201)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body).to.have.property('id');
+          done();
         });
-
-        done();
       });
     });
+    describe('reply', function() {
 
-    it('GET read/:msgid returns 200', function(done) {
-      supertest(messaging)
-      .get('/read/123456743')
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        var message = res.body.message;
-        testMessageContent(message);
-        done();
-      });
-    });
+      it('does not require the parentmessage to be set', function(done) {
 
-    it('GET all/:groupid with a starttime returns 200', function(done) {
+        var replyWithParentNotSet = {
+          userid: '12345',
+          groupid: '4567',
+          parentmessage: null ,
+          timestamp:'2013-11-28T23:07:40+00:00',
+          messagetext:'my reply'
+        };
 
-      var start = new Date();
-
-      supertest(messaging)
-      .get('/all/88883288?starttime='+start)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        var messages = res.body.messages;
-        expect(messages).to.be.instanceOf(Array);
-
-        messages.forEach(function(message){
-          testMessageContent(message);
+        supertest(messaging)
+        .post('/reply/123456743')
+        .send({message:replyWithParentNotSet})
+        .expect(201)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body).to.have.property('id');
+          done();
         });
-
-        done();
       });
-    });
 
-    it('GET all/:groupid with a starttime and end time returns 200', function(done) {
+      it('rejects an invalid reply', function(done) {
 
+        var invalidReplyNoTimeStamp = {
+          userid: '12345',
+          groupid: '4567',
+          parentmessage:'123456743',
+          timestamp:'',
+          messagetext:'my reply'
+        };
 
-      var start = new Date();
-      var end = new Date();
-
-      supertest(messaging)
-      .get('/all/88883288?starttime='+start+'&endtime='+end)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        var messages = res.body.messages;
-        expect(messages).to.be.instanceOf(Array);
-
-        messages.forEach(function(message){
-          testMessageContent(message);
+        supertest(messaging)
+        .post('/reply/123456743')
+        .send({message:invalidReplyNoTimeStamp})
+        .expect(400)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body).to.not.have.property('id');
+          done();
         });
-
-        done();
       });
-    });
 
-    it('GET thread/:msgid return 200', function(done) {
-      supertest(messaging)
-      .get('/thread/123456743')
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        var messages = res.body.messages;
-        expect(messages).to.be.instanceOf(Array);
+      it('returns 201 and the id of the message', function(done) {
 
-        messages.forEach(function(message){
-          testMessageContent(message);
+        supertest(messaging)
+        .post('/reply/123456743')
+        .send({message:testReply})
+        .expect(201)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body).to.have.property('id');
+          done();
         });
-
-        done();
       });
     });
+    describe('notes', function() {
+      it('returns 200 and an array if successful', function(done) {
 
-    it('POST send/:groupid returns 201 and the id of the message', function(done) {
+        supertest(messaging)
+        .get('/notes/88883288')
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          var messages = res.body.messages;
+          expect(messages).to.be.instanceOf(Array);
+          done();
+        });
+      });
+      it('allows a starttime', function(done) {
 
-      supertest(messaging)
-      .post('/send/88883288')
-      .send({message:testNote})
-      .expect(201)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body).to.have.property('id');
-        done();
+        var start = new Date();
+
+        supertest(messaging)
+        .get('/notes/88883288?starttime='+start)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          var messages = res.body.messages;
+          expect(messages).to.be.instanceOf(Array);
+          done();
+        });
+      });
+      it('allows a start and endtime', function(done) {
+
+        var start = new Date();
+        var end = new Date();
+
+        supertest(messaging)
+        .get('/notes/88883288?starttime='+start+'&endtime='+end)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          var messages = res.body.messages;
+          expect(messages).to.be.instanceOf(Array);
+          done();
+        });
       });
     });
-
-    it('POST reply/:msgid returns 201 and the id of the message', function(done) {
-
-      supertest(messaging)
-      .post('/reply/123456743')
-      .send({message:testReply})
-      .expect(201)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expect(res.body).to.have.property('id');
-        done();
+    describe('read', function() {
+      it('returns 200 and a message', function(done) {
+        supertest(messaging)
+        .get('/read/123456743')
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body.message).to.be.exist;
+          done();
+        });
       });
     });
+    describe('all', function() {
+      it('allows a starttime and returns an array of messages', function(done) {
 
-    it('GET /status', function(done) {
-      supertest(messaging)
-      .get('/status')
-      .expect(200,done);
+        var start = new Date();
+
+        supertest(messaging)
+        .get('/all/88883288?starttime='+start)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          expect(res.body.messages).to.be.instanceOf(Array);
+
+          done();
+        });
+      });
+      it('allows both a start and endtime', function(done) {
+
+        var start = new Date();
+        var end = new Date();
+
+        supertest(messaging)
+        .get('/all/88883288?starttime='+start+'&endtime='+end)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          var messages = res.body.messages;
+          expect(messages).to.be.instanceOf(Array);
+          done();
+        });
+      });
     });
-
-    it('GET /status?status=201 returns 201 ', function(done) {
-
-      supertest(messaging)
-      .get('/status?status=201')
-      .expect(201,done);
+    describe('thread', function() {
+      it('returns an array of messages', function(done) {
+        supertest(messaging)
+        .get('/thread/123456743')
+        .expect(200)
+        .end(function(err, res) {
+          if (err) return done(err);
+          var messages = res.body.messages;
+          expect(messages).to.be.instanceOf(Array);
+          done();
+        });
+      });
     });
+    describe('edit', function() {
+      it('returns 200', function(done) {
 
-    it('GET /status?randomParam=401 returns 200 as randomParam is ignored', function(done) {
+        var updates = {
+          messagetext : 'correction - should have been 12 units'
+        };
 
-      supertest(messaging)
-      .get('/status?randomParam=401')
-      .expect(200,done);
+        supertest(messaging)
+        .put('/edit/123456')
+        .send({message:updates})
+        .expect(200,done);
+      });
     });
+    describe('remove', function() {
+      it('returns 202', function(done) {
 
-    it('PUT /edit', function(done) {
-
-      var updates = {
-        messagetext: 'correction - should have been 12 units'
-      };
-
-      supertest(messaging)
-      .put('/edit/123456')
-      .send({message:updates})
-      .expect(200,done);
+        supertest(messaging)
+        .del('/remove/123456')
+        .expect(202,done);
+      });
     });
-
-    it('DELETE /remove', function(done) {
-
-      supertest(messaging)
-      .del('/remove/123456')
-      .expect(202,done);
-    });
-
   });
 
   /*
   GOAL: To test we get the correct return code when no data match's what we requested.
   */
-  describe('when no match for Request-URI', function() {
+  describe('when no match', function() {
     var messaging;
 
     before(function(){
@@ -433,28 +362,20 @@ describe('message API unit', function() {
 
     });
 
-    it('GET read/:msgid returns 404', function(done) {
+    it('read returns 404', function(done) {
       supertest(messaging)
       .get('/read/123456743')
-
       .expect(404,done);
     });
 
-    it('GET notes/:groupid returns 404', function(done) {
+    it('notes returns 404', function(done) {
       supertest(messaging)
       .get('/notes/2222233445')
 
       .expect(404,done);
     });
 
-    it('GET all/:groupid with a starttime returns 404', function(done) {
-      var start = new Date();
-      supertest(messaging)
-      .get('/all/88883288?starttime='+start)
-      .expect(404,done);
-    });
-
-    it('GET all/:groupid with a starttime and end time returns 404', function(done) {
+    it('all returns 404', function(done) {
       var start = new Date();
       var end = new Date();
       supertest(messaging)
@@ -468,7 +389,7 @@ describe('message API unit', function() {
   GOAL: To test that when excepetions occur when are give the correct return code and
   that no implementation details are leaked.
   */
-  describe('when an error occurs', function() {
+  describe('under error conditions', function() {
     var messaging;
 
     before(function(){
@@ -482,54 +403,60 @@ describe('message API unit', function() {
 
     });
 
-    it('GET read/:msgid returns 500', function(done) {
+    it('read will return 500', function(done) {
       supertest(messaging)
       .get('/read/123456743')
-
       .expect(500,done);
     });
 
-    it('GET notes/:groupid returns 500', function(done) {
+    it('notes will return 500', function(done) {
       supertest(messaging)
       .get('/notes/2222233445')
-
       .expect(500,done);
     });
 
-    it('GET all/:groupid?starttime=xxx returns 500', function(done) {
+    it('all will return 500', function(done) {
       var start = new Date();
       supertest(messaging)
       .get('/all/88883288?starttime='+start)
       .expect(500,done);
     });
 
-    it('GET all/:groupid?starttime=xxx&endtime=yyy returns 500', function(done) {
-      var start = new Date();
-      var end = new Date();
-      supertest(messaging)
-      .get('/all/88883288?starttime='+start+'&endtime='+end)
-      .expect(500,done);
-    });
-
-    it('POST send/:groupid returns 500', function(done) {
-
+    it('send will return 500', function(done) {
       supertest(messaging)
       .post('/send/88883288')
       .send({message:testNote})
       .expect(500,done);
     });
 
-    it('POST /reply/:msgid returns 500', function(done) {
-
+    it('reply will return 500', function(done) {
       supertest(messaging)
       .post('/reply/123456743')
       .send({message:testNote})
       .expect(500,done);
     });
 
-    it('GET status returns 500', function(done) {
+    it('status will return 500', function(done) {
       supertest(messaging)
       .get('/status')
+      .expect(500,done);
+    });
+
+    it('edit will return 500', function(done) {
+
+      var edits = {
+        messagetext: 'updated'
+      };
+
+      supertest(messaging)
+      .put('/edit/123-99-100')
+      .send({message:edits})
+      .expect(500,done);
+    });
+
+    it('remove will return 500', function(done) {
+      supertest(messaging)
+      .del('/remove/1234088')
       .expect(500,done);
     });
 

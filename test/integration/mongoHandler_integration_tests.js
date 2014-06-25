@@ -17,6 +17,7 @@
 
 var salinity = require('salinity');
 var expect = salinity.expect;
+var sundial = require('sundial');
 
 var _ = require('lodash');
 
@@ -34,6 +35,8 @@ describe('mongo handler', function() {
 
     function messageContentToReturn(saved,toReturn,cb){
       //should be these properties
+      expect(Object.keys(toReturn).length).to.equal(6);
+
       expect(toReturn).to.contain.keys(
         'id',
         'parentmessage',
@@ -42,14 +45,14 @@ describe('mongo handler', function() {
         'messagetext',
         'timestamp'
       );
-      //and only 6 properties
-      expect(Object.keys(toReturn).length).to.equal(6);
+
       //these properties must be returned with a value
       expect(toReturn.id).to.exist;
       expect(toReturn.groupid).to.exist;
       expect(toReturn.userid).to.exist;
       expect(toReturn.timestamp).to.exist;
       expect(toReturn.messagetext).to.exist;
+
       //equals what was saved
       expect(toReturn.groupid).to.equal(saved.groupid);
       expect(toReturn.userid).to.equal(saved.userid);
@@ -65,11 +68,12 @@ describe('mongo handler', function() {
         groupid : '123',
         userid : '456',
         messagetext : 'yay!',
-        timestamp : new Date().toISOString()
+        timestamp : sundial.utcDateString()
       };
 
       mongoHandler.createMessage(message,function(error,id){
         expect(error).to.not.exist;
+        expect(id).to.exist;
         expect(id).to.exist;
         done();
       });
@@ -82,7 +86,7 @@ describe('mongo handler', function() {
         groupid : '123',
         userid : '456',
         messagetext : 'yay!',
-        timestamp : new Date().toISOString()
+        timestamp : sundial.utcDateString()
       };
 
       mongoHandler.createMessage(messageToSave,function(error,id){
@@ -100,13 +104,15 @@ describe('mongo handler', function() {
     it('will get all messages for group', function(done) {
 
       var notesGroup = '99-100';
+      var theTime = sundial.utcDateString();
 
       var toSave = {
         parentmessage : null,
         groupid : notesGroup,
         userid : '456',
         messagetext : 'yay!',
-        timestamp : new Date().toISOString()
+        timestamp : theTime,
+        createdtime : theTime
       };
 
       mongoHandler.createMessage(toSave, function(createError, createdId){
@@ -124,29 +130,32 @@ describe('mongo handler', function() {
 
     it('will edit an existing note', function(done) {
 
+      var theTime = sundial.utcDateString();
+
       var originalMessage = {
         parentmessage : null,
         groupid : '98-99-100',
         userid : '456-234',
         messagetext : 'yay!',
-        timestamp : new Date().toISOString()
+        timestamp : theTime,
+        createdtime : theTime
       };
 
-      var edit = {
+      var edits = {
         messagetext : 'we just edited this',
-        id : null
+        modifiedtime : sundial.utcDateString() //would have been set in api
       };
 
       mongoHandler.createMessage(originalMessage, function(createError,createdId){
         if(createError){
           done(createError);
         }
-        edit.id = String(createdId);
 
-        mongoHandler.editMessage(edit, function(error,details){
+        mongoHandler.editMessage(String(createdId), edits, function(error,updatedMessage){
           expect(error).to.not.exist;
-          expect(details).to.exist;
-          expect(details.messagetext).to.equal(edit.messagetext);
+          expect(updatedMessage).to.exist;
+          expect(updatedMessage.messagetext).to.equal(edits.messagetext);
+          expect(updatedMessage.modifiedtime).to.equal(edits.modifiedtime);
           done();
         });
       });
@@ -160,7 +169,7 @@ describe('mongo handler', function() {
         groupid : '98-99-100',
         userid : '456-234',
         messagetext : 'yay! yay!',
-        timestamp : new Date().toISOString()
+        timestamp : sundial.utcDateString()
       };
 
       mongoHandler.createMessage(originalMessage, function(createError,createdId){
@@ -168,14 +177,15 @@ describe('mongo handler', function() {
           done(createError);
         }
         var deleteDetails = {
-          id : String(createdId),
-          deleteflag : new Date().toISOString()
+          modifiedtime : sundial.utcDateString(), //would have been set in api
+          deleteflag : sundial.utcDateString()
         };
 
-        mongoHandler.deleteMessage(deleteDetails, function(error,details){
+        mongoHandler.deleteMessage(String(createdId),deleteDetails, function(error,details){
             expect(error).to.not.exist;
             expect(details.deleteflag).to.exist;
             expect(details.deleteflag).to.equal(deleteDetails.deleteflag);
+            expect(details.modifiedtime).to.equal(deleteDetails.modifiedtime);
             done();
           });
       });
@@ -197,30 +207,30 @@ describe('mongo handler', function() {
           groupid : groupId,
           userid : '456',
           messagetext : 'yay! this is a good one',
-          timestamp : new Date().toISOString()
+          timestamp : sundial.utcDateString(),
         },
         {
           parentmessage : null,
           groupid : groupId,
           userid : '456',
           messagetext : 'this is flagged for deletion',
-          deleteflag : new Date().toISOString(),
-          timestamp : new Date().toISOString()
+          deleteflag : sundial.utcDateString(),
+          timestamp : sundial.utcDateString()
         },
         {
           parentmessage : null,
           groupid : groupId,
           userid : '123',
           messagetext : 'this is the parentmessage',
-          timestamp : new Date().toISOString()
+          timestamp : sundial.utcDateString()
         },
         {
           parentmessage : null,
           groupid : groupId,
           userid : '999',
           messagetext : 'this reply is flagged for deletion',
-          deleteflag : new Date().toISOString(),
-          timestamp : new Date().toISOString()
+          deleteflag : sundial.utcDateString(),
+          timestamp : sundial.utcDateString()
         }
       ];
     }
