@@ -28,7 +28,7 @@ var env = {
 };
 
 var userApiClient = mockableObject.make('checkToken');
-var dummyMetrics = mockableObject.make('postServer');
+var dummyMetrics = mockableObject.make('postThisUser');
 var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
 
 //mock metrics
@@ -70,11 +70,11 @@ describe('message service', function() {
   }
 
   function mockMetrics() {
-    sinon.stub(dummyMetrics,'postServer');
+    sinon.stub(dummyMetrics,'postThisUser');
   }
 
   function expectMetricsToBeCalled() {
-    expect(dummyMetrics.postServer).to.have.been.calledOnce;
+    expect(dummyMetrics.postThisUser).to.have.been.calledOnce;
   }
 
   /*
@@ -956,7 +956,7 @@ describe('message service', function() {
       .expect(200)
       .end(function(err, res) {
         if (err) return done(err);
-        expect(dummyMetrics.postServer).to.have.not.been.called;
+        expect(dummyMetrics.postThisUser).to.have.not.been.called;
         done();
       });
     });
