@@ -31,6 +31,8 @@ var testDbInstance = require('mongojs')(mongoConnectionString, ['messages']);
 
 describe('mongo handler', function() {
 
+  this.timeout(4000);
+
   describe('basics', function() {
 
     function messageContentToReturn(saved,toReturn,cb){
