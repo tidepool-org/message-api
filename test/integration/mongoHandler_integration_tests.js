@@ -37,7 +37,7 @@ describe('mongo handler', function() {
 
     function messageContentToReturn(saved,toReturn,cb){
       //should be these properties
-      expect(Object.keys(toReturn).length).to.equal(6);
+      expect(Object.keys(toReturn).length).to.equal(7);
 
       expect(toReturn).to.contain.keys(
         'id',
@@ -45,6 +45,7 @@ describe('mongo handler', function() {
         'groupid',
         'userid',
         'messagetext',
+        'createdtime',
         'timestamp'
       );
 
@@ -53,12 +54,14 @@ describe('mongo handler', function() {
       expect(toReturn.groupid).to.exist;
       expect(toReturn.userid).to.exist;
       expect(toReturn.timestamp).to.exist;
+      expect(toReturn.createdtime).to.exist;
       expect(toReturn.messagetext).to.exist;
 
       //equals what was saved
       expect(toReturn.groupid).to.equal(saved.groupid);
       expect(toReturn.userid).to.equal(saved.userid);
       expect(toReturn.timestamp).to.equal(saved.timestamp);
+      expect(toReturn.createdtime).to.equal(saved.createdtime);
       expect(toReturn.messagetext).to.equal(saved.messagetext);
       return cb();
     }
@@ -70,7 +73,8 @@ describe('mongo handler', function() {
         groupid : '123',
         userid : '456',
         messagetext : 'yay!',
-        timestamp : sundial.utcDateString()
+        timestamp : sundial.utcDateString(),
+        createdtime : sundial.utcDateString()
       };
 
       mongoHandler.createMessage(message,function(error,id){
@@ -88,7 +92,8 @@ describe('mongo handler', function() {
         groupid : '123',
         userid : '456',
         messagetext : 'yay!',
-        timestamp : sundial.utcDateString()
+        timestamp : sundial.utcDateString(),
+        createdtime : sundial.utcDateString()
       };
 
       mongoHandler.createMessage(messageToSave,function(error,id){
@@ -203,13 +208,17 @@ describe('mongo handler', function() {
 
     function testMessages(){
 
+      var created = sundial.utcDateString();
+      var time = sundial.utcDateString();
+
       return [
         {
           parentmessage : null,
           groupid : groupId,
           userid : '456',
           messagetext : 'yay! this is a good one',
-          timestamp : sundial.utcDateString(),
+          timestamp : time,
+          createdtime : created,
         },
         {
           parentmessage : null,
@@ -217,14 +226,16 @@ describe('mongo handler', function() {
           userid : '456',
           messagetext : 'this is flagged for deletion',
           deleteflag : sundial.utcDateString(),
-          timestamp : sundial.utcDateString()
+          timestamp : time,
+          createdtime : created
         },
         {
           parentmessage : null,
           groupid : groupId,
           userid : '123',
           messagetext : 'this is the parentmessage',
-          timestamp : sundial.utcDateString()
+          timestamp : time,
+          createdtime : created
         },
         {
           parentmessage : null,
@@ -232,7 +243,8 @@ describe('mongo handler', function() {
           userid : '999',
           messagetext : 'this reply is flagged for deletion',
           deleteflag : sundial.utcDateString(),
-          timestamp : sundial.utcDateString()
+          timestamp : time,
+          createdtime : created
         }
       ];
     }

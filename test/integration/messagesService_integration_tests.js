@@ -89,15 +89,17 @@ describe('message service', function() {
       'userid',
       'user',
       'messagetext',
+      'createdtime',
       'timestamp'
     );
-    //and only 7 properties
-    expect(Object.keys(message).length).to.equal(7);
+    //and only 8 properties
+    expect(Object.keys(message).length).to.equal(8);
     //these properties must be returned with a value
     expect(message.id).to.exist;
     expect(message.groupid).to.exist;
     expect(message.userid).to.exist;
     expect(message.timestamp).to.exist;
+    expect(message.createdtime).to.exist;
     expect(message.messagetext).to.exist;
 
   }
