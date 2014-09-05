@@ -208,14 +208,17 @@ describe('mongo handler', function() {
 
     function testMessages(){
 
+      var created = sundial.utcDateString();
+      var time = sundial.utcDateString();
+
       return [
         {
           parentmessage : null,
           groupid : groupId,
           userid : '456',
           messagetext : 'yay! this is a good one',
-          timestamp : sundial.utcDateString(),
-          createdtime : sundial.utcDateString(),
+          timestamp : time,
+          createdtime : created,
         },
         {
           parentmessage : null,
@@ -223,16 +226,16 @@ describe('mongo handler', function() {
           userid : '456',
           messagetext : 'this is flagged for deletion',
           deleteflag : sundial.utcDateString(),
-          timestamp : sundial.utcDateString(),
-          createdtime : sundial.utcDateString()
+          timestamp : time,
+          createdtime : created
         },
         {
           parentmessage : null,
           groupid : groupId,
           userid : '123',
           messagetext : 'this is the parentmessage',
-          timestamp : sundial.utcDateString(),
-          createdtime : sundial.utcDateString()
+          timestamp : time,
+          createdtime : created
         },
         {
           parentmessage : null,
@@ -240,8 +243,8 @@ describe('mongo handler', function() {
           userid : '999',
           messagetext : 'this reply is flagged for deletion',
           deleteflag : sundial.utcDateString(),
-          timestamp : sundial.utcDateString(),
-          createdtime : sundial.utcDateString()
+          timestamp : time,
+          createdtime : created
         }
       ];
     }
