@@ -9,7 +9,7 @@ BUILD_DIR=build
 # cleanup for mongo
 function cleanup {
   echo "Killing pid[$1]"
-  #kill -9 $1;
+  kill -9 $1;
   echo "Deleting the build directory: ${BUILD_DIR}"
   rm -r ${BUILD_DIR};
 }
