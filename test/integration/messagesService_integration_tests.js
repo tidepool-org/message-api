@@ -120,6 +120,8 @@ describe('message service', function() {
      */
     testDbInstance.messages.remove();
 
+
+
     for (var index = 0; index < noteAndComments.length; ++index) {
 
       if(index === 0){
@@ -128,11 +130,11 @@ describe('message service', function() {
         noteAndComments[index].parentmessage = fakeRootId;
         testDbInstance.messages.save(noteAndComments[index]);
       }
+      if (index === (noteAndComments.length-1)){
+        console.log('data loaded, now starting service');
+        messageService.start(done);
+      }
     }
-    /*
-     * Start things up
-     */
-    messageService.start(done);
   });
 
   after(function () {
@@ -147,6 +149,8 @@ describe('message service', function() {
     var messageFromMongo;
 
     before(function(done){
+      //create a message 
+
       // grab a message that has been saved already
       testDbInstance.messages.findOne({},function(err, doc) {
         messageFromMongo = doc;
