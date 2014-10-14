@@ -120,8 +120,6 @@ describe('message service', function() {
      */
     testDbInstance.messages.remove();
 
-
-
     for (var index = 0; index < noteAndComments.length; ++index) {
 
       if(index === 0){
@@ -149,8 +147,8 @@ describe('message service', function() {
     var messageFromMongo;
 
     before(function(done){
-      //create a message 
-
+      //create a message so we have one
+      testDbInstance.messages.save(noteAndComments[0]);
       // grab a message that has been saved already
       testDbInstance.messages.findOne({},function(err, doc) {
         messageFromMongo = doc;
