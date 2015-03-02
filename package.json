@@ -21,7 +21,7 @@
     "cookies": "0.5.0",
     "hakken": "0.1.4",
     "lodash": "3.3.1",
-    "mongojs": "0.9.8",
+    "mongojs": "0.18.2",
     "request": "2.34.0",
     "restify": "2.7.0",
     "sundial": "0.1.1",
