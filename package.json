@@ -38,6 +38,6 @@
     "grunt-mocha-test": "0.8.1",
     "grunt-shell-spawn": "0.3.0",
     "salinity": "0.0.3",
-    "supertest": "0.8.1"
+    "supertest": "0.15.0"
   }
 }
