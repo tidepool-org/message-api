@@ -22,7 +22,7 @@
     "hakken": "0.1.4",
     "lodash": "3.3.1",
     "mongojs": "0.18.2",
-    "request": "2.34.0",
+    "request": "2.53.0",
     "restify": "2.8.5",
     "sundial": "0.1.1",
     "tidepool-gatekeeper": "0.1.5",
