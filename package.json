@@ -16,7 +16,7 @@
   },
   "license": "Tidepool",
   "dependencies": {
-    "amoeba": "0.1.2",
+    "amoeba": "0.1.3",
     "bunyan": "1.3.4",
     "cookies": "0.5.0",
     "hakken": "0.1.6",
