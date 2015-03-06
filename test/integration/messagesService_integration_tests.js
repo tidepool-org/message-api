@@ -82,18 +82,19 @@ describe('message service', function() {
   */
   function testMessageContent(message){
     //should be these properties
-    expect(message).to.contain.keys(
+    var keys = [
       'id',
       'parentmessage',
       'groupid',
       'userid',
-      'user',
+      // 'user',
       'messagetext',
       'createdtime',
       'timestamp'
-    );
-    //and only 8 properties
-    expect(Object.keys(message).length).to.equal(8);
+    ];
+    expect(message).to.contain.keys(keys);
+    //and the right number of properties
+    expect(Object.keys(message).length).to.equal(keys.length);
     //these properties must be returned with a value
     expect(message.id).to.exist;
     expect(message.groupid).to.exist;
