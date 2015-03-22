@@ -87,7 +87,6 @@ describe('message service', function() {
       'parentmessage',
       'groupid',
       'userid',
-      // 'user',
       'messagetext',
       'createdtime',
       'timestamp'
