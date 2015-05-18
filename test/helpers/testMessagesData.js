@@ -24,6 +24,7 @@ var testMessagesData = {
 // A related set of messages
 testMessagesData.noteAndComments = [
   {
+    guid: 'abcde',
     parentmessage : null,
     userid: '12121212',
     groupid: '777',
@@ -32,6 +33,7 @@ testMessagesData.noteAndComments = [
     messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
   },
   {
+    guid: 'abcde',
     parentmessage:null,
     userid: '232323',
     groupid: '777',
@@ -40,6 +42,7 @@ testMessagesData.noteAndComments = [
     messagetext: 'Second message.'
   },
   {
+    guid: 'abcde',
     parentmessage:null,
     userid: '232323',
     groupid: '777',
@@ -48,6 +51,7 @@ testMessagesData.noteAndComments = [
     messagetext: 'Third message.'
   },
   {
+    guid: 'abcde',
     parentmessage:null,
     userid: '232323',
     groupid: '777',
@@ -59,6 +63,7 @@ testMessagesData.noteAndComments = [
 
 // One off group with no other related groups
 testMessagesData.note = {
+  guid: 'abcde',
   parentmessage:null,
   userid: '12121212',
   groupid: '999',
