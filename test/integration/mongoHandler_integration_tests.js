@@ -37,10 +37,11 @@ describe('mongo handler', function() {
 
     function messageContentToReturn(saved,toReturn,cb){
       //should be these properties
-      expect(Object.keys(toReturn).length).to.equal(7);
+      expect(Object.keys(toReturn).length).to.equal(8);
 
       expect(toReturn).to.contain.keys(
         'id',
+        'guid',
         'parentmessage',
         'groupid',
         'userid',
@@ -51,6 +52,7 @@ describe('mongo handler', function() {
 
       //these properties must be returned with a value
       expect(toReturn.id).to.exist;
+      expect(toReturn.guid).to.exist;
       expect(toReturn.groupid).to.exist;
       expect(toReturn.userid).to.exist;
       expect(toReturn.timestamp).to.exist;
@@ -58,6 +60,7 @@ describe('mongo handler', function() {
       expect(toReturn.messagetext).to.exist;
 
       //equals what was saved
+      expect(toReturn.guid).to.equal(saved.guid);
       expect(toReturn.groupid).to.equal(saved.groupid);
       expect(toReturn.userid).to.equal(saved.userid);
       expect(toReturn.timestamp).to.equal(saved.timestamp);
@@ -88,6 +91,7 @@ describe('mongo handler', function() {
     it('will get message with requested id', function(done) {
 
       var messageToSave = {
+        guid: 'abcde',
         parentmessage : null,
         groupid : '123',
         userid : '456',

@@ -135,6 +135,7 @@ describe('message API', function() {
       it('ignores the parentmessage as it will be created the parent', function(done) {
 
         var parentMessage = {
+          guid: 'abcde',
           userid: '12345',
           groupid: '4567',
           parentmessage:'',
@@ -171,6 +172,7 @@ describe('message API', function() {
       it('does not require the parentmessage to be set', function(done) {
 
         var replyWithParentNotSet = {
+          guid: 'abcde',
           userid: '12345',
           groupid: '4567',
           parentmessage: null ,
