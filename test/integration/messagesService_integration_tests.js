@@ -84,6 +84,7 @@ describe('message service', function() {
     //should be these properties
     var keys = [
       'id',
+      'guid',
       'parentmessage',
       'groupid',
       'userid',
