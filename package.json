@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.4.0-beta",
+  "version": "0.4.1-beta",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
