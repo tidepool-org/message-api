@@ -84,6 +84,7 @@ describe('message service', function() {
     //should be these properties
     var keys = [
       'id',
+      'guid',
       'parentmessage',
       'groupid',
       'userid',
@@ -559,6 +560,7 @@ describe('message service', function() {
     it('only saves core message fields', function(done) {
 
       var messageWithExtras = {
+        guid: 'abcde',
         parentmessage : null,
         userid: '12121212',
         groupid: '777',
@@ -627,7 +629,7 @@ describe('message service', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var message = res.body;
-        expect(message).equal('{"groupid":"property is required","messagetext":"property is required"}');
+        expect(message).equal('{"guid":"property is required","groupid":"property is required","messagetext":"property is required"}');
         done();
       });
     });
@@ -716,6 +718,7 @@ describe('message service', function() {
     it('only saves core message fields', function(done) {
 
       var replyWithExtras = {
+        guid: 'abcde',
         userid: '12121212',
         groupid: '777',
         timestamp: '2013-11-28T23:07:40+00:00',
@@ -766,7 +769,7 @@ describe('message service', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var message = res.body;
-        expect(message).equal('{"groupid":"property is required","messagetext":"property is required"}');
+        expect(message).equal('{"guid":"property is required","groupid":"property is required","messagetext":"property is required"}');
         done();
       });
     });
