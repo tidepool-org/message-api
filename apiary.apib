@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://api.tidepool.io
+HOST: http://api.tidepool.org
 
 # Tidepool Messages
 **Tidepool's api for exchanging short textual messages with timestamps.**
@@ -13,9 +13,9 @@ The message-api stores and manipulates messages for Tidepool's applications
 
 ## Health Check [/status]
 ### Retrieve status information [GET]
-Returns a status health check with a list of status of its dependencies. 
-If the server is operating properly and all dependencies are up and 
-running, returns 200, otherwise 500. In either case, the body contains a 
+Returns a status health check with a list of status of its dependencies.
+If the server is operating properly and all dependencies are up and
+running, returns 200, otherwise 500. In either case, the body contains a
 list of up and down dependencies.
 
 
@@ -25,7 +25,7 @@ list of up and down dependencies.
             "up" : [ "mongo" ],
             "down" : []
         }
-    
+
 + Response 500
 
         If the server is *not* operating properly and one or more dependencies
@@ -38,16 +38,16 @@ list of up and down dependencies.
 
 ## Read a message [/read/{messageid}]
 ### Fetch the contents of a message [GET]
-Returns the contents of a message by its ID number 
+Returns the contents of a message by its ID number
 + Parameters
     + messageid (required, string, `123abcd`) ... The ID of the message being requested.
 
 + Request
 
     + Headers
-    
+
             x-tidepool-session-token : 23sadf87.123840.aasd90JKj
-            
+
 
 + Response 200
 
@@ -61,7 +61,7 @@ Returns the contents of a message by its ID number
                 timestamp: "2013-12-25T12:34:56+0800"
             }
         }
-        
+
 + Response 404
 
 + Response 400
@@ -77,9 +77,9 @@ Returns the contents of a message by its ID number
 + Request
 
     + Headers
-    
+
             x-tidepool-session-token : 23sadf87.123840.aasd90JKj
-            
+
 + Response 200
 
         {
@@ -102,7 +102,7 @@ Returns the contents of a message by its ID number
                 }
             ]
         }
-        
+
 + Response 404
 
 
@@ -116,9 +116,9 @@ ID was not valid.
 + Request
 
     + Headers
-    
+
             x-tidepool-session-token : 23sadf87.123840.aasd90JKj
-            
+
 + Response 200
 
         {
@@ -141,8 +141,8 @@ ID was not valid.
                 }
             ]
         }
-        
-        
+
+
 + Response 404
 
 + Response 400
@@ -150,19 +150,19 @@ ID was not valid.
 ## Send a message [/send/{groupid}]
 ### Send a message to a group [POST]
 Sends a message to a given group (start a new thread). If found, returns
-an object containing the id of the message created. 
+an object containing the id of the message created.
 + Parameters
     + groupid (required, string, `123abcd`) ... Tidepool-assigned user ID
 
 + Request
 
     + Headers
-    
+
             x-tidepool-session-token : 23sadf87.123840.aasd90JKj
-            
-            
+
+
     + Body
-    
+
             {
                 parentmessage: '',
                 userid: '12121212',
@@ -176,11 +176,11 @@ an object containing the id of the message created.
         {
             id: "12a34d5"
         }
-        
+
 ## Reply to a message [/reply/{messageid}]
 ### Send a message to a group [POST]
-Sends a message in response to a previous message. The parent of the message you send is the 
-messageid that you reply to. If found, returns an object containing the id of the message 
+Sends a message in response to a previous message. The parent of the message you send is the
+messageid that you reply to. If found, returns an object containing the id of the message
 created. The parentmessage parameter, if specified, is ignored.
 + Parameters
     + messageid (required, string, `123abcd`) ... The ID of the message being requested.
@@ -188,12 +188,12 @@ created. The parentmessage parameter, if specified, is ignored.
 + Request
 
     + Headers
-    
+
             x-tidepool-session-token : 23sadf87.123840.aasd90JKj
-            
-            
+
+
     + Body
-    
+
             {
                 message: {
                     parentmessage: '',
@@ -209,6 +209,3 @@ created. The parentmessage parameter, if specified, is ignored.
         {
             id: "12a34d5"
         }
-        
-
-
