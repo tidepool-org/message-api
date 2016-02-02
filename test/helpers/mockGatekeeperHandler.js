@@ -36,6 +36,7 @@ module.exports = function() {
         return next(false);
       }
       req._message = {
+        id: '9876598765',
         guid: 'abcde',
         userid: 'message',
         groupid: '12345',
@@ -43,7 +44,7 @@ module.exports = function() {
         timestamp: '2013-11-28T23:07:40+00:00',
         createdtime: '2013-11-28T23:07:40+00:00',
         messagetext: 'checkPermissionsFromMessage message text'
-      }
+      };
       return next(true);
     }
 

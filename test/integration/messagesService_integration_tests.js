@@ -664,7 +664,7 @@ describe('message service', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var message = res.body;
-        expect(message).equal('{"guid":"property is required","groupid":"property is required","messagetext":"property is required"}');
+        expect(message).equal('{"guid":"property is required","messagetext":"property is required"}');
         done();
       });
     });

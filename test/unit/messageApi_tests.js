@@ -56,9 +56,9 @@ describe('message API', function() {
     var tokenInjection = function(req, res, next) {
       req._tokendata = {
         userid: '12121212'
-      }
+      };
       return next();
-    }
+    };
 
     var messageInjection = function(req, res, next) {
       req._message = {
@@ -69,7 +69,7 @@ describe('message API', function() {
         messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
       };
       return next();
-    }
+    };
 
     server.get('/status',messageApi.status);
 
