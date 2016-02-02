@@ -62,6 +62,7 @@ describe('message API', function() {
 
     var messageInjection = function(req, res, next) {
       req._message = {
+        id: '9876598765',
         guid: 'abcde',
         timestamp: '2013-11-28T23:07:40+00:00',
         createdtime: '2013-11-28T23:07:40+00:00',
