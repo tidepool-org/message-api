@@ -53,20 +53,37 @@ describe('message API', function() {
       dummyMetrics
     );
 
+    var tokenInjection = function(req, res, next) {
+      req._tokendata = {
+        userid: '12121212'
+      }
+      return next();
+    }
+
+    var messageInjection = function(req, res, next) {
+      req._message = {
+        guid: 'abcde',
+        timestamp: '2013-11-28T23:07:40+00:00',
+        createdtime: '2013-11-28T23:07:40+00:00',
+        messagetext: 'In three words I can sum up everything I have learned about life: it goes on.'
+      };
+      return next();
+    }
+
     server.get('/status',messageApi.status);
 
-    server.get('/read/:msgid', messageApi.findById);
+    server.get('/read/:msgid', messageInjection, messageApi.findById);
     server.get('/all/:groupid?starttime&endtime', messageApi.findAllById);
-    server.get('/thread/:msgid', messageApi.getThread);
+    server.get('/thread/:msgid', messageInjection, messageApi.getThread);
     server.get('/notes/:groupid?starttime&endtime', messageApi.getNotes);
 
     //adding messages
-    server.post('/send/:groupid', messageApi.addThread);
-    server.post('/reply/:msgid',messageApi.replyToThread);
+    server.post('/send/:groupid', tokenInjection, messageApi.addThread);
+    server.post('/reply/:msgid', tokenInjection, messageInjection, messageApi.replyToThread);
 
     //updates
-    server.put('/edit/:msgid', messageApi.editMessage);
-    server.del('/remove/:msgid',messageApi.removeMessage);
+    server.put('/edit/:msgid', messageInjection, messageApi.editMessage);
+    server.del('/remove/:msgid',messageInjection, messageApi.removeMessage);
 
     return server;
   };
@@ -114,8 +131,6 @@ describe('message API', function() {
       it('rejects an invalid parent message', function(done) {
 
         var invalidParentNoMessageText = {
-          userid: '12345',
-          groupid: '4567',
           parentmessage:'',
           timestamp:'2013-11-28T23:07:40+00:00',
           messagetext:''
@@ -136,8 +151,6 @@ describe('message API', function() {
 
         var parentMessage = {
           guid: 'abcde',
-          userid: '12345',
-          groupid: '4567',
           parentmessage:'',
           timestamp:'2013-11-28T23:07:40+00:00',
           messagetext:'my new message thread'
@@ -173,9 +186,7 @@ describe('message API', function() {
 
         var replyWithParentNotSet = {
           guid: 'abcde',
-          userid: '12345',
-          groupid: '4567',
-          parentmessage: null ,
+          parentmessage: null,
           timestamp:'2013-11-28T23:07:40+00:00',
           messagetext:'my reply'
         };
@@ -194,8 +205,6 @@ describe('message API', function() {
       it('rejects an invalid reply', function(done) {
 
         var invalidReplyNoTimeStamp = {
-          userid: '12345',
-          groupid: '4567',
           parentmessage:'123456743',
           timestamp:'',
           messagetext:'my reply'

@@ -52,7 +52,7 @@ var messageService = require('../../lib/messagesService')(
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
 var testDbInstance = require('mongojs')(env.mongoConnectionString, ['messages']);
 
-var messageUser = { userid: 'message', isserver: true };
+var messageUser = { userid: 'message' };
 var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
 var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
@@ -220,6 +220,19 @@ describe('message service', function() {
         done();
       });
     });
+
+    it('returns 401 when we do not have permission to read the message', function(done) {
+
+      supertest
+      .get('/read/no-permission')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(401)
+      .end(function(err, res) {
+        if (err) return done(err);
+        console.log(res.body);
+        done();
+      });
+    });
   });
   describe('/all', function() {
 
@@ -319,6 +332,19 @@ describe('message service', function() {
       supertest.get('/all/777?endtime=not-a-date')
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(400,done);
+    });
+
+    it('returns 401 when we do not have permission to read the message', function(done) {
+
+      supertest
+      .get('/all/no-permission')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(401)
+      .end(function(err, res) {
+        if (err) return done(err);
+        console.log(res.body);
+        done();
+      });
     });
   });
   describe('/notes', function() {
@@ -515,6 +541,18 @@ describe('message service', function() {
       });
     });
 
+    it('returns 401 when we do not have permission to read the message', function(done) {
+
+      supertest
+      .get('/thread/no-permission')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(401)
+      .end(function(err, res) {
+        if (err) return done(err);
+        console.log(res.body);
+        done();
+      });
+    });
   });
   describe('/send', function() {
 
@@ -562,8 +600,6 @@ describe('message service', function() {
       var messageWithExtras = {
         guid: 'abcde',
         parentmessage : null,
-        userid: '12121212',
-        groupid: '777',
         timestamp: '2013-11-28T23:07:40+00:00',
         messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
         stuff : {one:'one',two:'two'}
@@ -616,7 +652,6 @@ describe('message service', function() {
 
       var invalidMessage = {
         parentmessage : '',
-        userid: '12345',
         timestamp: '2013-12-04T23:05:40+00:00',
         messagetext: ''
       };
@@ -637,14 +672,12 @@ describe('message service', function() {
     it('returns 401 when we do not have permission to add a message', function(done) {
 
       var message = {
-        userid: '12345',
-        groupid: 'no-permission',
         timestamp: '2013-12-04T23:05:40+00:00',
         messagetext: 'no permission'
       };
 
       supertest
-      .post('/send/12345')
+      .post('/send/no-permission')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:message})
       .expect(401)
@@ -719,8 +752,6 @@ describe('message service', function() {
 
       var replyWithExtras = {
         guid: 'abcde',
-        userid: '12121212',
-        groupid: '777',
         timestamp: '2013-11-28T23:07:40+00:00',
         messagetext: 'In three words I can sum up everything I have learned about life: it goes on.',
         stuff : {one:'one',two:'two'},
@@ -756,7 +787,6 @@ describe('message service', function() {
     it('returns 400 when given an invalid message and an appropriate message as to why', function(done) {
 
       var invalidMessage = {
-        userid: '12345',
         timestamp: '2013-12-04T23:05:40+00:00',
         messagetext: ''
       };
@@ -769,21 +799,19 @@ describe('message service', function() {
       .end(function(err, res) {
         if (err) return done(err);
         var message = res.body;
-        expect(message).equal('{"guid":"property is required","groupid":"property is required","messagetext":"property is required"}');
+        expect(message).equal('{"guid":"property is required","messagetext":"property is required"}');
         done();
       });
     });
     it('returns 401 when we do not have permission to reply to a message', function(done) {
 
       var replyWithNoPermission = {
-        userid: '12345',
-        groupid: 'no-permission',
         timestamp: '2013-12-04T23:05:40+00:00',
         messagetext: 'no permission to reply'
       };
 
       supertest
-      .post('/reply/12345')
+      .post('/reply/no-permission')
       .set('X-Tidepool-Session-Token', sessionToken)
       .send({message:replyWithNoPermission})
       .expect(401,done);
@@ -880,6 +908,19 @@ describe('message service', function() {
       });
 
     });
+
+    it('returns 401 when we do not have permission to edit a message', function(done) {
+
+      supertest
+      .put('/edit/no-permission')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(401)
+      .end(function(err, res) {
+        if (err) return done(err);
+        console.log(res.body);
+        done();
+      });
+    });
   });
   describe('/remove', function() {
 
@@ -953,6 +994,18 @@ describe('message service', function() {
       });
     });
 
+    it('returns 401 when we do not have permission to remove a message', function(done) {
+
+      supertest
+      .del('/remove/no-permission')
+      .set('X-Tidepool-Session-Token', sessionToken)
+      .expect(401)
+      .end(function(err, res) {
+        if (err) return done(err);
+        console.log(res.body);
+        done();
+      });
+    });
   });
   describe('/status', function() {
 

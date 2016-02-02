@@ -61,8 +61,6 @@ describe('mongo handler', function() {
 
       //equals what was saved
       expect(toReturn.guid).to.equal(saved.guid);
-      expect(toReturn.groupid).to.equal(saved.groupid);
-      expect(toReturn.userid).to.equal(saved.userid);
       expect(toReturn.timestamp).to.equal(saved.timestamp);
       expect(toReturn.createdtime).to.equal(saved.createdtime);
       expect(toReturn.messagetext).to.equal(saved.messagetext);

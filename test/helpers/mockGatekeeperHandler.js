@@ -31,9 +31,18 @@ module.exports = function() {
     },
 
     checkPermissionsFromMessage: function(req, res, next) {
-      if(req.params.message.groupid == 'no-permission'){
+      if(req.params.msgid == 'no-permission'){
         res.send(401);
         return next(false);
+      }
+      req._message = {
+        guid: 'abcde',
+        userid: 'message',
+        groupid: '12345',
+        parentmessage: null,
+        timestamp: '2013-11-28T23:07:40+00:00',
+        createdtime: '2013-11-28T23:07:40+00:00',
+        messagetext: 'checkPermissionsFromMessage message text'
       }
       return next(true);
     }
