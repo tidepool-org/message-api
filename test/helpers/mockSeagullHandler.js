@@ -24,7 +24,7 @@ module.exports = function() {
 
   return {
 
-    resolveUsers:  function(userIds, token, callback) {
+    resolveUsers:  function(userIds, callback) {
 
       var resolvedUsers = {};
 
