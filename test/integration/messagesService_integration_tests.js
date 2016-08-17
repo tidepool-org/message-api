@@ -23,7 +23,7 @@ var mockableObject = salinity.mockableObject;
 
 var env = {
   httpPort: 21000,
-  mongoConnectionString: 'mongodb://localhost/test_messages',
+  mongoConnectionString: 'mongodb://localhost/messages_test',
   deleteWindow : 5
 };
 
