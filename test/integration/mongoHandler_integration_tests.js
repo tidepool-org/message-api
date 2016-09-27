@@ -203,7 +203,7 @@ describe('mongo handler', function() {
 
   });
 
-  describe('getting messages using ', function() {
+  describe('getting messages using', function() {
 
     var groupId = '123-456-99-100';
     var idOfParentMessage;
@@ -255,18 +255,20 @@ describe('mongo handler', function() {
       /*
        * Load multiple messages for testing
        */
-      testDbInstance.messages.remove();
-      var messages = testMessages();
+      testDbInstance.messages.remove(function(err) {
+        var messages = testMessages();
 
-      _.forEach(messages, function(message){
-        if(message.messagetext === 'this is the parentmessage'){
+        var pending = messages.length;
+        _.forEach(messages, function(message){
           testDbInstance.messages.save(message,function(err,doc){
-            idOfParentMessage = String(doc._id);
-            done();
+            if(doc.messagetext === 'this is the parentmessage'){
+              idOfParentMessage = String(doc._id);
+            }
+            if (--pending === 0) {
+              done();
+            }
           });
-        } else {
-          testDbInstance.messages.save(message);
-        }
+        });
       });
 
     });
