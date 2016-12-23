@@ -26,4 +26,4 @@ echo "Running tests"
 trap "cleanup ${MONGO_PID}" EXIT
 
 # run tests
-# ./node_modules/.bin/grunt test
+./node_modules/.bin/grunt test
