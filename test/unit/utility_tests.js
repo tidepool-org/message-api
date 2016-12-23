@@ -35,16 +35,22 @@ describe('utility', function() {
       expect(returnedDate).to.equal('2015-12-21T00:00:00.000Z');
       done();
     });
-    it('date, time and offset', function(done) {
+    it('date, time and offset + UTC', function(done) {
       var returnedDate = utility.getISODate('2016-12-22T16:27:10+13:00');
       expect(returnedDate).to.exist;
       expect(returnedDate).to.equal('2016-12-22T03:27:10.000Z');
       done();
     });
-    it('date, time and offset', function(done) {
+    it('date, time and offset UTC', function(done) {
       var returnedDate = utility.getISODate('2016-12-22T16:27:10 13:00');
       expect(returnedDate).to.exist;
       expect(returnedDate).to.equal('2016-12-22T03:27:10.000Z');
+      done();
+    });
+    it('date, time and offset - UTC', function(done) {
+      var returnedDate = utility.getISODate('2016-12-22T16:27:10-08:00');
+      expect(returnedDate).to.exist;
+      expect(returnedDate).to.equal('2016-12-23T00:27:10.000Z');
       done();
     });
   });
