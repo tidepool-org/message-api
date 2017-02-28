@@ -27,7 +27,7 @@
     "sundial": "1.4.0",
     "tidepool-gatekeeper": "0.2.2",
     "tidepool-seagull-client": "0.1.5",
-    "user-api-client": "0.3.4"
+    "user-api-client": "0.4.0"
   },
   "devDependencies": {
     "async": "0.9.0",
