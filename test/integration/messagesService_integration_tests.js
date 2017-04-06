@@ -73,10 +73,6 @@ describe('message service', function() {
     sinon.stub(dummyMetrics,'postThisUser');
   }
 
-  function expectMetricsToBeCalled() {
-    expect(dummyMetrics.postThisUser).to.have.been.calledOnce;
-  }
-
   /*
   * The expectations for a message
   */
@@ -153,19 +149,6 @@ describe('message service', function() {
       // grab a message that has been saved already
       testDbInstance.messages.findOne({},function(err, doc) {
         messageFromMongo = doc;
-        done();
-      });
-    });
-
-    it('metrics are called', function(done) {
-
-      supertest
-      .get('/read/'+String(messageFromMongo._id))
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectMetricsToBeCalled();
         done();
       });
     });
@@ -349,19 +332,6 @@ describe('message service', function() {
   });
   describe('/notes', function() {
 
-    it('metrics are called', function(done) {
-
-      supertest
-      .get('/notes/777')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectMetricsToBeCalled();
-        done();
-      });
-    });
-
     it('the token is used', function(done) {
 
       supertest
@@ -483,19 +453,6 @@ describe('message service', function() {
   });
   describe('/thread', function() {
 
-    it('metrics are called', function(done) {
-
-      supertest
-      .get('/thread/'+fakeRootId)
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectMetricsToBeCalled();
-        done();
-      });
-    });
-
     it('the token is used', function(done) {
 
       supertest
@@ -555,21 +512,6 @@ describe('message service', function() {
     });
   });
   describe('/send', function() {
-
-    it('metrics are called', function(done) {
-      var testMessage = require('../helpers/testMessagesData').note;
-
-      supertest
-      .post('/send/12345')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(201)
-      .send({message:testMessage})
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectMetricsToBeCalled();
-        done();
-      });
-    });
 
     it('the token is used', function(done) {
       var testMessage = require('../helpers/testMessagesData').note;
@@ -690,22 +632,6 @@ describe('message service', function() {
   });
   describe('/reply', function() {
 
-    it('metrics are called', function(done) {
-
-      var testMessage = require('../helpers/testMessagesData').note;
-
-      supertest
-      .post('/reply/12345')
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(201)
-      .send({message:testMessage})
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectMetricsToBeCalled();
-        done();
-      });
-    });
-
     it('the token is used', function(done) {
 
       var testMessage = require('../helpers/testMessagesData').note;
@@ -743,7 +669,6 @@ describe('message service', function() {
       .end(function(err, res) {
         if (err) return done(err);
         expectToken(sessionToken);
-        expectMetricsToBeCalled();
         expect(res.body).to.have.property('id');
         done();
       });
@@ -829,23 +754,6 @@ describe('message service', function() {
       });
     });
 
-    it('metrics are called', function(done) {
-
-      var updatedNoteText = {
-        messagetext: 'some updated text'
-      };
-
-      supertest
-      .put('/edit/'+messageToEdit)
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .send({message:updatedNoteText})
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectMetricsToBeCalled();
-        done();
-      });
-    });
     it('the token is used', function(done) {
 
       var updatedNoteText = {
@@ -930,19 +838,6 @@ describe('message service', function() {
       // grab a message that has been saved already
       testDbInstance.messages.findOne({},function(err, doc) {
         messageToRemove = String(doc._id);
-        done();
-      });
-    });
-
-    it('metrics are called', function(done) {
-
-      supertest
-      .del('/remove/'+messageToRemove)
-      .set('X-Tidepool-Session-Token', sessionToken)
-      .expect(202)
-      .end(function(err, res) {
-        if (err) return done(err);
-        expectMetricsToBeCalled();
         done();
       });
     });
