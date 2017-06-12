@@ -25,7 +25,7 @@ services:
   - mongodb
 
 before_script:
-# Sleeps make me sad, but tests can fail intermittently if mongodb isn't ready
+# Sleeps make me sad, but tests can fail intermittently if mongodb isn't ready.
 # See https://docs.travis-ci.com/user/database-setup/#MongoDB-does-not-immediately-accept-connections
   - sleep 15
 
