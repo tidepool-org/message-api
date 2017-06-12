@@ -14,6 +14,7 @@ addons:
       - mongodb-3.2-precise
     packages:
       - mongodb-org-server
+      - mongodb-org-shell
   artifacts:
     s3_region: us-west-2
     paths:
