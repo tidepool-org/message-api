@@ -22,6 +22,7 @@ addons:
       - /
 
 services:
+  - docker
   - mongodb
 
 before_script:
@@ -32,8 +33,3 @@ before_script:
 script:
   - npm test
   - ./artifact.sh
-
-notifications:
-  email:
-    on_success: change
-    on_failure: always
