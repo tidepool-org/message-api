@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.7.13",
+  "version": "0.8.0-auth0-integration.1",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
@@ -27,7 +27,7 @@
     "sundial": "1.4.0",
     "tidepool-gatekeeper": "0.2.2",
     "tidepool-seagull-client": "0.1.5",
-    "user-api-client": "0.4.0"
+    "user-api-client": "0.5.0-oauth.3"
   },
   "devDependencies": {
     "async": "0.9.0",
