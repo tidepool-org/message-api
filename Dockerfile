@@ -2,7 +2,7 @@ FROM node:6.10.3-alpine
 
 WORKDIR /app
 
-COPY . .
+COPY package.json package.json
 
 RUN apk --no-cache update && \
     apk --no-cache upgrade && \
@@ -11,5 +11,7 @@ RUN apk --no-cache update && \
     yarn cache clean
 
 USER node
+
+COPY . .
 
 CMD ["npm", "start"]
