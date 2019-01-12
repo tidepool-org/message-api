@@ -3,7 +3,7 @@ message-api
 
 Repository for the message API
 
-[![Build Status](https://travis-ci.org/tidepool-org/message-api.png)](https://travis-ci.org/tidepool-org/message-api)
+[![Build Status](https://travis-ci.com/tidepool-org/message-api.png)](https://travis-ci.com/tidepool-org/message-api)
 
 The documentation for the API lives here: [http://docs.tidepoolmessages.apiary.io/](http://docs.tidepoolmessages.apiary.io/)
 
