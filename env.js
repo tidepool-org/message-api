@@ -88,8 +88,10 @@ module.exports = (function(){
 
   // The host to contact for discovery
   if (process.env.DISCOVERY_HOST != null) {
-    env.discovery = {};
-    env.discovery.host = process.env.DISCOVERY_HOST;
+    env.discovery = {
+       host: process.env.DISCOVERY_HOST,
+       skipHakken: config.fromEnvironment('SKIP_HAKKEN', false)
+    }
 
     // The service name to expose to discovery
     env.serviceName = config.fromEnvironment('SERVICE_NAME');
