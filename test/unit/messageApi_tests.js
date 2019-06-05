@@ -35,8 +35,8 @@ describe('message API', function() {
   var setupAPI = function(crudHandler){
 
     var server = restify.createServer({name:'Message API Tests'});
-    server.use(restify.queryParser());
-    server.use(restify.bodyParser());
+    server.use(restify.plugins.queryParser());
+    server.use(restify.plugins.bodyParser());
 
     function doNothing() { return null; }
 
