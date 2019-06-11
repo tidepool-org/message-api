@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.7.13",
+  "version": "0.1.0",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
@@ -21,7 +21,7 @@
     "cookies": "0.5.0",
     "hakken": "0.1.8",
     "lodash": "3.4.0",
-    "mongojs": "0.18.2",
+    "mongojs": "2.4.0",
     "request": "2.53.0",
     "restify": "2.8.5",
     "sundial": "1.4.0",
