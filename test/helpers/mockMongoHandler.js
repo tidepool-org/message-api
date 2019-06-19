@@ -50,7 +50,7 @@ var mockMongoHandler = function(testingConfig) {
 function resolveCallbackValues(callback,data){
 
   if (settings.throwErrors){
-    return callback(new Error('fake error'),null);
+    return callback(new Error('fake error'),data);
   }else if (settings.returnNone){
     //if expecting an array return empty array
     if( Object.prototype.toString.call( data ) === '[object Array]' ) {
