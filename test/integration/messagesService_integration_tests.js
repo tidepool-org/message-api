@@ -84,6 +84,7 @@ describe('message service', function() {
       'parentmessage',
       'groupid',
       'userid',
+      'user',
       'messagetext',
       'createdtime',
       'timestamp'
@@ -871,7 +872,7 @@ describe('message service', function() {
 
     });
 
-    it('allows you to start a delete on a message and means you can no loger get that message', function(done) {
+    it('allows you to start a delete on a message and means you can no longer get that message', function(done) {
 
       expect(messageToRemove).to.exist;
 
