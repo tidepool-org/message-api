@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.7.16",
+  "version": "0.7.17",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
@@ -16,7 +16,7 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "amoeba": "0.4.6",
+    "amoeba": "0.4.7",
     "bunyan": "1.8.12",
     "cookies": "0.7.3",
     "hakken": "0.1.12",
