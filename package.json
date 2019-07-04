@@ -8,7 +8,9 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "test": "grunt test"
+    "test": "grunt test",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": "https://github.com/tidepool-org/message-api.git",
   "author": {
@@ -28,7 +30,8 @@
     "sundial": "1.6.0",
     "tidepool-gatekeeper": "0.2.3",
     "tidepool-seagull-client": "0.1.6",
-    "user-api-client": "0.4.2"
+    "user-api-client": "0.4.2",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "async": "3.0.1",
@@ -41,5 +44,6 @@
     "mocha": "6.1.4",
     "salinity": "0.0.8",
     "supertest": "4.0.2"
-  }
+  },
+  "snyk": true
 }
