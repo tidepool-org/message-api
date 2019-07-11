@@ -27,8 +27,8 @@
     "restify": "8.3.2",
     "sundial": "1.6.0",
     "tidepool-gatekeeper": "0.2.4",
-    "tidepool-seagull-client": "0.1.7",
-    "user-api-client": "0.4.2"
+    "tidepool-seagull-client": "0.1.8",
+    "user-api-client": "0.4.4"
   },
   "devDependencies": {
     "async": "3.0.1",
