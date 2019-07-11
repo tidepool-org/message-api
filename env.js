@@ -19,7 +19,7 @@ not, you can obtain one from Tidepool Project at tidepool.org.
 var fs = require('fs');
 var amoeba = require('amoeba');
 var config = amoeba.config;
-var cs = amoeba.mongo.toConnectionString
+var cs = amoeba.mongoUtil.toConnectionString
 
 function maybeReplaceWithContentsOfFile(obj, field)
 {
