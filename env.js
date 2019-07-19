@@ -19,6 +19,7 @@ not, you can obtain one from Tidepool Project at tidepool.org.
 var fs = require('fs');
 var amoeba = require('amoeba');
 var config = amoeba.config;
+var cs = amoeba.mongoUtil.toConnectionString
 
 function maybeReplaceWithContentsOfFile(obj, field)
 {
@@ -57,7 +58,7 @@ module.exports = (function(){
     throw new Error('Must specify either PORT or HTTPS_PORT in your environment.');
   }
 
-  env.mongoDbConnectionString = process.env.MONGO_CONNECTION_STRING || 'mongodb://localhost/messages';
+  env.mongoDbConnectionString = cs('messages')
 
   env.metrics = {
     // The config object to discover highwater (the metrics API).
@@ -88,8 +89,10 @@ module.exports = (function(){
 
   // The host to contact for discovery
   if (process.env.DISCOVERY_HOST != null) {
-    env.discovery = {};
-    env.discovery.host = process.env.DISCOVERY_HOST;
+    env.discovery = {
+       host: process.env.DISCOVERY_HOST,
+       skipHakken: config.fromEnvironment('SKIP_HAKKEN', false)
+    }
 
     // The service name to expose to discovery
     env.serviceName = config.fromEnvironment('SERVICE_NAME');

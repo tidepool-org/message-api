@@ -27,7 +27,7 @@ module.exports = function() {
         res.send(401);
         return next(false);
       }
-      return next(true);
+      return next();
     },
 
     checkPermissionsFromMessage: function(req, res, next) {
@@ -45,7 +45,7 @@ module.exports = function() {
         createdtime: '2013-11-28T23:07:40+00:00',
         messagetext: 'checkPermissionsFromMessage message text'
       };
-      return next(true);
+      return next();
     }
 
   };
