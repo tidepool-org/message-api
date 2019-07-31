@@ -3,7 +3,7 @@ sudo: false
 language: node_js
 
 node_js:
-  - 0.12.18
+  - 6.10.2
 
 install:
   - npm install
@@ -48,5 +48,6 @@ before_script:
   - sleep 15
 
 script:
+  - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
   - npm test
   - ./artifact.sh
