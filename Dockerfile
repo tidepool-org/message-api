@@ -7,9 +7,9 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN apk add --no-cache --virtual .build-dependencies git && \
-    yarn install && \
-    yarn cache clean && \
+RUN apk add --no-cache --virtual .build-dependencies git python make && \
+    npm install && \
+    npm cache clean --force && \
     apk del .build-dependencies
 
 USER node
