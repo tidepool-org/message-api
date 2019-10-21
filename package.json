@@ -22,7 +22,7 @@
     "hakken": "0.1.12",
     "lodash": "4.17.11",
     "moment": "^2.24.0",
-    "mongojs": "2.6.0",
+    "mongojs": "3.0.0",
     "request": "2.88.0",
     "restify": "8.3.2",
     "sundial": "1.6.0",
