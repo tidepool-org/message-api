@@ -1,0 +1,44 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - amoeba > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - hakken > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - tidepool-gatekeeper > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - user-api-client > amoeba > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - hakken > amoeba > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - hakken > restify > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - tidepool-gatekeeper > amoeba > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - tidepool-seagull-client > amoeba > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - restify > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - user-api-client > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - restify > restify-errors > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - restify > restify-errors > @netflix/nerror > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - hakken > restify > restify-errors > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - hakken > restify > restify-errors > @netflix/nerror > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - mongojs > nyc > istanbul-lib-instrument > @babel/traverse > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - mongojs > nyc > istanbul-lib-instrument > @babel/traverse > @babel/generator > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - mongojs > nyc > istanbul-lib-instrument > @babel/traverse > @babel/helper-split-export-declaration > @babel/types > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
+    - mongojs > nyc > istanbul-lib-instrument > @babel/traverse > @babel/helper-function-name > @babel/helper-get-function-arity > @babel/types > lodash:
+        patched: '2020-05-01T01:16:14.451Z'
