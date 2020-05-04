@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.9.0",
+  "version": "0.2.0",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
@@ -10,7 +10,7 @@
     "start": "node lib/index.js",
     "test": "grunt test"
   },
-  "repository": "https://github.com/tidepool-org/message-api.git",
+  "repository": "https://github.com/mdblp/message-api",
   "author": {
     "name": "Jamie Bate"
   },
@@ -20,15 +20,15 @@
     "bunyan": "1.8.12",
     "cookies": "0.7.3",
     "hakken": "0.1.12",
-    "lodash": "4.17.11",
+    "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "mongojs": "2.6.0",
+    "mongojs": "^3.1.0",
     "request": "2.88.0",
     "restify": "8.3.2",
     "sundial": "1.6.0",
     "tidepool-gatekeeper": "0.2.4",
-    "tidepool-seagull-client": "0.1.8",
-    "user-api-client": "0.4.4"
+    "tidepool-seagull-client": "^0.1.9",
+    "user-api-client": "^0.5.0"
   },
   "devDependencies": {
     "async": "3.0.1",
