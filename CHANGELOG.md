@@ -2,9 +2,10 @@
 
 Tidepools message API for adding context to diabetes data
 
-## Unreleased
+## 0.3.0 - 2020-05-14
 ### Changed
 - PT-1285 Integrate Tidepool master for message-api
+- PT-1331 Remove highwater
 
 ## 0.2.0 - 2019-10-08
 ### Changed

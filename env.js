@@ -60,12 +60,6 @@ module.exports = (function(){
 
   env.mongoDbConnectionString = cs('messages')
 
-  env.metrics = {
-    // The config object to discover highwater (the metrics API).
-    // This is just passed through to hakken.watchFromConfig()
-    serviceSpec: JSON.parse(config.fromEnvironment('METRICS_SERVICE'))
-  };
-
   env.userApi = {
     // The config object to discover user-api.  This is just passed through to hakken.watchFromConfig()
     serviceSpec: JSON.parse(config.fromEnvironment('USER_API_SERVICE')),
@@ -96,10 +90,6 @@ module.exports = (function(){
 
     // The service name to expose to discovery
     env.serviceName = config.fromEnvironment('SERVICE_NAME');
-
-    // info for properly tagging metrics
-    env.metricsSource = env.serviceName;
-    env.metricsVersion = require('./package.json').version;
 
     // The local host to expose to discovery
     env.publishHost = config.fromEnvironment('PUBLISH_HOST');
