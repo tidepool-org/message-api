@@ -20,7 +20,7 @@
     "bunyan": "1.8.12",
     "cookies": "0.8.0",
     "hakken": "0.1.12",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "moment": "^2.24.0",
     "mongojs": "3.1.0",
     "request": "2.88.0",
