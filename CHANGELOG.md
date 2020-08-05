@@ -2,6 +2,10 @@
 
 Tidepools message API for adding context to diabetes data
 
+## 0.3.1 - 2020-08-04
+### Engineering
+- PT-1450 Generate SOUP Report
+
 ## 0.3.0 - 2020-05-14
 ### Changed
 - PT-1285 Integrate Tidepool master for message-api

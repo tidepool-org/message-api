@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
@@ -8,7 +8,9 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "test": "grunt test"
+    "test": "grunt test",
+    "prebuild-soup": "mkdir -p doc/soup",
+    "build-soup": "release-helper gen-dep-report doc/soup/${npm_package_name}-${npm_package_version}-soup.md"
   },
   "repository": "https://github.com/mdblp/message-api",
   "author": {
