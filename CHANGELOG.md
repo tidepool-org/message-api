@@ -2,6 +2,10 @@
 
 Tidepools message API for adding context to diabetes data
 
+## Unreleased
+### Changed
+- PT-1438 Make service start without MongoDb available
+
 ## 0.3.1 - 2020-08-04
 ### Engineering
 - PT-1450 Generate SOUP Report
