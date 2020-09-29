@@ -3,18 +3,16 @@ sudo: false
 language: node_js
 
 node_js:
-  - 10.14.2
+  - 10
+
+before_install:
+  # MongoDb 4.2 docker container
+  - docker container run -d -p 27017:27017 mongo:4.2
 
 install:
+  - npm install -g npm@latest
   - npm install
   - npm install --save-dev ci-toolbox@latest
-
-addons:
-  apt:
-    sources:
-      - mongodb-3.6-trusty
-    packages:
-      - mongodb-org-server
 
 env:
   global:
@@ -58,7 +56,6 @@ deploy:
 
 services:
   - docker
-  - mongodb
 
 before_script:
 # Sleeps make me sad, but tests can fail intermittently if mongodb isn't ready.
@@ -68,4 +65,5 @@ before_script:
 script:
   - mongo mydb_test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
   - npm test
+  - npm audit --registry=https://registry.npmjs.org --production --audit-level=moderate
   - ./artifact.sh

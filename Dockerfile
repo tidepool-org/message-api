@@ -1,11 +1,12 @@
 ### Stage 0 - Base image
-FROM node:10.14.2-alpine as base
+FROM node:10-alpine as base
 ARG npm_token
-ENV nexus_token=$npm_token
+ENV NEXUS_TOKEN=$npm_token
 WORKDIR /app
 RUN apk --no-cache update && \
     apk --no-cache upgrade && \
     apk add --no-cache --virtual .build-dependencies python make g++ && \
+    npm install -g npm@latest && \
     mkdir -p node_modules && chown -R node:node .
 
 
@@ -36,6 +37,7 @@ CMD ["npm", "start"]
 ### Stage 3 - Serve production-ready release
 FROM base as production
 ENV NODE_ENV=production
+RUN apk del .build-dependencies
 # Copy only `node_modules` needed to run the server
 COPY --from=dependencies /app/production_node_modules ./node_modules
 # Copy source files

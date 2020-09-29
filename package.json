@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
@@ -22,15 +22,15 @@
     "bunyan": "1.8.12",
     "cookies": "0.7.3",
     "hakken": "^0.2.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "moment": "^2.24.0",
     "mongojs": "^3.1.0",
     "request": "2.88.0",
     "restify": "8.3.2",
     "sundial": "1.6.0",
-    "tidepool-gatekeeper": "0.2.4",
-    "tidepool-seagull-client": "^0.1.9",
-    "user-api-client": "^0.5.0"
+    "tidepool-gatekeeper": "0.2.5",
+    "tidepool-seagull-client": "0.1.10",
+    "user-api-client": "0.5.2"
   },
   "devDependencies": {
     "async": "3.0.1",

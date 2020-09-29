@@ -2,9 +2,12 @@
 
 Tidepools message API for adding context to diabetes data
 
-## Unreleased
+## 0.4.0 2020-09-29
 ### Changed
 - PT-1438 Make service start without MongoDb available
+### Engineering
+- Fix security audit && update to mongo 4.2 
+- PT-1528 Base message-api image on node:10-alpine
 
 ## 0.3.1 - 2020-08-04
 ### Engineering
