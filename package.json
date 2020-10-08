@@ -16,7 +16,7 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "amoeba": "0.8.1",
+    "amoeba": "0.9.0",
     "bunyan": "1.8.14",
     "cookies": "0.8.0",
     "hakken": "0.1.12",
