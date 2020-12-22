@@ -2,6 +2,10 @@
 
 Tidepools message API for adding context to diabetes data
 
+## 0.4.1 - 2020-10-30
+### Engineering
+- YLP-259 Review SOUP doc destination
+
 ## 0.4.0 2020-09-29
 ### Changed
 - PT-1438 Make service start without MongoDb available
