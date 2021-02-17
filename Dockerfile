@@ -1,5 +1,5 @@
 ### Stage 0 - Base image
-FROM node:10-alpine as base
+FROM node:12-alpine as base
 ARG npm_token
 ENV NEXUS_TOKEN=$npm_token
 WORKDIR /app
@@ -37,10 +37,12 @@ CMD ["npm", "start"]
 ### Stage 3 - Serve production-ready release
 FROM base as production
 ENV NODE_ENV=production
-RUN apk del .build-dependencies
 # Copy only `node_modules` needed to run the server
 COPY --from=dependencies /app/production_node_modules ./node_modules
 # Copy source files
 COPY --chown=node:node . .
+RUN apk del .build-dependencies && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm && \
+    rm package-lock.json package.json
 USER node
-CMD ["npm", "start"]
+CMD ["node", "lib/index.js"]

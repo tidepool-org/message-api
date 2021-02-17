@@ -29,7 +29,7 @@ var env = {
 
 var userApiClient = mockableObject.make('checkToken');
 var dummyMetrics = mockableObject.make('postThisUser');
-var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
+var authorizationHandler = require('../helpers/mockGatekeeperHandler')();
 
 //mock metrics
 
@@ -46,7 +46,7 @@ var messageService = require('../../lib/messagesService')(
   env,
   messageApi,
   userApiClient,
-  gatekeeperHandler
+  authorizationHandler
 );
 
 var supertest = require('supertest')('http://localhost:' + env.httpPort);

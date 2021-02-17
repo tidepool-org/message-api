@@ -22,7 +22,7 @@ module.exports = function() {
 
   return {
 
-    checkPermissionsFromGroup: function(req, res, next) {
+    authorize: function(req, res, next) {
       if(req.params.groupid == 'no-permission'){
         res.send(401);
         return next(false);
@@ -30,7 +30,7 @@ module.exports = function() {
       return next();
     },
 
-    checkPermissionsFromMessage: function(req, res, next) {
+    authorizeFromMessage: function(req, res, next) {
       if(req.params.msgid == 'no-permission'){
         res.send(401);
         return next(false);
@@ -43,7 +43,7 @@ module.exports = function() {
         parentmessage: null,
         timestamp: '2013-11-28T23:07:40+00:00',
         createdtime: '2013-11-28T23:07:40+00:00',
-        messagetext: 'checkPermissionsFromMessage message text'
+        messagetext: 'authorizeFromMessage message text'
       };
       return next();
     }

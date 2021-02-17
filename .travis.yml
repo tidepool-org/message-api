@@ -3,10 +3,11 @@ sudo: false
 language: node_js
 
 node_js:
-  - 10
+  - 12
 
 before_install:
   # MongoDb 4.2 docker container
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY
   - docker container run -d -p 27017:27017 mongo:4.2
 
 install:
