@@ -31,6 +31,12 @@ var userApiClient = mockableObject.make('checkToken');
 var dummyMetrics = mockableObject.make('postThisUser');
 var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
 
+// Mocks Kafka consumer's start and stop
+var kafkaConsumer = {
+  start: () => { return; },
+  stop: () => { return; }
+};
+
 //mock metrics
 
 var mongoHandler = require('../../lib/handler/mongoHandler')(env.mongoConnectionString);
@@ -46,7 +52,8 @@ var messageService = require('../../lib/messagesService')(
   env,
   messageApi,
   userApiClient,
-  gatekeeperHandler
+  gatekeeperHandler,
+  kafkaConsumer
 );
 
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
@@ -137,7 +144,7 @@ describe('message service', function() {
     /*
      * Close things down
      */
-    messageService.close();
+    messageService.onShutdown();
   });
 
   describe('/read', function() {
