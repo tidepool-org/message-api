@@ -2,6 +2,10 @@
 
 Tidepools message API for adding context to diabetes data
 
+## 0.5.1 - 2021-03-05
+### Fixed
+- Remove legacy gatekeeper url (env var)
+
 ## 0.5.0 - 2021-02-16
 ### Changed
 - YLP-473 Implement authorization rules for message-api

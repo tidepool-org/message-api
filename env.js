@@ -76,11 +76,6 @@ module.exports = (function(){
     serviceSpec: JSON.parse(config.fromEnvironment('SEAGULL_SERVICE'))
   };
 
-  env.gatekeeper = {
-    // The config object to discover gatekeeper.  This is just passed through to hakken.watchFromConfig()
-    serviceSpec: JSON.parse(config.fromEnvironment('GATEKEEPER_SERVICE'))
-  };
-
   // The host to contact for discovery
   if (process.env.DISCOVERY_HOST != null) {
     env.discovery = {
