@@ -29,13 +29,8 @@ var env = {
 
 var userApiClient = mockableObject.make('checkToken');
 var dummyMetrics = mockableObject.make('postThisUser');
+var kafkaConsumer = mockableObject.make('start', 'stop');
 var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
-
-// Mocks Kafka consumer's start and stop
-var kafkaConsumer = {
-  start: () => { return; },
-  stop: () => { return; }
-};
 
 //mock metrics
 
@@ -135,6 +130,7 @@ describe('message service', function() {
       }
       if (index === (noteAndComments.length-1)){
         console.log('data loaded, now starting service');
+        sinon.stub(kafkaConsumer, 'start');
         messageService.start(done);
       }
     }
@@ -144,6 +140,7 @@ describe('message service', function() {
     /*
      * Close things down
      */
+    sinon.stub(kafkaConsumer, 'stop');
     messageService.onShutdown();
   });
 
