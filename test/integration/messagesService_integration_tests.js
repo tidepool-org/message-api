@@ -29,6 +29,7 @@ var env = {
 
 var userApiClient = mockableObject.make('checkToken');
 var dummyMetrics = mockableObject.make('postThisUser');
+var kafkaConsumer = mockableObject.make('start', 'stop');
 var gatekeeperHandler = require('../helpers/mockGatekeeperHandler')();
 
 //mock metrics
@@ -46,7 +47,8 @@ var messageService = require('../../lib/messagesService')(
   env,
   messageApi,
   userApiClient,
-  gatekeeperHandler
+  gatekeeperHandler,
+  kafkaConsumer
 );
 
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
@@ -128,6 +130,7 @@ describe('message service', function() {
       }
       if (index === (noteAndComments.length-1)){
         console.log('data loaded, now starting service');
+        sinon.stub(kafkaConsumer, 'start');
         messageService.start(done);
       }
     }
@@ -137,7 +140,8 @@ describe('message service', function() {
     /*
      * Close things down
      */
-    messageService.close();
+    sinon.stub(kafkaConsumer, 'stop');
+    messageService.onShutdown();
   });
 
   describe('/read', function() {
