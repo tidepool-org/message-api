@@ -21,11 +21,6 @@ install:
   - npm install
 
 addons:
-  apt:
-    sources:
-      - mongodb-3.2-trusty
-    packages:
-      - mongodb-org-server
   artifacts:
     s3_region: us-west-2
     paths:
