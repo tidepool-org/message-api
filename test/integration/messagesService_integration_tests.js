@@ -150,11 +150,12 @@ describe('message service', function() {
 
     before(function(done){
       //create a message so we have one
-      testDbInstance.messages.save(noteAndComments[0]);
-      // grab a message that has been saved already
-      testDbInstance.messages.findOne({},function(err, doc) {
-        messageFromMongo = doc;
-        done();
+      testDbInstance.messages.save(noteAndComments[0], {}, function() {
+        // grab a message that has been saved already
+        testDbInstance.messages.findOne({},function(err, doc) {
+          messageFromMongo = doc;
+          done(err);
+        });
       });
     });
 
