@@ -9,6 +9,8 @@
   "scripts": {
     "start": "node lib/index.js",
     "test": "grunt test",
+    "security-checks": "npm audit --production --registry=https://registry.npmjs.org/ --audit-level=moderate",
+    "build-ci": "npm install && npm run security-checks",
     "prebuild-soup": "mkdir -p doc/soup",
     "build-soup": "release-helper gen-dep-report doc/soup/${npm_package_name}-${npm_package_version}-soup.md"
   },
@@ -30,7 +32,7 @@
     "sundial": "1.6.0",
     "tidepool-gatekeeper": "0.3.0",
     "tidepool-seagull-client": "0.1.10",
-    "user-api-client": "0.5.2"
+    "user-api-client": "0.5.3"
   },
   "devDependencies": {
     "async": "3.0.1",

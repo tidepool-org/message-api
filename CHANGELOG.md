@@ -2,6 +2,11 @@
 
 Tidepools message API for adding context to diabetes data
 
+## Unreleased
+### Engineering
+- YLP-756 Bump some dependencies
+- Replace Travis with Jenkins
+
 ## 0.5.1 - 2021-03-05
 ### Fixed
 - Remove legacy gatekeeper url (env var)
