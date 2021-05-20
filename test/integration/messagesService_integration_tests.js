@@ -21,9 +21,14 @@ var expect = salinity.expect;
 var sinon = salinity.sinon;
 var mockableObject = salinity.mockableObject;
 
+var mongoConnectionString = 'mongodb://localhost/messages_test'
+if (process.env.MONGO_CONN_STRING != null) {
+  mongoConnectionString = process.env.MONGO_CONN_STRING
+}
+
 var env = {
   httpPort: 21000,
-  mongoConnectionString: 'mongodb://localhost/messages_test',
+  mongoConnectionString: mongoConnectionString,
   deleteWindow : 5
 };
 

@@ -24,7 +24,10 @@ var _ = require('lodash');
 /*
  * SETUP
  */
-var mongoConnectionString = 'mongodb://localhost/messages_test';
+var mongoConnectionString = 'mongodb://localhost/messages_test'
+if (process.env.MONGO_CONN_STRING != null) {
+  mongoConnectionString = process.env.MONGO_CONN_STRING
+}
 
 var mongoHandler = require('../../lib/handler/mongoHandler')(mongoConnectionString);
 var testDbInstance = require('mongojs')(mongoConnectionString, ['messages']);

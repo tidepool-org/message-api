@@ -2,7 +2,9 @@
 
 Tidepools message API for adding context to diabetes data
 
-## Unreleased
+## 0.5.2 - 2021-05-19
+### Fixed
+- Authorization middleware should inject message content in request
 ### Engineering
 - YLP-756 Bump some dependencies
 - Replace Travis with Jenkins
