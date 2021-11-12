@@ -2,6 +2,10 @@
 
 Tidepools message API for adding context to diabetes data
 
+## 0.5.3 2021-11-12
+### Engineering
+- YLP-1076 Upgrade OS image and npm packages to fix vulnerabilities
+
 ## 0.5.2 - 2021-05-19
 ### Fixed
 - Authorization middleware should inject message content in request
