@@ -2,9 +2,12 @@
 
 Tidepools message API for adding context to diabetes data
 
+## 0.5.4 2021-12-15
+- YLP-1124: Upgrade to node v16 to fix vulnerabilities
+
 ## 0.5.3 2021-11-12
 ### Engineering
-- YLP-1076 Upgrade OS image and npm packages to fix vulnerabilities
+- YLP-1076: Upgrade OS image and npm packages to fix vulnerabilities
 
 ## 0.5.2 - 2021-05-19
 ### Fixed

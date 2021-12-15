@@ -11,13 +11,14 @@ pipeline {
                         env.GIT_COMMIT = "f".multiply(40)
                     }
                     env.RUN_ID = UUID.randomUUID().toString()
+                    env.imageBuild = "docker.ci.diabeloop.eu/node-build:16"
                 }
             }
         }
         stage('Build') {
             agent {
                 docker {
-                    image "docker.ci.diabeloop.eu/node-build:14"
+                    image env.imageBuild
                 }
             }
             steps {
@@ -35,7 +36,7 @@ pipeline {
                 echo 'start mongo to serve as a testing db'
                 sh 'docker network create messageapitest${RUN_ID} && docker run --rm -d --net=messageapitest${RUN_ID} --name=mongo4messageapitest${RUN_ID} mongo:4.2'
                 script {
-                    docker.image("docker.ci.diabeloop.eu/node-build:14").inside("--net=messageapitest${RUN_ID}") {
+                    docker.image(env.imageBuild).inside("--net=messageapitest${RUN_ID}") {
                         withCredentials([string(credentialsId: 'nexus-token', variable: 'NEXUS_TOKEN')]) {
                             sleep 5
                             sh "MONGO_CONN_STRING='mongodb://mongo4messageapitest${RUN_ID}:27017/messageapi_test' npm run test-ci"
