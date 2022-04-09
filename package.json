@@ -21,7 +21,7 @@
     "bunyan": "1.8.14",
     "cookies": "0.8.0",
     "lodash": "4.17.20",
-    "moment": "^2.29.0",
+    "moment": "^2.29.2",
     "mongojs": "3.1.0",
     "request": "2.88.2",
     "restify": "8.5.1",
