@@ -16,6 +16,7 @@
 'use strict';
 
 var salinity = require('salinity');
+const mongodb = require('mongodb-legacy');
 
 var expect = salinity.expect;
 var sinon = salinity.sinon;
@@ -52,7 +53,10 @@ var messageService = require('../../lib/messagesService')(
 );
 
 var supertest = require('supertest')('http://localhost:' + env.httpPort);
-var testDbInstance = require('mongojs')(env.mongoConnectionString, ['messages']);
+const client = new mongodb.MongoClient(env.mongoConnectionString);
+const getDatabaseName = require('amoeba').mongoUtil.getDatabaseName;
+const testDbInstance = client.db(getDatabaseName(env.mongoConnectionString, 'messages_test'));
+const messagesColl = testDbInstance.collection('messages');
 
 var messageUser = { userid: 'message' };
 var noteAndComments = require('../helpers/testMessagesData').noteAndComments;
@@ -60,7 +64,7 @@ var sessionToken = '99406ced-8052-49c5-97ee-547cc3347da6';
 
 describe('message service', function() {
 
-  var fakeRootId = String(testDbInstance.ObjectId());
+  var fakeRootId = String(new mongodb.ObjectId());
 
   function setupToken(user) {
     sinon.stub(userApiClient, 'checkToken').callsArgWith(1, null, user);
@@ -118,22 +122,22 @@ describe('message service', function() {
     /*
      * Refresh data for each test
      */
-    testDbInstance.messages.remove();
+      (async function() {
+      await messagesColl.deleteMany({});
 
-    for (var index = 0; index < noteAndComments.length; ++index) {
-
-      if(index === 0){
-        testDbInstance.messages.save(noteAndComments[index]);
-      }else{
-        noteAndComments[index].parentmessage = fakeRootId;
-        testDbInstance.messages.save(noteAndComments[index]);
+      for (var index = 0; index < noteAndComments.length; ++index) {
+        if (index === 0){
+          await messagesColl.insertOne(noteAndComments[index]);
+        } else {
+          noteAndComments[index].parentmessage = fakeRootId;
+          await messagesColl.insertOne(noteAndComments[index]);
+        }
+        if (index === (noteAndComments.length-1)){
+          sinon.stub(kafkaConsumer, 'start');
+          messageService.start(done);
+        }
       }
-      if (index === (noteAndComments.length-1)){
-        console.log('data loaded, now starting service');
-        sinon.stub(kafkaConsumer, 'start');
-        messageService.start(done);
-      }
-    }
+    })();
   });
 
   after(function () {
@@ -150,9 +154,9 @@ describe('message service', function() {
 
     before(function(done){
       //create a message so we have one
-      testDbInstance.messages.save(noteAndComments[0], {}, function() {
+      messagesColl.insertOne(noteAndComments[0], {}, function() {
         // grab a message that has been saved already
-        testDbInstance.messages.findOne({},function(err, doc) {
+        messagesColl.findOne({},function(err, doc) {
           messageFromMongo = doc;
           done(err);
         });
@@ -494,7 +498,7 @@ describe('message service', function() {
     it('returns 404 when there are no messages', function(done) {
 
       supertest
-      .get('/thread/'+String(testDbInstance.ObjectId()))
+      .get('/thread/'+String(new mongodb.ObjectId()))
       .set('X-Tidepool-Session-Token', sessionToken)
       .expect(404)
       .end(function(err, res) {
@@ -754,7 +758,7 @@ describe('message service', function() {
 
     before(function(done){
       // grab a message that has been saved already
-      testDbInstance.messages.findOne({},function(err, doc) {
+      messagesColl.findOne({},function(err, doc) {
         messageToEdit = String(doc._id);
         done();
       });
@@ -842,7 +846,7 @@ describe('message service', function() {
 
     beforeEach(function(done){
       // grab a message that has been saved already
-      testDbInstance.messages.findOne({},function(err, doc) {
+      messagesColl.findOne({},function(err, doc) {
         messageToRemove = String(doc._id);
         done();
       });

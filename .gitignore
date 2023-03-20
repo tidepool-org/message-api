@@ -20,3 +20,4 @@ config/*
 
 deploy/
 artifact_node.sh
+.DS_Store

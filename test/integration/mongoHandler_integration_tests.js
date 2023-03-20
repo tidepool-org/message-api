@@ -18,6 +18,7 @@
 var salinity = require('salinity');
 var expect = salinity.expect;
 var sundial = require('sundial');
+const mongodb = require('mongodb-legacy');
 
 var _ = require('lodash');
 
@@ -27,7 +28,10 @@ var _ = require('lodash');
 var mongoConnectionString = 'mongodb://localhost/messages_test';
 
 var mongoHandler = require('../../lib/handler/mongoHandler')(mongoConnectionString);
-var testDbInstance = require('mongojs')(mongoConnectionString, ['messages']);
+const client = new mongodb.MongoClient(mongoConnectionString);
+const getDatabaseName = require('amoeba').mongoUtil.getDatabaseName;
+const testDbInstance = client.db(getDatabaseName(mongoConnectionString, 'messages_test'));
+const messagesColl = testDbInstance.collection('messages');
 
 describe('mongo handler', function() {
 
@@ -100,7 +104,7 @@ describe('mongo handler', function() {
 
       mongoHandler.createMessage(messageToSave,function(error,id){
         if(error){
-          done(error);
+          return done(error);
         }
         mongoHandler.getMessage(String(id),function(messageError,foundMessage){
           expect(messageError).to.not.exist;
@@ -255,18 +259,29 @@ describe('mongo handler', function() {
       /*
        * Load multiple messages for testing
        */
-      testDbInstance.messages.remove(function(err) {
+      messagesColl.deleteMany({}, function(err) {
+        if (err) {
+          return done(err);
+        }
         var messages = testMessages();
 
         var pending = messages.length;
         _.forEach(messages, function(message){
-          testDbInstance.messages.save(message,function(err,doc){
-            if(doc.messagetext === 'this is the parentmessage'){
-              idOfParentMessage = String(doc._id);
+          messagesColl.insertOne(message, function(err,result){
+            if (err) {
+              return done(err);
             }
-            if (--pending === 0) {
-              done();
-            }
+            messagesColl.findOne({_id: result.insertedId}, (err, doc) => {
+              if (err) {
+                return done(err);
+              }
+              if(doc.messagetext === 'this is the parentmessage'){
+                idOfParentMessage = String(doc._id);
+              }
+              if (--pending === 0) {
+                done();
+              }
+            });
           });
         });
       });
