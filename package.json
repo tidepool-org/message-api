@@ -1,6 +1,6 @@
 {
   "name": "message-api",
-  "version": "0.9.1-alpha.2",
+  "version": "0.9.1-alpha.3",
   "description": "Tidepool Message API.",
   "main": "lib/index.js",
   "directories": {
@@ -21,7 +21,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "@godaddy/terminus": "^4.6.0",
-    "amoeba": "1.1.1-alpha.2",
+    "amoeba": "1.2.1-alpha.1",
     "bunyan": "1.8.14",
     "cookies": "0.8.0",
     "lodash": "4.17.21",
@@ -30,9 +30,9 @@
     "mongodb-legacy": "^5.0.0",
     "restify": "11.1.0",
     "sundial": "1.7.2-alpha.2",
-    "tidepool-gatekeeper": "0.2.6-alpha.2",
-    "tidepool-seagull-client": "0.1.11-alpha.2",
-    "user-api-client": "0.5.1-alpha.2"
+    "tidepool-gatekeeper": "0.2.6-alpha.3",
+    "tidepool-seagull-client": "0.1.11-alpha.3",
+    "user-api-client": "0.5.1-alpha.3"
   },
   "devDependencies": {
     "async": "3.2.4",
