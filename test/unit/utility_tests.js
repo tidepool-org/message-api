@@ -13,6 +13,8 @@
 // not, you can obtain one from Tidepool Project at tidepool.org.
 // == BSD2 LICENSE ==
 
+// jshint -W030
+
 'use strict';
 
 var salinity = require('salinity');

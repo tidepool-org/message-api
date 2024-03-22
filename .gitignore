@@ -19,5 +19,5 @@ config/*
 *.iml
 
 deploy/
-artifact_node.sh
+artifact_docker.sh
 .DS_Store
