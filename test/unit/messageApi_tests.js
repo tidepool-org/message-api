@@ -1,4 +1,4 @@
-    // == BSD2 LICENSE ==
+// == BSD2 LICENSE ==
 // Copyright (c) 2014, Tidepool Project
 //
 // This program is free software; you can redistribute it and/or modify it under
@@ -12,6 +12,8 @@
 // You should have received a copy of the License along with this program; if
 // not, you can obtain one from Tidepool Project at tidepool.org.
 // == BSD2 LICENSE ==
+
+// jshint -W030
 
 'use strict';
 
@@ -74,9 +76,9 @@ describe('message API', function() {
     server.get('/status',messageApi.status);
 
     server.get('/read/:msgid', messageInjection, messageApi.findById);
-    server.get('/all/:groupid?starttime&endtime', messageApi.findAllById);
+    server.get('/all/:groupid', messageApi.findAllById);
     server.get('/thread/:msgid', messageInjection, messageApi.getThread);
-    server.get('/notes/:groupid?starttime&endtime', messageApi.getNotes);
+    server.get('/notes/:groupid', messageApi.getNotes);
 
     //adding messages
     server.post('/send/:groupid', tokenInjection, messageApi.addThread);

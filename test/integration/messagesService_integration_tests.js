@@ -13,6 +13,8 @@
 // not, you can obtain one from Tidepool Project at tidepool.org.
 // == BSD2 LICENSE ==
 
+// jshint -W030
+
 'use strict';
 
 var salinity = require('salinity');
@@ -23,7 +25,7 @@ var sinon = salinity.sinon;
 var mockableObject = salinity.mockableObject;
 
 var env = {
-  httpPort: 21000,
+  httpPort: 21003,
   mongoConnectionString: 'mongodb://localhost/messages_test',
   deleteWindow : 5
 };
