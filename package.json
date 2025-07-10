@@ -21,7 +21,8 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "@godaddy/terminus": "^4.6.0",
-    "amoeba": "1.2.3",
+    "amoeba": "^1.2.4",
+    "axios": "^1.10.0",
     "bunyan": "1.8.15",
     "cookies": "0.8.0",
     "lodash": "4.17.21",
