@@ -29,7 +29,7 @@
     "mongodb": "^5.0.1",
     "mongodb-legacy": "^5.0.0",
     "restify": "11.1.0",
-    "sundial": "1.7.4",
+    "sundial": "1.7.6-rc.1",
     "tidepool-gatekeeper": "0.2.7",
     "tidepool-seagull-client": "0.1.11",
     "user-api-client": "0.5.2"
